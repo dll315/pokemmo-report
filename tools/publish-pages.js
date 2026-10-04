@@ -30,14 +30,19 @@ function build() {
   main("data");
 }
 
-/* 用独立索引文件打包 dist 内容，分支根就是 dist/ 里的东西，且不碰工作区的索引 */
+/* 用独立索引 + 把 work-tree 指向 dist，分支根目录才是 dist 里的文件本身。
+   少了 GIT_WORK_TREE 的话，git 会按仓库根记路径，推上去变成 dist/index.html，Pages 就 404 */
 function commitDist(ts) {
   const index = path.join(os.tmpdir(), `pages-index-${process.pid}`);
-  const env = { ...process.env, GIT_INDEX_FILE: index };
+  const env = { ...process.env, GIT_INDEX_FILE: index, GIT_WORK_TREE: DIST };
   fs.rmSync(index, { force: true });
   git(["read-tree", "--empty"], { env });
-  execFileSync("git", ["add", "-f", "--", "."], { cwd: DIST, env, stdio: "pipe" });
+  git(["add", "-f", "--", "."], { env });
   const tree = git(["write-tree"], { env });
+  const listing = git(["ls-tree", "-r", "--name-only", tree]);
+  if (!/^index\.html$/m.test(listing) || !/^data\.json$/m.test(listing)) {
+    throw new Error(`分支根目录内容不对（应为 dist 里的文件本身）：\n${listing}`);
+  }
   let parent = "";
   try {
     parent = git(["rev-parse", `origin/${BRANCH}`]);
@@ -48,7 +53,7 @@ function commitDist(ts) {
   if (parent) cmd.push("-p", parent);
   const commit = git(cmd);
   fs.rmSync(index, { force: true });
-  return { commit, tree, parent: parent || "(首次)" };
+  return { commit, tree, parent: parent || "(首次)", files: listing.split("\n").length };
 }
 
 function main() {
