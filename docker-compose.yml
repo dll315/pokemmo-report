@@ -9,7 +9,8 @@ services:
       - "3580:3580"
     environment:
       # 这两个变量优先级高于容器内的 config.json，网页里改不会生效
-      ADMIN_TOKEN: "${ADMIN_TOKEN:?请在 .env 里写 ADMIN_TOKEN，或 export ADMIN_TOKEN=xxx}"
+      ADMIN_USER: "${ADMIN_USER:-admin}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD:-123456}"
       WECOM_WEBHOOK: "${WECOM_WEBHOOK:-}"
       # 前面有 Nginx 反代时设 1，上报限频才按真实访客 IP 算
       TRUST_PROXY: "${TRUST_PROXY:-0}"

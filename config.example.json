@@ -1,5 +1,6 @@
 {
-  "adminToken": "换成你自己的长随机串",
+  "adminUser": "admin",
+  "adminPassword": "123456",
   "publicReport": true,
   "reportRequireApprove": true,
   "wecom": {

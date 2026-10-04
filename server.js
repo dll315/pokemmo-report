@@ -2,7 +2,8 @@
 "use strict";
 /* PokeMMO 报点站：静态站点 + 数据接口 + 上游同步 + 企业微信推送调度，单进程零依赖。
    node server.js [端口] [--host=0.0.0.0] [--no-scheduler]
-   环境变量：ADMIN_TOKEN（管理接口口令，必填才能用 /api/admin/*）、WECOM_WEBHOOK（优先于 data/config.json）、TZ 不影响业务时间 */
+   登录：管理台用账号 + 密码（config 的 adminUser / adminPassword，或环境变量 ADMIN_USER / ADMIN_PASSWORD）
+   WECOM_WEBHOOK 优先于 data/config.json；TZ 不影响业务时间（北京时间按 UTC+8 硬算） */
 
 const http = require("http");
 const fs = require("fs");
@@ -14,6 +15,7 @@ const push = require("./src/push-wecom");
 const local = require("./src/local");
 const refdata = require("./src/refdata");
 const dict = require("./src/dict");
+const auth = require("./src/auth");
 const { fmtBeijing } = require("./src/rules");
 
 const ROOT = __dirname;
@@ -85,13 +87,10 @@ function boardData(query = {}) {
 
 async function handleApi(req, res, url) {
   const cfg = readConfig();
-  const isAdmin = url.pathname.startsWith("/api/admin/");
-  if (isAdmin) {
-    if (!cfg.adminToken) return send(res, 403, { error: "未设置管理口令：请配置 ADMIN_TOKEN 环境变量或 data/config.json 的 adminToken" });
-    /* 只读接口允许 ?token= 方便浏览器/curl 直接取；写操作必须用请求头，避免口令落进访问日志 */
-    const given = req.headers["x-admin-token"] || (req.method === "GET" ? url.searchParams.get("token") || "" : "");
-    if (given !== cfg.adminToken) return send(res, 401, { error: "管理口令不正确" });
-  }
+  const isLoginFlow = url.pathname === "/api/admin/login" || url.pathname === "/api/admin/logout" || url.pathname === "/api/admin/session";
+  const isAdmin = url.pathname.startsWith("/api/admin/") && !isLoginFlow;
+  const session = auth.whoami(req.headers.cookie);
+  if (isAdmin && !session) return send(res, 401, { error: "请先登录管理台", needLogin: true });
 
   /* 只读接口 */
   if (req.method === "GET") {
@@ -112,6 +111,7 @@ async function handleApi(req, res, url) {
     if (url.pathname === "/api/ref/species") return send(res, 200, refdata.speciesDetail(url.searchParams.get("name") || ""));
     if (url.pathname === "/api/ref/location") return send(res, 200, locationInfo(url.searchParams.get("name")));
     if (url.pathname === "/api/config/public") return send(res, 200, { publicReport: cfg.publicReport, reportRequireApprove: cfg.reportRequireApprove, windows: cfg.windows });
+    if (url.pathname === "/api/admin/session") return send(res, 200, { authed: !!session, user: session ? session.user : null, expiresAt: session ? new Date(session.exp).toISOString() : null });
     if (url.pathname === "/api/admin/state") {
       return send(res, 200, { config: masked(cfg), meta: store.db.meta, board: boardData(), reports: local.list(store, { status: "pending", limit: 100 }), queue: store.db.queue || [] });
     }
@@ -125,10 +125,25 @@ async function handleApi(req, res, url) {
   if (req.method !== "POST" && req.method !== "PUT") return send(res, 405, { error: "方法不允许" });
   const payload = await readBody(req);
 
+  /* 登录 / 退出：不需要已有会话 */
+  if (url.pathname === "/api/admin/login") {
+    const ip = clientIp(req);
+    if (auth.tooMany(ip)) return send(res, 429, { error: "登录尝试太多，10 分钟后再试" });
+    const r = auth.login(payload.user, payload.password, cfg);
+    auth.recordAttempt(ip);
+    if (!r.ok) return send(res, 401, r);
+    res.setHeader("Set-Cookie", auth.cookieHeader(auth.CookieName, r.token, Math.floor(auth.TTL_MS / 1000)));
+    return send(res, 200, { ok: true, user: r.user, expiresAt: new Date(Date.now() + auth.TTL_MS).toISOString() });
+  }
+  if (url.pathname === "/api/admin/logout") {
+    auth.logout(req.headers.cookie);
+    res.setHeader("Set-Cookie", auth.cookieHeader(auth.CookieName, "", 0));
+    return send(res, 200, { ok: true });
+  }
+
   /* 玩家上报 */
   if (url.pathname === "/api/report") {
-    const isAdminCaller = !!cfg.adminToken && req.headers["x-admin-token"] === cfg.adminToken;
-    const r = local.create(store, payload, { ip: clientIp(req), admin: isAdminCaller });
+    const r = local.create(store, payload, { ip: clientIp(req), admin: !!session });
     return send(res, r.ok ? 200 : 400, r);
   }
 
@@ -136,8 +151,9 @@ async function handleApi(req, res, url) {
 
   if (url.pathname === "/api/admin/config") {
     const patch = {};
-    if (payload.adminToken === "__clear__") patch.adminToken = "";
-    else if (payload.adminToken) patch.adminToken = String(payload.adminToken).trim();
+    if (typeof payload.adminUser === "string" && payload.adminUser.trim()) patch.adminUser = payload.adminUser.trim().slice(0, 32);
+    if (payload.adminPassword === "__clear__") patch.adminPassword = "";
+    else if (payload.adminPassword) patch.adminPassword = String(payload.adminPassword).slice(0, 64);
     if (typeof payload.publicReport === "boolean") patch.publicReport = payload.publicReport;
     if (typeof payload.reportRequireApprove === "boolean") patch.reportRequireApprove = payload.reportRequireApprove;
 
@@ -152,7 +168,9 @@ async function handleApi(req, res, url) {
     if (payload.windows) patch.windows = payload.windows;
 
     writeConfig(patch);
-    return send(res, 200, { saved: true, config: masked(readConfig()) });
+    /* 改过账号或密码，就让除本次之外的会话全部失效，逼别人手里那份旧 cookie 作废 */
+    if (patch.adminPassword || patch.adminUser) for (const t of [...auth.sessions.keys()]) if (t !== (session && session.token)) auth.sessions.delete(t);
+    return send(res, 200, { saved: true, credentialsChanged: !!(patch.adminPassword || patch.adminUser), config: masked(readConfig()) });
   }
   if (url.pathname === "/api/admin/sync") {
     const r = await sync.syncOnce(store, readConfig(), { log });
@@ -236,6 +254,7 @@ async function tick() {
   try {
     const cfg = readConfig();
     local.sweep();
+    auth.sweep();
     const r = await sync.syncOnce(store, cfg, { log });
     if (r.newEvents.length) {
       push.enqueue(store, r.newEvents);
@@ -257,8 +276,11 @@ server.listen(PORT, HOST, async () => {
   console.log(`  管理台   http://${HOST}:${PORT}/admin`);
   console.log(`  数据库   ${path.join(DATA_DIR, "db.json")}（${store.index.size} 条事件）`);
   if (process.env.WECOM_WEBHOOK) console.log("  推送     webhook 由环境变量注入，网页里改不会生效（环境变量优先）");
-  if (!cfg.adminToken) console.log("  ⚠ 未设置管理口令，/api/admin/* 全部禁用。设 ADMIN_TOKEN 环境变量或网页 data/config.json 的 adminToken");
-  if (HOST !== "127.0.0.1" && HOST !== "localhost" && !cfg.adminToken) console.log("  ⚠ 公网监听且无管理口令，请尽快设置");
+  if (!cfg.adminPassword) console.log("  ⚠ 未设置管理密码，管理台无法登录。在 data/config.json 写 adminPassword 或设环境变量 ADMIN_PASSWORD");
+  else if (require("./src/config").isWeakPassword(cfg.adminPassword))
+    console.log(`  ⚠ 管理密码是弱口令（当前账号 ${cfg.adminUser}）。站点是公网可访问的，建议改成 8 位以上；登录已限频 8 次/10 分钟`);
+  if (HOST !== "127.0.0.1" && HOST !== "localhost" && cfg.adminPassword && require("./src/config").isWeakPassword(cfg.adminPassword))
+    console.log("  ⚠ 公网监听 + 弱密码，任何人猜到就能改你的推送设置；至少把密码换掉再对外");
   if (!TRUST_PROXY && (HOST === "0.0.0.0" || HOST !== "127.0.0.1"))
     console.log("  ⚠ 未设 TRUST_PROXY=1：前面有 Nginx 反代时所有玩家会共用同一个上报限流桶（6 条/10 分钟），配上反代就设这个环境变量");
 

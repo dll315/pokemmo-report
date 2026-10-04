@@ -10,7 +10,8 @@ const os = require("os");
 
 process.env.CONFIG_FILE = path.join(os.tmpdir(), "poke-unittest-" + process.pid + ".json");
 delete process.env.WECOM_WEBHOOK;
-delete process.env.ADMIN_TOKEN;
+delete process.env.ADMIN_USER;
+delete process.env.ADMIN_PASSWORD;
 
 const ROOT = path.resolve(__dirname, "..");
 const UPSTREAM_DIR = path.join(ROOT, "data", "upstream");

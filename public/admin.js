@@ -1,8 +1,7 @@
 "use strict";
-/* 管理台脚本。口令只放 sessionStorage（关标签页即失效），每个请求带 x-admin-token 头。
+/* 管理台脚本。登录态是服务端的 HttpOnly cookie（同域请求自动带上），前端不存任何凭据。
    所有玩家输入用 textContent 写入 DOM，不走 innerHTML。 */
 
-const T = { get: () => sessionStorage.getItem("adminToken") || "", set: (v) => sessionStorage.setItem("adminToken", v) };
 const $ = (s) => document.querySelector(s);
 const el = (tag, attrs = {}, kids = []) => {
   const n = document.createElement(tag);
@@ -26,11 +25,12 @@ function toast(msg) {
 async function api(path, opts = {}) {
   const res = await fetch(path, {
     ...opts,
-    headers: { "Content-Type": "application/json", "x-admin-token": T.get(), ...(opts.headers || {}) },
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json", ...(opts.headers || {}) },
   });
   if (res.status === 401 || res.status === 403) {
     showGate(await res.json().catch(() => ({})));
-    throw new Error("口令失效");
+    throw new Error("登录已失效，请重新登录");
   }
   return res.json();
 }
@@ -111,7 +111,10 @@ function renderConfig(cfg) {
   $("#retention").value = cfg.sync.retentionDays;
   $("#winAlpha").value = cfg.windows.alphaMinutes;
   $("#winSwarm").value = cfg.windows.swarmMinutes;
-  $("#newToken").placeholder = cfg.adminTokenSet ? "已设置，留空不修改" : "未设置！请立刻设定";
+  $("#newUser").value = "";
+  $("#newToken").value = "";
+  $("#newToken").placeholder = cfg.adminPasswordWeak ? "当前密码是弱口令，建议改掉" : "已设置，留空不修改";
+  $("#userHint").textContent = `当前账号 ${cfg.adminUser}${cfg.adminPasswordWeak ? " · 密码是弱口令（登录已限频 8 次/10 分钟，仍建议改）" : ""}`;
 }
 
 function renderLog(meta) {
@@ -180,33 +183,65 @@ function collectConfig() {
   };
   const hook = $("#webhook").value.trim();
   if (hook === "__clear__" || hook) patch.webhook = hook;
-  const nt = $("#newToken").value.trim();
-  if (nt) patch.adminToken = nt;
+  const nu = $("#newUser").value.trim();
+  const np = $("#newToken").value.trim();
+  if (nu) patch.adminUser = nu;
+  if (np) patch.adminPassword = np;
   return patch;
 }
 
 async function saveAll() {
-  const typedToken = $("#newToken").value.trim();
+  const changed = $("#newUser").value.trim() || $("#newToken").value.trim();
   const r = await api("/api/admin/config", { method: "PUT", body: JSON.stringify(collectConfig()) });
   if (r.error) return toast(r.error);
+  $("#newUser").value = "";
   $("#newToken").value = "";
   $("#saveMsg").textContent = "已保存 " + new Date().toLocaleTimeString("zh-CN", { hour12: false });
-  /* 换了口令就切到新口令，否则下一次请求会 401 又被踢回登录页 */
-  if (typedToken) T.set(typedToken);
+  /* 改过账号/密码，服务端已把旧会话作废，必须重新登录一次 */
+  if (r.credentialsChanged || changed) {
+    showGate({ error: "账号或密码已更新，请用新密码重新登录" });
+    toast("凭据已更新，请重新登录");
+    return;
+  }
   await refresh();
 }
 
 /* ---------- 启动 ---------- */
 
+function doLogin() {
+  const user = $("#userInput").value.trim();
+  const password = $("#passInput").value;
+  $("#gateMsg").textContent = "登录中…";
+  fetch("/api/admin/login", {
+    method: "POST",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ user, password }),
+  })
+    .then(async (r) => {
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        $("#gateMsg").textContent = j.error || "登录失败";
+        $("#passInput").value = "";
+        return;
+      }
+      $("#gateMsg").textContent = "";
+      await refresh();
+      toast(`欢迎，${j.user}`);
+    })
+    .catch((e) => {
+      $("#gateMsg").textContent = "登录请求失败：" + e.message;
+    });
+}
+
 function bind() {
-  $("#loginBtn").addEventListener("click", () => {
-    T.set($("#tokenInput").value.trim());
-    refresh().then(() => toast("已进入管理台")).catch(() => {});
-  });
-  $("#tokenInput").addEventListener("keydown", (e) => e.key === "Enter" && $("#loginBtn").click());
-  $("#logoutBtn").addEventListener("click", () => {
-    sessionStorage.removeItem("adminToken");
+  $("#loginBtn").addEventListener("click", doLogin);
+  $("#passInput").addEventListener("keydown", (e) => e.key === "Enter" && doLogin());
+  $("#userInput").addEventListener("keydown", (e) => e.key === "Enter" && $("#passInput").focus());
+  $("#logoutBtn").addEventListener("click", async () => {
+    await fetch("/api/admin/logout", { method: "POST", credentials: "same-origin" }).catch(() => {});
     showGate();
+    toast("已退出登录");
   });
   $("#syncBtn").addEventListener("click", () => act("sync", {}));
   $("#testBtn").addEventListener("click", () => act("test-push", {}));
@@ -216,6 +251,9 @@ function bind() {
   $("#saveBtn").addEventListener("click", saveAll);
 }
 
-if (T.get()) refresh().catch(() => {});
-else showGate();
+/* 先看有没有有效会话（cookie 由浏览器管），有就直接进，没有就摆登录框 */
+fetch("/api/admin/session", { credentials: "same-origin" })
+  .then((r) => r.json())
+  .then((s) => (s.authed ? refresh().catch(() => {}) : showGate()))
+  .catch(() => showGate());
 bind();

@@ -20,15 +20,15 @@
 
 ```bash
 # 需要 Node 16+
-cp config.example.json data/config.json   # 填 adminToken、wecom.webhook
+cp config.example.json data/config.json   # 管理账号 admin、密码 123456，webhook 也填这里
 node server.js 3580 --host=127.0.0.1    # 首次启动会自动回填上游报点
-# 打开 http://127.0.0.1:3580/  管理台 http://127.0.0.1:3580/admin
+# 浏览器打开 http://127.0.0.1:3580/ ；管理台 http://127.0.0.1:3580/admin（admin / 123456）
 ```
 
 没有真实报点时可以先造几条演示数据看界面：
 
 ```bash
-ADMIN_TOKEN=你填的口令 node tools/demo-events.js --url=http://127.0.0.1:3580
+ADMIN_USER=admin ADMIN_PASSWORD=123456 node tools/demo-events.js --url=http://127.0.0.1:3580
 ```
 
 验证推送排版时，建议先用本地假端点，别直接往自己群里发：
@@ -42,7 +42,7 @@ WECOM_WEBHOOK="http://127.0.0.1:3599/send?key=MOCK" node server.js 3580
 
 ```bash
 npm test                                   # 纯逻辑单测 19 项，不联网
-ADMIN_TOKEN=口令 npm run selftest           # 对着跑着的服务打 49 项接口用例
+ADMIN_USER=admin ADMIN_PASSWORD=密码 npm run selftest   # 对着跑着的服务打 53 项接口用例
 node tools/verify-cn-data.js               # 校验宝可梦名/地点名覆盖率
 npm run verify:terms                       # 校验术语表覆盖率
 npm run phrases                            # 重新生成整句表（上游语言包有更新时）
@@ -63,31 +63,51 @@ npm run audit:sources                      # 译名溯源复核：整句表回�
 ### A. 服务器上直接 `docker run`（推荐）
 
 ```bash
-git clone git@github.com:dll315/pokemmo-report.git && cd pokemmo-report
-docker build -t pokemmo-report:1.0 .
-mkdir -p /opt/pokemmo/data
+# 1) 登上服务器
+ssh root@159.198.67.190
 
+# 2) 取代码（私有库；用 HTTPS 就换成 https://github.com/dll315/pokemmo-report.git）
+git clone git@github.com:dll315/pokemmo-report.git /opt/pokemmo-report && cd /opt/pokemmo-report
+
+# 3) 数据目录 + 镜像
+mkdir -p /opt/pokemmo/data
+docker build -t pokemmo-report:1.0 .
+
+# 4) 起容器
 docker run -d --name pokemmo-report --restart unless-stopped \
   -p 3580:3580 \
-  -e ADMIN_TOKEN="$(openssl rand -hex 16)" \
-  -e WECOM_WEBHOOK="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=你的key" \
+  -e ADMIN_USER=admin \
+  -e ADMIN_PASSWORD=123456 \
+  -e WECOM_WEBHOOK="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=你的机器人key" \
   -e TZ=Asia/Shanghai \
   -v /opt/pokemmo/data:/app/data \
   --memory 256m pokemmo-report:1.0
 
-docker logs -f pokemmo-report     # 首启回填 48 小时报点，约 15~25 秒
+# 5) 放行本机防火墙（Ubuntu 用 ufw allow 3580/tcp）
+firewall-cmd --permanent --add-port=3580/tcp && firewall-cmd --reload
+
+docker logs -f pokemmo-report        # 首启回填 48 小时报点，约 15~25 秒
 ```
 
-- 不带 `ADMIN_TOKEN` 的话管理接口全部 403（安全默认）；不带 `WECOM_WEBHOOK` 就只更新看板不推送。
-- `-v` 必须给，否则删容器就丢玩家上报与同步游标；备份就只有 `db.json` 一个文件。
-- 云主机要在**安全组**放行 TCP 3580。用 35xx 这类非标端口是为了避开国内 80/443 的备案检查。
-- 有 `docker compose` 的话更省事：`cp .env.example .env` 填好后 `docker compose up -d --build`。
+打开这两个地址：
+
+| | |
+|---|---|
+| 看板 | `http://159.198.67.190:3580/` |
+| 管理台 | `http://159.198.67.190:3580/admin` → 账号 `admin`，密码 `123456` |
+
+还要在**云厂商控制台的安全组**放行 TCP 3580，只开本机防火墙不够。
+
+- 密码就是 `123456`（按你的要求）；启动日志会提醒一句"弱口令"，不影响使用。想改：登录后在「站点设置 → 修改密码」，改完要重新登录；或者直接改下面 `.env` 里的 `ADMIN_PASSWORD` 再重建容器。
+- 不带 `WECOM_WEBHOOK` 就只更新网页不推送；填了就以它为准，网页里改 webhook 不会生效。
+- `-v` 一定要给：玩家上报、审核记录、同步游标都在 `/opt/pokemmo/data/db.json`，备份也就拷这一个文件。
+- 有 compose 更省事：`cp .env.example .env`（填三个值）→ `docker compose up -d --build`。
 
 ### B. 不装 Docker：纯 Node + systemd
 
 ```bash
-cp .env.example .env      # 或用 Environment= 写进 unit 文件
-node server.js 3580       # 生产用 systemd 托管，见 DEPLOY.md 第 6 节
+cd /opt/pokemmo-report && cp .env.example .env && vi .env
+node server.js 3580 --host=0.0.0.0     # 生产用 systemd 托管，见 DEPLOY.md 第 6 节
 ```
 
 ### C. GitHub Pages 托管（静态快照，无上报/审核）

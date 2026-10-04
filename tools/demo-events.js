@@ -1,11 +1,13 @@
 #!/usr/bin/env node
 "use strict";
 /* 造几条演示点位，方便在没有真实报点的时段预览界面（也会触发一次推送）。
-   需要管理口令：ADMIN_TOKEN=demo-password node tools/demo-events.js [--url=http://127.0.0.1:3999]
+   需要管理台账号：ADMIN_USER=admin ADMIN_PASSWORD=123456 node tools/demo-events.js [--url=…]
    注意：这些点位的来源会标成"玩家上报"，上线后请当作测试数据看待，或直接等 prune 清掉。 */
 
 const BASE = (process.argv.find((a) => a.startsWith("--url=")) || "--url=http://127.0.0.1:3580").split("=")[1];
-const TOKEN = process.env.ADMIN_TOKEN || "";
+const USER = process.env.ADMIN_USER || "admin";
+const PASS = process.env.ADMIN_PASSWORD || "123456";
+let cookie = "";
 
 const SAMPLES = [
   { kind: "alpha", pokemon: "Breloom", location: "Route 119", region: "Hoenn", reporter: "演示数据", note: "入口附近草丛，需要怪力" },
@@ -15,16 +17,19 @@ const SAMPLES = [
 
 async function post(path, body, admin = false) {
   const headers = { "Content-Type": "application/json" };
-  if (admin) headers["x-admin-token"] = TOKEN;
+  if (admin && cookie) headers.Cookie = cookie;
   const r = await fetch(BASE + path, { method: "POST", headers, body: JSON.stringify(body) });
   return r.json();
 }
 
 (async () => {
-  if (!TOKEN) {
-    console.error("缺少 ADMIN_TOKEN 环境变量");
+  const lg = await fetch(BASE + "/api/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ user: USER, password: PASS }) });
+  if (!lg.ok) {
+    console.error("登录失败（" + lg.status + "）：" + (await lg.text()));
+    console.error("确认服务端的管理账号密码，用 ADMIN_USER / ADMIN_PASSWORD 传给本脚本");
     process.exit(1);
   }
+  cookie = (lg.headers.get("set-cookie") || "").split(";")[0];
   const ids = [];
   for (const s of SAMPLES) {
     const r = await post("/api/report", s);

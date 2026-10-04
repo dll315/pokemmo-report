@@ -25,8 +25,7 @@ git clone <你的仓库地址> pokemmo-report
 cd pokemmo-report
 
 cp .env.example .env
-# 至少要填 ADMIN_TOKEN；口令可以这样生成： openssl rand -hex 16
-vi .env
+vi .env        # 三个值：ADMIN_USER / ADMIN_PASSWORD / WECOM_WEBHOOK
 ```
 
 `.env` 已在 `.gitignore` 里，不会被提交。`TRUST_PROXY` 只在前面挂了 Nginx 反代时才设 1。
@@ -40,7 +39,7 @@ docker compose up -d --build
 docker compose logs -f      # 首次启动会回填 48 小时报点，看到"同步 每 2 分钟一次"就算好了
 ```
 
-访问 `http://服务器IP:3580/`，管理台 `http://服务器IP:3580/admin`（粘 `ADMIN_TOKEN`）。
+访问 **`http://159.198.67.190:3580/`**，管理台 **`http://159.198.67.190:3580/admin`**（账号 `admin` / 密码 `123456`，就是你 .env 里那两个值）。
 
 ### 2b. 不用 compose，直接 `docker run`
 
@@ -58,7 +57,8 @@ docker run -d \
   --name pokemmo-report \
   --restart unless-stopped \
   -p 3580:3580 \
-  -e ADMIN_TOKEN='你的长随机口令' \
+  -e ADMIN_USER=admin \
+  -e ADMIN_PASSWORD=123456 \
   -e WECOM_WEBHOOK='https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxx' \
   -e TZ=Asia/Shanghai \
   -v /opt/pokemmo/data:/app/data \
@@ -71,7 +71,7 @@ docker run -d \
 | 参数 | 作用 | 不给会怎样 |
 |---|---|---|
 | `-p 3580:3580` | 宿主机端口映射 | 外面访问不到。换端口就改冒号左边，如 `-p 8080:3580` |
-| `-e ADMIN_TOKEN` | 管理台与 `/api/admin/*` 的口令 | **所有管理接口直接 403 不可用**（安全默认，不是坏了） |
+| `-e ADMIN_USER` / `-e ADMIN_PASSWORD` | 管理台登录账号与密码 | 不设就用默认 `admin` / `123456`；密码留空的语义是**禁止登录**（管理接口全部 401） |
 | `-e WECOM_WEBHOOK` | 企业微信机器人地址 | 只更新看板，不推送；也可以在管理台网页里填 |
 | `-e TZ` | 容器时区 | 不影响业务时间（代码按 UTC+8 硬算北京时间），只影响日志可读性 |
 | `-v /opt/pokemmo/data:/app/data` | 数据落地 | 容器一删，玩家上报和同步游标全没 |
@@ -83,7 +83,7 @@ docker run -d \
 ```bash
 docker logs -f pokemmo-report                # 看同步与推送日志（第一次要等 15~25 秒回填）
 docker inspect -f '{{.State.Health.Status}}' pokemmo-report   # healthcheck: healthy / unhealthy
-docker exec -it pokemmo-report node tools/selftest.js --url=http://127.0.0.1:3580   # 自检 49 项
+docker exec -e ADMIN_USER=admin -e ADMIN_PASSWORD=123456 pokemmo-report node tools/selftest.js   # 自检 53 项
 docker stop pokemmo-report && docker rm pokemmo-report        # 停止并删除（数据在宿主机，不会丢）
 ```
 
@@ -94,7 +94,7 @@ git pull
 docker build -t pokemmo-report:1.1 .
 docker stop pokemmo-report && docker rm pokemmo-report
 docker run -d --name pokemmo-report --restart unless-stopped -p 3580:3580 \
-  -e ADMIN_TOKEN='同样的口令' -e WECOM_WEBHOOK='同样的地址' -e TZ=Asia/Shanghai \
+  -e ADMIN_USER='同样的账号' -e ADMIN_PASSWORD='同样的密码' -e WECOM_WEBHOOK='同样的地址' -e TZ=Asia/Shanghai \
   -v /opt/pokemmo/data:/app/data --memory 256m pokemmo-report:1.1
 docker image prune -f          # 清掉旧镜像
 ```
@@ -154,7 +154,7 @@ server {
 ```bash
 yum install -y nodejs || apt install -y nodejs        # 需要 Node 16+
 useradd -r -s /sbin/nologin poke
-cp config.example.json data/config.json && vim data/config.json  # 填 adminToken 与 webhook
+cp config.example.json data/config.json && vim data/config.json  # 填 adminUser / adminPassword 与 webhook
 mkdir -p /etc/systemd/system && cat > /etc/systemd/system/poke.service <<'EOF'
 [Unit]
 Description=PokeMMO 报点站
@@ -163,7 +163,8 @@ After=network.target
 [Service]
 WorkingDirectory=/opt/pokemmo-report
 Environment=HOST=0.0.0.0
-Environment=ADMIN_TOKEN=你的口令
+Environment=ADMIN_USER=admin
+Environment=ADMIN_PASSWORD=123456
 Environment=WECOM_WEBHOOK=你的机器人地址
 ExecStart=/usr/bin/node server.js 3580
 Restart=always

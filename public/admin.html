@@ -56,10 +56,11 @@
 
     <div id="gate" class="wrap" hidden>
       <div class="gate">
-        <h2>管理口令</h2>
-        <p class="hint">口令在服务端的 <code>data/config.json</code> 或环境变量 <code>ADMIN_TOKEN</code> 里设置。</p>
-        <input id="tokenInput" type="password" placeholder="粘贴管理口令" autocomplete="off" />
-        <button class="act" id="loginBtn" type="button">进入管理台</button>
+        <h2>管理台登录</h2>
+        <p class="hint">默认账号 <code>admin</code>、密码 <code>123456</code>；可在下方「站点设置」里改，或服务端 <code>data/config.json</code> / 环境变量 <code>ADMIN_USER</code>、<code>ADMIN_PASSWORD</code> 改。</p>
+        <input id="userInput" type="text" placeholder="账号" autocomplete="username" value="admin" />
+        <input id="passInput" type="password" placeholder="密码" autocomplete="current-password" />
+        <button class="act" id="loginBtn" type="button">登录</button>
         <p class="hint" id="gateMsg"></p>
       </div>
     </div>
@@ -135,8 +136,10 @@
           <label>保留天数<input id="retention" type="number" min="1" max="60" /></label>
           <label>Alpha 有效期（分钟）<input id="winAlpha" type="number" min="5" max="600" /></label>
           <label>群蜂有效期（分钟）<input id="winSwarm" type="number" min="5" max="120" /></label>
-          <label>修改管理口令<input id="newToken" type="password" placeholder="留空则不修改" autocomplete="new-password" /></label>
+          <label>修改账号<input id="newUser" type="text" placeholder="留空则不修改" autocomplete="off" /></label>
+          <label>修改密码<input id="newToken" type="password" placeholder="留空则不修改" autocomplete="new-password" /></label>
         </div>
+        <p class="hint" id="userHint"></p>
         <div class="row">
           <button class="act ok" id="saveBtn" type="button">保存全部设置</button>
           <span class="hint" id="saveMsg"></span>

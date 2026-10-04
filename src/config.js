@@ -7,7 +7,8 @@ const fs = require("fs");
 const path = require("path");
 
 const DEFAULTS = {
-  adminToken: "",
+  adminUser: "admin",
+  adminPassword: "123456",
   publicReport: true,
   reportRequireApprove: true,
   wecom: {
@@ -47,9 +48,14 @@ function readConfig() {
   }
   const cfg = deepMerge(DEFAULTS, disk);
   if (process.env.WECOM_WEBHOOK) cfg.wecom.webhook = process.env.WECOM_WEBHOOK;
-  if (process.env.ADMIN_TOKEN) cfg.adminToken = process.env.ADMIN_TOKEN;
+  if (process.env.ADMIN_USER) cfg.adminUser = process.env.ADMIN_USER;
+  if (process.env.ADMIN_PASSWORD) cfg.adminPassword = process.env.ADMIN_PASSWORD;
   return cfg;
 }
+
+/* 弱口令表只用来提醒，不拦着人用（站主自己选的密码，我们让他知道风险） */
+const WEAK = new Set(["", "123456", "123456789", "admin", "admin123", "888888", "666666", "password", "qwerty", "abc123"]);
+const isWeakPassword = (p) => WEAK.has(String(p || "").toLowerCase());
 
 function writeConfig(patch) {
   const disk = (() => {
@@ -69,9 +75,10 @@ function masked(cfg) {
   return {
     ...cfg,
     wecom: { ...cfg.wecom, webhook: "", webhookSet: !!cfg.wecom.webhook, webhookHint: key ? `…${key.slice(-6)}` : "" },
-    adminToken: cfg.adminToken ? "••••" : "",
-    adminTokenSet: !!cfg.adminToken,
+    adminPassword: cfg.adminPassword ? "••••••" : "",
+    adminPasswordSet: !!cfg.adminPassword,
+    adminPasswordWeak: isWeakPassword(cfg.adminPassword),
   };
 }
 
-module.exports = { FILE, DEFAULTS, readConfig, writeConfig, masked };
+module.exports = { FILE, DEFAULTS, readConfig, writeConfig, masked, isWeakPassword };

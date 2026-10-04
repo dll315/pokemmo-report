@@ -2,12 +2,14 @@
 "use strict";
 /* 接口冒烟测试：对着一个正在跑的实例打一遍所有路由与关键分支，退出码非 0 就有问题。
    用法：先起服务，再
-     ADMIN_TOKEN=你的口令 node tools/selftest.js --url=http://127.0.0.1:3580
+     ADMIN_USER=admin ADMIN_PASSWORD=123456 node tools/selftest.js --url=http://127.0.0.1:3580
    只读为主，会产生的副作用：提交并驳回一条测试上报、（配了 webhook 时）发一条测试推送。 */
 
 const BASE = (process.argv.find((a) => a.startsWith("--url=")) || "--url=http://127.0.0.1:3580").split("=")[1];
-const TOKEN = process.env.ADMIN_TOKEN || "";
+const USER = process.env.ADMIN_USER || "admin";
+const PASS = process.env.ADMIN_PASSWORD || "123456";
 
+let cookie = "";
 let pass = 0;
 const fails = [];
 function check(name, cond, detail = "") {
@@ -16,18 +18,37 @@ function check(name, cond, detail = "") {
 }
 
 async function hit(path, opts = {}) {
+  const rest = { ...opts };
+  delete rest.admin;
+  delete rest.anon;
   const headers = { "Content-Type": "application/json", ...(opts.headers || {}) };
-  if (opts.admin) headers["x-admin-token"] = TOKEN;
-  const r = await fetch(BASE + path, { ...opts, headers });
+  if (!opts.anon && cookie) headers.Cookie = cookie;
+  const r = await fetch(BASE + path, { ...rest, headers });
+  const sc = r.headers.get("set-cookie");
+  if (sc) cookie = sc.split(";")[0];
   const text = await r.text();
   let json = null;
   try { json = JSON.parse(text); } catch (e) { /* 保留原文 */ }
   return { status: r.status, json, text };
 }
 
+/* 登录类请求单独走，免得好密码那次把 cookie 冲掉 */
+async function rawPost(path, body) {
+  const r = await fetch(BASE + path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  return { status: r.status, json: await r.json().catch(() => null), sc: r.headers.get("set-cookie") || "" };
+}
+
 (async () => {
   console.log(`目标 ${BASE}`);
-  if (!TOKEN) console.log("⚠ 未设 ADMIN_TOKEN，管理端用例会被跳过或失败");
+
+  /* ---------- 管理台登录 ---------- */
+  const bad = await rawPost("/api/admin/login", { user: USER, password: "绝不对的密码" });
+  check("错误密码被拒（401）", bad.status === 401, `${bad.status} ${JSON.stringify(bad.json)}`);
+  check("错误密码不发会话 cookie", !/admin_session=/.test(bad.sc), bad.sc);
+  const good = await rawPost("/api/admin/login", { user: USER, password: PASS });
+  if (good.status === 200) cookie = good.sc.split(";")[0];
+  check(`用 ${USER}/${PASS === "123456" ? "123456" : "***"} 登录成功`, good.status === 200 && !!cookie, `${good.status} ${JSON.stringify(good.json)}`);
+  if (good.status !== 200) console.log(`⚠ 登录不上（${JSON.stringify(good.json)}），管理端用例会被跳过`);
 
   /* ---------- 公开接口 ---------- */
   const board = await hit("/api/board");
@@ -56,7 +77,7 @@ async function hit(path, opts = {}) {
   check("ref/location 命中", loc.status === 200 && Array.isArray(loc.json?.detail?.alpha), JSON.stringify(loc.json || {}).slice(0, 80));
 
   const cfgPub = await hit("/api/config/public");
-  check("config/public 不含密钥", cfgPub.status === 200 && !("wecom" in (cfgPub.json || {})) && !("adminToken" in (cfgPub.json || {})), JSON.stringify(cfgPub.json));
+  check("config/public 不含凭据", cfgPub.status === 200 && !("wecom" in (cfgPub.json || {})) && !("adminPassword" in (cfgPub.json || {})), JSON.stringify(cfgPub.json));
   check("config/public 带有效期窗口", cfgPub.json?.windows?.alphaMinutes > 0 && cfgPub.json?.windows?.swarmMinutes > 0, JSON.stringify(cfgPub.json?.windows));
 
   /* 需求索引与中文术语 */
@@ -71,7 +92,7 @@ async function hit(path, opts = {}) {
   const home = await hit("/");
   check("首页 200", home.status === 200 && home.text.includes("<title>"));
   const adminHtml = await hit("/admin");
-  check("管理台 HTML 200", adminHtml.status === 200 && adminHtml.text.includes("管理口令"));
+  check("管理台 HTML 200", adminHtml.status === 200 && adminHtml.text.includes("管理台登录"));
   const trav = await hit("/../config.json");
   check("目录穿越被挡", trav.status !== 200, trav.status);
   const leak = await hit("/config.json");
@@ -92,27 +113,28 @@ async function hit(path, opts = {}) {
     ["空体", {}, /类型|不存在/],
   ];
   for (const [name, body, re] of cases) {
-    const r = await hit("/api/report", { method: "POST", body: JSON.stringify(body), headers: TOKEN ? { "x-admin-token": TOKEN } : {} });
+    const r = await hit("/api/report", { method: "POST", body: JSON.stringify(body) });
     check(`上报被拒：${name}`, r.status === 400 && re.test(r.json?.error || ""), `${r.status} ${JSON.stringify(r.json)}`);
   }
 
-  const ok = await hit("/api/report", { method: "POST", headers: TOKEN ? { "x-admin-token": TOKEN } : {}, body: JSON.stringify({ kind: "alpha", pokemon: "crobat", location: "route 123", region: "Kanto", reporter: "<script>bad</script>", note: "自检数据" }) });
+  const ok = await hit("/api/report", { method: "POST", body: JSON.stringify({ kind: "alpha", pokemon: "crobat", location: "route 123", region: "Kanto", reporter: "<script>bad</script>", note: "自检数据" }) });
   check("合法上报进入待审核", ok.json?.ok === true && ok.json?.status === "pending", JSON.stringify(ok.json));
 
-  const dup = await hit("/api/report", { method: "POST", headers: TOKEN ? { "x-admin-token": TOKEN } : {}, body: JSON.stringify({ kind: "alpha", pokemon: "Crobat", location: "Route 123" }) });
+  const dup = await hit("/api/report", { method: "POST", body: JSON.stringify({ kind: "alpha", pokemon: "Crobat", location: "Route 123" }) });
   check("重复上报被合并拒绝", dup.status === 400 && /已经有玩家报/.test(dup.json?.error || ""), JSON.stringify(dup.json));
 
   /* ---------- 管理端鉴权 ---------- */
-  const noToken = await hit("/api/admin/state");
-  check("无口令的管理接口被拒", [401, 403].includes(noToken.status), noToken.status);
-  const wrong = await hit("/api/admin/state", { headers: { "x-admin-token": "definitely-wrong" } });
-  check("错口令被拒", wrong.status === 401, wrong.status);
+  const anon = await hit("/api/admin/state", { anon: true });
+  check("未登录访问管理接口被拒", [401, 403].includes(anon.status), anon.status);
+  const forged = await hit("/api/admin/state", { anon: true, headers: { Cookie: "admin_session=" + "f".repeat(48) } });
+  check("伪造会话 cookie 被拒", forged.status === 401, forged.status);
 
-  if (TOKEN) {
+  if (cookie) {
     const state = await hit("/api/admin/state", { admin: true });
     check("admin/state 200", state.status === 200 && !!state.json?.config && !!state.json?.board, state.status);
     check("admin/state 不回显 webhook 明文", !JSON.stringify(state.json?.config || {}).includes("qyapi") && !String(state.json?.config?.wecom?.webhook || "").length);
-    check("admin/state 不回显管理口令", (state.json?.config?.adminToken || "") === "" || state.json.config.adminToken === "••••", state.json?.config?.adminToken);
+    check("admin/state 不回显管理密码", String(state.json?.config?.adminPassword || "").replace(/•/g, "") === "", state.json?.config?.adminPassword);
+    check("admin/state 标出弱口令", state.json?.config?.adminPasswordWeak === true, String(state.json?.config?.adminPasswordWeak));
 
     const pend = (state.json?.reports?.rows || []).find((r) => r.note === "自检数据");
     if (pend) {
