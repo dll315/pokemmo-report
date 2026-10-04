@@ -16,6 +16,29 @@
 ---
 
 ## A. 自建服务器（Docker 单容器）
+### 0. 服务器拿不到代码时（私有仓库没配 key）
+
+`git clone` 需要服务器上有你 GitHub 的授权；没配就会 clone 失败、`cd` 落空，
+接着 `docker build` 报 `open Dockerfile: no such file or directory`。
+**最快办法是在自己电脑上打包传上去**（无需服务器能访问 GitHub）：
+
+```bash
+# 在你电脑上（Git Bash）
+cd /g/QoderCNworks/pokemmo-spawns
+git archive --format=tar.gz -o /g/QoderCNworks/pokemmo-report.tar.gz HEAD
+scp /g/QoderCNworks/pokemmo-report.tar.gz root@159.198.67.190:/root/
+
+# 在服务器上
+mkdir -p /opt/pokemmo-report
+tar xzf /root/pokemmo-report.tar.gz -C /opt/pokemmo-report
+ls /opt/pokemmo-report/Dockerfile        # 看到路径打印出来才算成功
+```
+
+要走 git 的话二选一：`ssh-keygen -t ed25519` 后把 `/root/.ssh/id_ed25519.pub` 加到
+GitHub → Settings → SSH Keys，再 `git clone git@github.com:dll315/pokemmo-report.git`；
+或者用 HTTPS + 只读令牌 `git clone https://<TOKEN>@github.com/dll315/pokemmo-report.git`
+（令牌会进 shell 历史，用完记得去 GitHub 撤销）。
+
 
 ### 1. 准备
 
