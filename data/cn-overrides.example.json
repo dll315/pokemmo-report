@@ -1,0 +1,14 @@
+{
+  "_说明": "把本文件改名为 cn-overrides.json 放在 data/ 下，即可覆盖译名；改完在管理台点「重载词表」生效。不确定的名字宁可留空回落英文，别改出不存在的官方译名。",
+  "species": {
+    "Nidoran♂": "尼多朗"
+  },
+  "locations": {
+    "Giant Chasm": "巨大之洼",
+    "Tanoby Ruins": "蔓藤废墟",
+    "Guidance Chamber": "引导之间"
+  },
+  "regions": {
+    "Unova": "合众地区"
+  }
+}

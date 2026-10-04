@@ -1,0 +1,18 @@
+{
+  "adminToken": "换成你自己的长随机串",
+  "publicReport": true,
+  "reportRequireApprove": true,
+  "wecom": {
+    "webhook": "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "enabled": true,
+    "kinds": ["alpha", "swarm"],
+    "onlyPokemon": [],
+    "exceptPokemon": [],
+    "regions": [],
+    "minTier": 0,
+    "maxPerTick": 4,
+    "quietHours": { "enabled": false, "from": "01:00", "to": "07:00" }
+  },
+  "sync": { "intervalMinutes": 2, "backfillHours": 48, "retentionDays": 7 },
+  "windows": { "alphaMinutes": 75, "swarmMinutes": 25 }
+}

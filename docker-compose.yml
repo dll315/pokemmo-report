@@ -1,0 +1,24 @@
+services:
+  report:
+    build: .
+    image: pokemmo-report:latest
+    container_name: pokemmo-report
+    restart: unless-stopped
+    ports:
+      # 非 80/443：国内云厂商对备案的检查通常落在 80/443，直连端口最省事
+      - "3580:3580"
+    environment:
+      # 这两个变量优先级高于容器内的 config.json，网页里改不会生效
+      ADMIN_TOKEN: "${ADMIN_TOKEN:?请在 .env 里写 ADMIN_TOKEN，或 export ADMIN_TOKEN=xxx}"
+      WECOM_WEBHOOK: "${WECOM_WEBHOOK:-}"
+      # 前面有 Nginx 反代时设 1，上报限频才按真实访客 IP 算
+      TRUST_PROXY: "${TRUST_PROXY:-0}"
+      TZ: Asia/Shanghai
+    volumes:
+      # db.json 和静态参考表落在宿主机，重建镜像不丢历史
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:3580/api/board"]
+      interval: 90s
+      timeout: 15s
+      start_period: 120s

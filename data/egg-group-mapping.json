@@ -1,0 +1,347 @@
+{
+  "generatedAt": "2026-10-04T11:06:01.301Z",
+  "method": "包含率 = 上游该标签的宝可梦中属于该官方蛋组的比例；中文名取 PokeAPI zh-hans",
+  "rows": [
+    {
+      "upstream": "Bug",
+      "official": "bug",
+      "cn": "虫",
+      "containment": 1,
+      "overlap": "25/25",
+      "runnerUp": "plant(0.08)",
+      "verdict": "可采信",
+      "samples": [
+        "pinsir",
+        "ariados",
+        "venomoth",
+        "ledian",
+        "forretress",
+        "gligar",
+        "parasect",
+        "butterfree"
+      ]
+    },
+    {
+      "upstream": "Cannot Breed",
+      "official": "no-eggs",
+      "cn": "未发现",
+      "containment": 0.95,
+      "overlap": "19/20",
+      "runnerUp": "bug(0)",
+      "verdict": "可采信",
+      "samples": [
+        "articuno",
+        "azurill",
+        "bonsly",
+        "budew",
+        "chingling",
+        "cleffa",
+        "elekid",
+        "happiny"
+      ]
+    },
+    {
+      "upstream": "Chaos",
+      "official": "indeterminate",
+      "cn": "不定形",
+      "containment": 1,
+      "overlap": "24/24",
+      "runnerUp": "humanshape(0.167)",
+      "verdict": "可采信",
+      "samples": [
+        "banette",
+        "gardevoir",
+        "gallade",
+        "chandelure",
+        "chimecho",
+        "drifblim",
+        "drifloon",
+        "dusclops"
+      ]
+    },
+    {
+      "upstream": "Ditto",
+      "official": "ditto",
+      "cn": "百变怪",
+      "containment": 1,
+      "overlap": "1/1",
+      "runnerUp": "bug(0)",
+      "verdict": "可采信",
+      "samples": [
+        "ditto"
+      ]
+    },
+    {
+      "upstream": "Dragon",
+      "official": "dragon",
+      "cn": "龙",
+      "containment": 1,
+      "overlap": "30/30",
+      "runnerUp": "monster(0.3)",
+      "verdict": "可采信",
+      "samples": [
+        "altaria",
+        "salamence",
+        "shelgon",
+        "seviper",
+        "milotic",
+        "dragonite",
+        "kingdra",
+        "arbok"
+      ]
+    },
+    {
+      "upstream": "Fairy",
+      "official": "fairy",
+      "cn": "妖精",
+      "containment": 1,
+      "overlap": "25/25",
+      "runnerUp": "plant(0.24)",
+      "verdict": "可采信",
+      "samples": [
+        "breloom",
+        "minun",
+        "plusle",
+        "wigglytuff",
+        "roserade",
+        "azumarill",
+        "granbull",
+        "clefable"
+      ]
+    },
+    {
+      "upstream": "Field",
+      "official": "ground",
+      "cn": "陆上",
+      "containment": 0.967,
+      "overlap": "116/120",
+      "runnerUp": "water1(0.1)",
+      "verdict": "可采信",
+      "samples": [
+        "exploud",
+        "spinda",
+        "ninetales",
+        "linoone",
+        "mightyena",
+        "sandslash",
+        "seviper",
+        "walrein"
+      ]
+    },
+    {
+      "upstream": "Flying",
+      "official": "flying",
+      "cn": "飞行",
+      "containment": 1,
+      "overlap": "30/30",
+      "runnerUp": "dragon(0.067)",
+      "verdict": "可采信",
+      "samples": [
+        "altaria",
+        "crobat",
+        "pelipper",
+        "xatu",
+        "pidgeotto",
+        "noctowl",
+        "murkrow",
+        "golbat"
+      ]
+    },
+    {
+      "upstream": "Genderless",
+      "official": "mineral",
+      "cn": "矿物",
+      "containment": 1,
+      "overlap": "4/4",
+      "runnerUp": "bug(0)",
+      "verdict": "可采信",
+      "samples": [
+        "magneton",
+        "magnezone",
+        "bronzong",
+        "bronzor"
+      ]
+    },
+    {
+      "upstream": "Humanoid",
+      "official": "humanshape",
+      "cn": "人型",
+      "containment": 0.955,
+      "overlap": "21/22",
+      "runnerUp": "ground(0.273)",
+      "verdict": "可采信",
+      "samples": [
+        "sableye",
+        "spinda",
+        "gardevoir",
+        "magmortar",
+        "electivire",
+        "hypno",
+        "jynx",
+        "magmar"
+      ]
+    },
+    {
+      "upstream": "Mineral",
+      "official": "mineral",
+      "cn": "矿物",
+      "containment": 1,
+      "overlap": "22/22",
+      "runnerUp": "fairy(0.136)",
+      "verdict": "可采信",
+      "samples": [
+        "golem",
+        "sudowoodo",
+        "graveler",
+        "voltorb",
+        "electrode",
+        "bronzong",
+        "bronzor",
+        "cryogonal"
+      ]
+    },
+    {
+      "upstream": "Monster",
+      "official": "monster",
+      "cn": "怪兽",
+      "containment": 0.925,
+      "overlap": "49/53",
+      "runnerUp": "ground(0.208)",
+      "verdict": "可采信",
+      "samples": [
+        "exploud",
+        "lairon",
+        "tropius",
+        "loudred",
+        "aggron",
+        "lapras",
+        "rhyperior",
+        "nidoqueen"
+      ]
+    },
+    {
+      "upstream": "Plant",
+      "official": "plant",
+      "cn": "植物",
+      "containment": 1,
+      "overlap": "23/23",
+      "runnerUp": "fairy(0.261)",
+      "verdict": "可采信",
+      "samples": [
+        "breloom",
+        "roserade",
+        "tropius",
+        "sunflora",
+        "victreebel",
+        "parasect",
+        "weepinbell",
+        "roselia"
+      ]
+    },
+    {
+      "upstream": "Water A",
+      "official": "water1",
+      "cn": "水中1",
+      "containment": 1,
+      "overlap": "21/21",
+      "runnerUp": "ground(0.333)",
+      "verdict": "可采信",
+      "samples": [
+        "crawdaunt",
+        "pelipper",
+        "milotic",
+        "azumarill",
+        "walrein",
+        "corsola",
+        "golduck",
+        "sealeo"
+      ]
+    },
+    {
+      "upstream": "Water B",
+      "official": "water2",
+      "cn": "水中2",
+      "containment": 1,
+      "overlap": "2/2",
+      "runnerUp": "bug(0)",
+      "verdict": "可采信",
+      "samples": [
+        "sharpedo",
+        "qwilfish"
+      ]
+    },
+    {
+      "upstream": "Water C",
+      "official": "water3",
+      "cn": "水中3",
+      "containment": 1,
+      "overlap": "8/8",
+      "runnerUp": "water1(0.5)",
+      "verdict": "可采信",
+      "samples": [
+        "crawdaunt",
+        "corsola",
+        "tentacruel",
+        "kingler",
+        "cloyster",
+        "drapion",
+        "tirtouga",
+        "carracosta"
+      ]
+    },
+    {
+      "upstream": "Watera",
+      "official": "water1",
+      "cn": "水中1",
+      "containment": 1,
+      "overlap": "43/43",
+      "runnerUp": "ground(0.279)",
+      "verdict": "可采信",
+      "samples": [
+        "azumarill",
+        "blastoise",
+        "buizel",
+        "corphish",
+        "corsola",
+        "crawdaunt",
+        "delibird",
+        "dewgong"
+      ]
+    },
+    {
+      "upstream": "Waterb",
+      "official": "water2",
+      "cn": "水中2",
+      "containment": 1,
+      "overlap": "5/5",
+      "runnerUp": "dragon(0.4)",
+      "verdict": "可采信",
+      "samples": [
+        "carvanha",
+        "gyarados",
+        "magikarp",
+        "qwilfish",
+        "sharpedo"
+      ]
+    },
+    {
+      "upstream": "Waterc",
+      "official": "water3",
+      "cn": "水中3",
+      "containment": 1,
+      "overlap": "23/23",
+      "runnerUp": "water1(0.304)",
+      "verdict": "可采信",
+      "samples": [
+        "anorith",
+        "archen",
+        "archeops",
+        "armaldo",
+        "cloyster",
+        "corphish",
+        "corsola",
+        "cradily"
+      ]
+    }
+  ]
+}

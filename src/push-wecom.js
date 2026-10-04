@@ -1,0 +1,160 @@
+"use strict";
+/* 企业微信机器人推送。
+   - 一条事件一张卡片，保证时效；但每个 tick 最多发 maxPerTick 条，
+     企业微信群机器人限速约 20 条/分钟，回填几千条时会直接被打回。
+   - 发送失败不推进队列，事件留在 db.queue 里下个 tick 重试，重试 5 次后丢弃。 */
+
+const { request } = require("./net");
+const { fmtBeijing, decide } = require("./rules");
+const dict = require("./dict");
+const refdata = require("./refdata");
+
+/* 标题用社区通用术语（上游语言包：Alpha→头目、Swarm→大量出现(明雷)、Pheno→奇遇），
+   括注英文原名，避免老玩家对不上号 */
+const KIND_EMOJI = { alpha: "🔴", swarm: "🐝", pheno: "🌀" };
+function kindTitle(kind) {
+  const en = { alpha: "Alpha", swarm: "Swarm", pheno: "Pheno" }[kind] || "Alpha";
+  const cn = dict.concept(en);
+  return cn && cn !== en ? `${cn} ${en}` : en;
+}
+
+const byteLen = (s) => Buffer.byteLength(s, "utf8");
+const LIMIT = 4096;
+
+function displayName(ev) {
+  return ev.pokemonCn ? `${ev.pokemonCn}（${ev.pokemon}）` : ev.pokemon;
+}
+function placeName(ev) {
+  return ev.locationCn ? `${ev.locationCn}${ev.location && ev.locationCn !== ev.location ? `（${ev.location}）` : ""}` : ev.location;
+}
+function regionName(ev) {
+  return ev.regionCn ? `${ev.regionCn}（${ev.region}）` : ev.region;
+}
+
+function remainingText(ev, nowUnix) {
+  const left = (ev.expiresUnix || ev.tsUnix) - nowUnix;
+  if (left <= 0) return "已到点";
+  const m = Math.round(left / 60);
+  return m >= 60 ? `${Math.floor(m / 60)} 小时 ${m % 60} 分` : `${m} 分`;
+}
+
+/* 去之前要带什么：秘传兽需求，来自上游静态表 */
+function hmsText(req) {
+  if (!req || !req.hms || !req.hms.length) return "";
+  return req.hms.map((h) => dict.termPair("hms", h) || h).filter(Boolean).join(" / ");
+}
+
+function buildMessage(ev, { nowUnix = Math.floor(Date.now() / 1000) } = {}) {
+  const req = ev.req || refdata.requirementFor(ev);
+  const lines = [
+    `**${KIND_EMOJI[ev.kind] || "🔴"} ${kindTitle(ev.kind)}｜${displayName(ev)}**`,
+    `地点：<font color="info">${placeName(ev)}</font>`,
+    ev.region ? `地区：${regionName(ev)}` : "",
+    `剩余：<font color="warning">约 ${remainingText(ev, nowUnix)}</font>（${fmtBeijing(ev.expiresUnix || ev.tsUnix)} 北京时间消失）`,
+    `报出：${fmtBeijing(ev.tsUnix)}`,
+    ev.phenoType ? `天气：${dict.termPair("concepts", ev.phenoType)}` : "",
+    hmsText(req) ? `需要：${hmsText(req)}` : "",
+    req && req.specific ? `位置：${req.specific}` : "",
+    ev.tier ? `价值 tier：${ev.tier}` : "",
+    ev.reporter ? `上报人：${ev.reporter}` : "",
+    ev.note ? `备注：${String(ev.note).slice(0, 80)}` : "",
+    req && req.map ? `[点位地图](${req.map})` : "",
+    ev.upstreamUrl ? `[查看上游原始报点](${ev.upstreamUrl})` : "",
+    `<font color="comment">数据来自 Alphapedia 众包 · 本站镜像</font>`,
+  ].filter(Boolean);
+  let content = lines.join("\n");
+  while (byteLen(content) > LIMIT) content = content.slice(0, content.length - 40);
+  return { msgtype: "markdown", markdown: { content } };
+}
+
+function buildDigest(events, meta = {}) {
+  const head = `**📊 报点汇总（近 ${meta.hours || 24} 小时）**`;
+  const rows = events.slice(0, 30).map((ev) => `· ${displayName(ev)} @ ${placeName(ev)} — ${remainingText(ev, meta.nowUnix || Math.floor(Date.now() / 1000))}`);
+  let content = [head, ...rows, `<font color="comment">共 ${events.length} 条有效点位</font>`].join("\n");
+  while (byteLen(content) > LIMIT) content = content.slice(0, content.length - 40);
+  return { msgtype: "markdown", markdown: { content } };
+}
+
+async function send(webhook, payload) {
+  if (!/^https?:\/\//.test(webhook)) throw new Error("webhook 地址不合法");
+  const res = await request(webhook, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+    retries: 2,
+    timeoutMs: 12000,
+  });
+  const body = res.json || {};
+  return { httpStatus: res.status, errcode: body.errcode ?? -1, errmsg: body.errmsg || res.text.slice(0, 120) };
+}
+
+/* ---------- 待发队列 ---------- */
+
+function enqueue(store, events, { maxAgeSeconds = 2 * 3600 } = {}) {
+  const now = Math.floor(Date.now() / 1000);
+  const q = store.db.queue || (store.db.queue = []);
+  const seen = new Set(q.map((i) => i.key));
+  let added = 0;
+  for (const ev of [].concat(events)) {
+    /* 首轮回填会一次捞回几天前的历史点，超过 maxAgeSeconds 的不进队列，否则群会被刷屏 */
+    if (now - ev.tsUnix > maxAgeSeconds) continue;
+    if (seen.has(ev.key)) continue;
+    q.push({ key: ev.key, kind: ev.kind, tries: 0 });
+    added++;
+  }
+  if (q.length > 300) q.splice(0, q.length - 300);
+  if (added) store.scheduleFlush();
+  return added;
+}
+
+async function flushQueue(store, cfg, { log = () => {} } = {}) {
+  const q = store.db.queue || [];
+  if (!q.length) return { sent: 0, failed: 0 };
+  const w = cfg.wecom;
+  if (!w.webhook || !w.enabled) return { sent: 0, failed: 0, skipped: "未配置或已关闭" };
+
+  const cap = Number(w.maxPerTick || 4);
+  let sent = 0;
+  let failed = 0;
+  for (let i = 0; i < Math.min(cap, q.length); ) {
+    const item = q[i];
+    const ev = store.getEvent(item.key);
+    if (!ev) {
+      q.splice(i, 1);
+      continue;
+    }
+    const nowUnix = Math.floor(Date.now() / 1000);
+    const verdict = decide(ev, cfg, nowUnix);
+    if (!verdict.ok) {
+      /* 规则不满足或已过期：不是错误，直接丢弃 */
+      q.splice(i, 1);
+      continue;
+    }
+    let r;
+    try {
+      r = await send(w.webhook, buildMessage(ev, { nowUnix }));
+    } catch (e) {
+      r = { errcode: -1, errmsg: e.message };
+    }
+    if (r.errcode === 0) {
+      q.splice(i, 1);
+      sent++;
+      ev.pushedAt = nowUnix;
+      log(`推送成功 ${ev.kind} ${ev.pokemon} @ ${ev.location}`);
+    } else {
+      item.tries++;
+      if (item.tries >= 5) {
+        q.splice(i, 1);
+        log(`推送放弃（重试 5 次）${ev.pokemon} @ ${ev.location}: ${r.errmsg}`);
+      } else {
+        i++;
+      }
+      failed++;
+    }
+    await new Promise((res) => setTimeout(res, 350));
+  }
+  store.scheduleFlush();
+  return { sent, failed, remaining: q.length };
+}
+
+module.exports = { buildMessage, buildDigest, send, enqueue, flushQueue, remainingText, displayName, placeName, regionName, hmsText, kindTitle };

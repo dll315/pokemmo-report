@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>报点站管理台</title>
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css?v=1" />
+    <style>
+      .wrap { max-width: 1180px; margin: 0 auto; padding: 16px; }
+      .gate { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; margin: 40px auto; max-width: 460px; display: flex; flex-direction: column; gap: 12px; }
+      .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 18px; }
+      .stat { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; }
+      .stat b { display: block; font-size: 22px; }
+      .stat span { color: var(--ink-2); font-size: 12px; }
+      .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
+      .card > h2 { font-size: 16px; margin-bottom: 10px; }
+      .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 10px; }
+      .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+      label { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; color: var(--ink-2); }
+      input, select, textarea { width: 100%; }
+      .checks { display: flex; gap: 14px; flex-wrap: wrap; }
+      .checks label { flex-direction: row; align-items: center; gap: 6px; font-size: 13px; color: var(--ink); }
+      .checks input { width: auto; }
+      button.act { background: var(--accent); color: #fff; border: 0; border-radius: 9px; padding: 9px 14px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+      button.act.ok { background: var(--good); }
+      button.act.no { background: var(--bad); }
+      button.act.mini { padding: 5px 10px; font-size: 12.5px; font-weight: 500; }
+      table.log { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+      table.log th, table.log td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+      .pend { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; border-bottom: 1px solid var(--line); padding: 10px 0; }
+      .pend .who { color: var(--ink-2); font-size: 12px; }
+      .toast { position: fixed; right: 16px; bottom: 16px; background: var(--ink); color: var(--bg); padding: 10px 14px; border-radius: 10px; font-size: 13px; opacity: 0; transition: 0.25s; pointer-events: none; }
+      .toast.show { opacity: 0.95; }
+      .empty { color: var(--ink-2); font-size: 13px; }
+      code { font-family: ui-monospace, Consolas, monospace; font-size: 12px; background: var(--bg); padding: 1px 5px; border-radius: 5px; }
+      @media (max-width: 760px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="ball" aria-hidden="true"></span>
+        <div>
+          <h1>报点站管理台</h1>
+          <p class="sub">审核 · 推送 · 同步</p>
+        </div>
+      </div>
+      <nav class="tabs">
+        <a class="tab" href="/">← 返回看板</a>
+        <button class="tab" id="logoutBtn" type="button">退出</button>
+      </nav>
+    </header>
+
+    <div id="gate" class="wrap" hidden>
+      <div class="gate">
+        <h2>管理口令</h2>
+        <p class="hint">口令在服务端的 <code>config.json</code> 或环境变量 <code>ADMIN_TOKEN</code> 里设置。</p>
+        <input id="tokenInput" type="password" placeholder="粘贴管理口令" autocomplete="off" />
+        <button class="act" id="loginBtn" type="button">进入管理台</button>
+        <p class="hint" id="gateMsg"></p>
+      </div>
+    </div>
+
+    <div id="ui" class="wrap" hidden>
+      <div class="cards" id="statCards"></div>
+
+      <div class="card">
+        <h2>操作</h2>
+        <div class="row">
+          <button class="act" id="syncBtn" type="button">立即同步上游</button>
+          <button class="act" id="testBtn" type="button">发一条测试推送</button>
+          <button class="act" id="flushBtn" type="button">冲刷推送队列</button>
+          <button class="act mini" id="reloadBtn" type="button">重载词表</button>
+          <button class="act mini" id="refreshBtn" type="button">刷新本页</button>
+        </div>
+        <p class="hint">同步 = 从 Alphapedia 增量拉报点；队列里的新点会按订阅规则发到企业微信群。</p>
+      </div>
+
+      <div class="card">
+        <h2>待审核上报 <span class="hint" id="pendCount"></span></h2>
+        <div id="pendingList"><p class="empty">加载中…</p></div>
+      </div>
+
+      <div class="card">
+        <h2>企业微信推送</h2>
+        <div class="grid2">
+          <label>Webhook 地址
+            <input id="webhook" placeholder="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=…" />
+          </label>
+          <label>每轮最多发几条
+            <input id="maxPerTick" type="number" min="1" max="15" />
+          </label>
+        </div>
+        <p class="hint" id="hookHint"></p>
+        <div class="row checks">
+          <label><input type="checkbox" id="pushEnabled" /> 启用推送</label>
+          <label><input type="checkbox" id="kindAlpha" /> 头目 Alpha</label>
+          <label><input type="checkbox" id="kindSwarm" /> 大量出现 Swarm</label>
+          <label><input type="checkbox" id="kindPheno" /> 奇遇 Pheno</label>
+        </div>
+        <div class="grid3">
+          <label>关注宝可梦（空 = 全部，逗号分隔）
+            <input id="onlyPokemon" placeholder="Breloom, Relicanth" />
+          </label>
+          <label>屏蔽宝可梦（逗号分隔）
+            <input id="exceptPokemon" />
+          </label>
+          <label>只看这些地区（空 = 全部）
+            <input id="regions" placeholder="Kanto, Hoenn" />
+          </label>
+          <label>最低价值 tier
+            <input id="minTier" type="number" min="0" max="7" />
+          </label>
+          <label><input type="checkbox" id="quietEnabled" style="width:auto" /> 免打扰时段（北京时间）</label>
+          <label>免打扰区间
+            <div class="row" style="margin: 0">
+              <input id="quietFrom" type="time" /> <input id="quietTo" type="time" />
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>站点设置</h2>
+        <div class="row checks">
+          <label><input type="checkbox" id="publicReport" /> 开放玩家上报</label>
+          <label><input type="checkbox" id="requireApprove" /> 上报需人工审核</label>
+        </div>
+        <div class="grid3">
+          <label>同步间隔（分钟）<input id="interval" type="number" min="1" max="60" /></label>
+          <label>首轮回填小时<input id="backfill" type="number" min="1" max="240" /></label>
+          <label>保留天数<input id="retention" type="number" min="1" max="60" /></label>
+          <label>Alpha 有效期（分钟）<input id="winAlpha" type="number" min="5" max="600" /></label>
+          <label>群蜂有效期（分钟）<input id="winSwarm" type="number" min="5" max="120" /></label>
+          <label>修改管理口令<input id="newToken" type="password" placeholder="留空则不修改" autocomplete="new-password" /></label>
+        </div>
+        <div class="row">
+          <button class="act ok" id="saveBtn" type="button">保存全部设置</button>
+          <span class="hint" id="saveMsg"></span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>同步日志</h2>
+        <table class="log" id="logTable"></table>
+        <p class="hint" id="metaHint"></p>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <script src="/admin.js?v=1"></script>
+  </body>
+</html>

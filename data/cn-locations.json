@@ -1,0 +1,1023 @@
+{
+  "locations": {
+    "Abandoned Ship": {
+      "cn": "弃船",
+      "kind": "special"
+    },
+    "Abundant Shrine": {
+      "cn": "丰饶之祠",
+      "kind": "special"
+    },
+    "Acuity Lakefront": {
+      "cn": "睿智湖畔",
+      "kind": "special"
+    },
+    "Aqua Hideout": {
+      "cn": "海洋队基地",
+      "kind": "special"
+    },
+    "Artisan Cave": {
+      "cn": "工匠之穴",
+      "kind": "special"
+    },
+    "Battle Frontier": {
+      "cn": "对战开拓区",
+      "kind": "special"
+    },
+    "Bell Tower": {
+      "cn": "铃铛塔",
+      "kind": "special"
+    },
+    "Bellchime Trail": {
+      "cn": "铃音小道",
+      "kind": "special"
+    },
+    "Berry Forest": {
+      "cn": "树果森林",
+      "kind": "special"
+    },
+    "Bond Bridge": {
+      "cn": "牵绊桥",
+      "kind": "special"
+    },
+    "Burned Tower": {
+      "cn": "烧焦塔",
+      "kind": "special"
+    },
+    "Canyon Entrance": {
+      "cn": "溪谷入口",
+      "kind": "special"
+    },
+    "Cape Brink": {
+      "cn": "边缘海岬",
+      "kind": "special"
+    },
+    "Celestial Tower": {
+      "cn": "天堂之塔",
+      "kind": "special"
+    },
+    "Cerulean Cave": {
+      "cn": "华蓝洞窟",
+      "kind": "special"
+    },
+    "Challenger's Cave": {
+      "cn": "修行岩屋",
+      "kind": "special"
+    },
+    "Chargestone Cave": {
+      "cn": "电气石洞穴",
+      "kind": "special"
+    },
+    "Cliff Cave": {
+      "cn": "断崖洞窟",
+      "kind": "special"
+    },
+    "Cliff Edge Gate": {
+      "cn": "断崖入口",
+      "kind": "special"
+    },
+    "Cold Storage": {
+      "cn": "冷冻仓库",
+      "kind": "special"
+    },
+    "Dark Cave": {
+      "cn": "黑暗洞穴",
+      "kind": "special"
+    },
+    "Desert Resort": {
+      "cn": "荒野名胜区",
+      "kind": "special"
+    },
+    "Desert Underpass": {
+      "cn": "沙漠的地下道",
+      "kind": "special"
+    },
+    "Diglett's Cave": {
+      "cn": "地鼠洞穴",
+      "kind": "special"
+    },
+    "Dragon's Den": {
+      "cn": "龙穴",
+      "kind": "special"
+    },
+    "Dragonspiral Tower": {
+      "cn": "龙螺旋之塔",
+      "kind": "special"
+    },
+    "Dreamyard": {
+      "cn": "梦的遗址",
+      "kind": "special"
+    },
+    "Driftveil City": {
+      "cn": "帆巴市",
+      "kind": "other"
+    },
+    "Driftveil Drawbridge": {
+      "cn": "帆巴吊桥",
+      "kind": "special"
+    },
+    "Eterna Forest": {
+      "cn": "百代森林",
+      "kind": "special"
+    },
+    "Ever Grande City": {
+      "cn": "彩悠市",
+      "kind": "other"
+    },
+    "Fiery Path": {
+      "cn": "烈焰小径",
+      "kind": "special"
+    },
+    "Five Island": {
+      "cn": "第五岛",
+      "kind": "special"
+    },
+    "Five Isle Meadow": {
+      "cn": "第五岛空地",
+      "kind": "special"
+    },
+    "Floaroma Meadow": {
+      "cn": "花苑花田",
+      "kind": "special"
+    },
+    "Four Island": {
+      "cn": "第四岛",
+      "kind": "special"
+    },
+    "Fuego Ironworks": {
+      "cn": "多多罗钢铁厂",
+      "kind": "special"
+    },
+    "Giant Chasm": {
+      "cn": "巨人洞窟",
+      "kind": "special"
+    },
+    "Giant Chasm (Cave)": {
+      "cn": "巨人洞窟（洞窟）",
+      "kind": "special"
+    },
+    "Giant Chasm (Entrance)": {
+      "cn": "巨人洞窟（入口）",
+      "kind": "special"
+    },
+    "Giant Chasm (Forest)": {
+      "cn": "巨人洞窟（森林）",
+      "kind": "special"
+    },
+    "Granite Cave": {
+      "cn": "石之洞窟",
+      "kind": "special"
+    },
+    "Great Marsh": {
+      "cn": "大湿地",
+      "kind": "special"
+    },
+    "Green Path": {
+      "cn": "绿之步道",
+      "kind": "special"
+    },
+    "Guidance Chamber": {
+      "cn": null,
+      "kind": "special"
+    },
+    "Ice Path": {
+      "cn": "冰雪小径",
+      "kind": "special"
+    },
+    "Icefall Cave": {
+      "cn": "冻瀑洞窟",
+      "kind": "special"
+    },
+    "Icirrus City": {
+      "cn": "雪花市",
+      "kind": "other"
+    },
+    "Ilex Forest": {
+      "cn": "栎树林",
+      "kind": "special"
+    },
+    "Iron Island": {
+      "cn": "钢铁岛",
+      "kind": "special"
+    },
+    "Jagged Pass": {
+      "cn": "凹凸山道",
+      "kind": "special"
+    },
+    "Kindle Road": {
+      "cn": "热气之路",
+      "kind": "special"
+    },
+    "Lake Acuity": {
+      "cn": "睿智湖",
+      "kind": "special"
+    },
+    "Lake Valor": {
+      "cn": "立志湖",
+      "kind": "special"
+    },
+    "Lake Verity": {
+      "cn": "心齐湖",
+      "kind": "special"
+    },
+    "Lake of Rage": {
+      "cn": "愤怒之湖",
+      "kind": "special"
+    },
+    "Lighthouse": {
+      "cn": "正辉的灯塔",
+      "kind": "special"
+    },
+    "Lost Cave": {
+      "cn": "不归之穴",
+      "kind": "special"
+    },
+    "Lost Tower": {
+      "cn": "迷失塔",
+      "kind": "special"
+    },
+    "Lostlorn Forest": {
+      "cn": "迷幻森林",
+      "kind": "special"
+    },
+    "Magma Hideout": {
+      "cn": "熔岩队基地",
+      "kind": "special"
+    },
+    "Maniac Tunnel": {
+      "cn": "遗迹迷隧道",
+      "kind": "special"
+    },
+    "Marvelous Bridge": {
+      "cn": "奇幻桥",
+      "kind": "special"
+    },
+    "Memorial Pillar": {
+      "cn": "回忆之塔",
+      "kind": "special"
+    },
+    "Meteor Falls": {
+      "cn": "流星瀑布",
+      "kind": "special"
+    },
+    "Mirage Tower": {
+      "cn": "幻影之塔",
+      "kind": "special"
+    },
+    "Mistralton Cave": {
+      "cn": "吹寄洞穴",
+      "kind": "special"
+    },
+    "Moor Of Icirrus": {
+      "cn": "雪花湿地",
+      "kind": "special"
+    },
+    "Moor of Icirrus": {
+      "cn": "雪花湿地",
+      "kind": "special"
+    },
+    "Mt. Chimney": {
+      "cn": "烟囱山",
+      "kind": "special"
+    },
+    "Mt. Coronet": {
+      "cn": "天冠山",
+      "kind": "special"
+    },
+    "Mt. Ember": {
+      "cn": "灯火山",
+      "kind": "special"
+    },
+    "Mt. Moon": {
+      "cn": "月见山",
+      "kind": "special"
+    },
+    "Mt. Mortar": {
+      "cn": "擂钵山",
+      "kind": "special"
+    },
+    "Mt. Pyre": {
+      "cn": "送神山",
+      "kind": "special"
+    },
+    "Mt. Silver Cave": {
+      "cn": "白银山",
+      "kind": "special"
+    },
+    "National Park": {
+      "cn": "自然公园",
+      "kind": "special"
+    },
+    "New Mauville": {
+      "cn": "新紫堇",
+      "kind": "special"
+    },
+    "Old Chateau": {
+      "cn": "森之洋馆",
+      "kind": "special"
+    },
+    "One Island": {
+      "cn": "第一岛",
+      "kind": "special"
+    },
+    "Oreburgh Gate": {
+      "cn": "黑金闸口",
+      "kind": "special"
+    },
+    "Oreburgh Mine": {
+      "cn": "黑金炭坑",
+      "kind": "special"
+    },
+    "P2 Laboratory": {
+      "cn": "Ｐ２实验室",
+      "kind": "special"
+    },
+    "Pastoria City": {
+      "cn": "野原市",
+      "kind": "other"
+    },
+    "Pattern Bush": {
+      "cn": "标志之林",
+      "kind": "special"
+    },
+    "Petalburg Woods": {
+      "cn": "橙华森林",
+      "kind": "special"
+    },
+    "Pinwheel Forest": {
+      "cn": "矢车森林",
+      "kind": "special"
+    },
+    "Pinwheel Forest (Inner)": {
+      "cn": "矢车森林（内部）",
+      "kind": "special"
+    },
+    "Pinwheel Forest (Outer)": {
+      "cn": "矢车森林（外部）",
+      "kind": "special"
+    },
+    "Pokemon Mansion": {
+      "cn": "宝可梦屋",
+      "kind": "special"
+    },
+    "Pokemon Tower": {
+      "cn": "宝可梦塔",
+      "kind": "special"
+    },
+    "Power Plant": {
+      "cn": "无人发电厂",
+      "kind": "special"
+    },
+    "Ravaged Path": {
+      "cn": "荒芜小道",
+      "kind": "special"
+    },
+    "Relic Castle": {
+      "cn": "古代城",
+      "kind": "special"
+    },
+    "Resort Gorgeous": {
+      "cn": "豪华度假区",
+      "kind": "special"
+    },
+    "Rock Tunnel": {
+      "cn": "岩山隧道",
+      "kind": "special"
+    },
+    "Route 1": {
+      "cn": "1号道路",
+      "kind": "route"
+    },
+    "Route 10": {
+      "cn": "10号道路",
+      "kind": "route"
+    },
+    "Route 101": {
+      "cn": "101号道路",
+      "kind": "route"
+    },
+    "Route 102": {
+      "cn": "102号道路",
+      "kind": "route"
+    },
+    "Route 103": {
+      "cn": "103号道路",
+      "kind": "route"
+    },
+    "Route 104": {
+      "cn": "104号道路",
+      "kind": "route"
+    },
+    "Route 105": {
+      "cn": "105号道路",
+      "kind": "route"
+    },
+    "Route 106": {
+      "cn": "106号道路",
+      "kind": "route"
+    },
+    "Route 107": {
+      "cn": "107号道路",
+      "kind": "route"
+    },
+    "Route 108": {
+      "cn": "108号道路",
+      "kind": "route"
+    },
+    "Route 109": {
+      "cn": "109号道路",
+      "kind": "route"
+    },
+    "Route 11": {
+      "cn": "11号道路",
+      "kind": "route"
+    },
+    "Route 110": {
+      "cn": "110号道路",
+      "kind": "route"
+    },
+    "Route 111": {
+      "cn": "111号道路",
+      "kind": "route"
+    },
+    "Route 112": {
+      "cn": "112号道路",
+      "kind": "route"
+    },
+    "Route 113": {
+      "cn": "113号道路",
+      "kind": "route"
+    },
+    "Route 114": {
+      "cn": "114号道路",
+      "kind": "route"
+    },
+    "Route 115": {
+      "cn": "115号道路",
+      "kind": "route"
+    },
+    "Route 116": {
+      "cn": "116号道路",
+      "kind": "route"
+    },
+    "Route 117": {
+      "cn": "117号道路",
+      "kind": "route"
+    },
+    "Route 118": {
+      "cn": "118号道路",
+      "kind": "route"
+    },
+    "Route 119": {
+      "cn": "119号道路",
+      "kind": "route"
+    },
+    "Route 12": {
+      "cn": "12号道路",
+      "kind": "route"
+    },
+    "Route 120": {
+      "cn": "120号道路",
+      "kind": "route"
+    },
+    "Route 121": {
+      "cn": "121号道路",
+      "kind": "route"
+    },
+    "Route 122": {
+      "cn": "122号道路",
+      "kind": "route"
+    },
+    "Route 123": {
+      "cn": "123号道路",
+      "kind": "route"
+    },
+    "Route 124": {
+      "cn": "124号道路",
+      "kind": "route"
+    },
+    "Route 125": {
+      "cn": "125号道路",
+      "kind": "route"
+    },
+    "Route 126": {
+      "cn": "126号道路",
+      "kind": "route"
+    },
+    "Route 127": {
+      "cn": "127号道路",
+      "kind": "route"
+    },
+    "Route 128": {
+      "cn": "128号道路",
+      "kind": "route"
+    },
+    "Route 129": {
+      "cn": "129号道路",
+      "kind": "route"
+    },
+    "Route 13": {
+      "cn": "13号道路",
+      "kind": "route"
+    },
+    "Route 130": {
+      "cn": "130号道路",
+      "kind": "route"
+    },
+    "Route 131": {
+      "cn": "131号道路",
+      "kind": "route"
+    },
+    "Route 132": {
+      "cn": "132号道路",
+      "kind": "route"
+    },
+    "Route 133": {
+      "cn": "133号道路",
+      "kind": "route"
+    },
+    "Route 134": {
+      "cn": "134号道路",
+      "kind": "route"
+    },
+    "Route 14": {
+      "cn": "14号道路",
+      "kind": "route"
+    },
+    "Route 15": {
+      "cn": "15号道路",
+      "kind": "route"
+    },
+    "Route 16": {
+      "cn": "16号道路",
+      "kind": "route"
+    },
+    "Route 17": {
+      "cn": "17号道路",
+      "kind": "route"
+    },
+    "Route 18": {
+      "cn": "18号道路",
+      "kind": "route"
+    },
+    "Route 19": {
+      "cn": "19号道路",
+      "kind": "route"
+    },
+    "Route 2": {
+      "cn": "2号道路",
+      "kind": "route"
+    },
+    "Route 20": {
+      "cn": "20号道路",
+      "kind": "route"
+    },
+    "Route 201": {
+      "cn": "201号道路",
+      "kind": "route"
+    },
+    "Route 202": {
+      "cn": "202号道路",
+      "kind": "route"
+    },
+    "Route 203": {
+      "cn": "203号道路",
+      "kind": "route"
+    },
+    "Route 204": {
+      "cn": "204号道路",
+      "kind": "route"
+    },
+    "Route 205": {
+      "cn": "205号道路",
+      "kind": "route"
+    },
+    "Route 206": {
+      "cn": "206号道路",
+      "kind": "route"
+    },
+    "Route 207": {
+      "cn": "207号道路",
+      "kind": "route"
+    },
+    "Route 208": {
+      "cn": "208号道路",
+      "kind": "route"
+    },
+    "Route 209": {
+      "cn": "209号道路",
+      "kind": "route"
+    },
+    "Route 21": {
+      "cn": "21号道路",
+      "kind": "route"
+    },
+    "Route 210": {
+      "cn": "210号道路",
+      "kind": "route"
+    },
+    "Route 211": {
+      "cn": "211号道路",
+      "kind": "route"
+    },
+    "Route 212": {
+      "cn": "212号道路",
+      "kind": "route"
+    },
+    "Route 213": {
+      "cn": "213号道路",
+      "kind": "route"
+    },
+    "Route 214": {
+      "cn": "214号道路",
+      "kind": "route"
+    },
+    "Route 215": {
+      "cn": "215号道路",
+      "kind": "route"
+    },
+    "Route 216": {
+      "cn": "216号道路",
+      "kind": "route"
+    },
+    "Route 217": {
+      "cn": "217号道路",
+      "kind": "route"
+    },
+    "Route 218": {
+      "cn": "218号道路",
+      "kind": "route"
+    },
+    "Route 219": {
+      "cn": "219号道路",
+      "kind": "route"
+    },
+    "Route 22": {
+      "cn": "22号道路",
+      "kind": "route"
+    },
+    "Route 220": {
+      "cn": "220号道路",
+      "kind": "route"
+    },
+    "Route 221": {
+      "cn": "221号道路",
+      "kind": "route"
+    },
+    "Route 222": {
+      "cn": "222号道路",
+      "kind": "route"
+    },
+    "Route 223": {
+      "cn": "223号道路",
+      "kind": "route"
+    },
+    "Route 224": {
+      "cn": "224号道路",
+      "kind": "route"
+    },
+    "Route 225": {
+      "cn": "225号道路",
+      "kind": "route"
+    },
+    "Route 226": {
+      "cn": "226号道路",
+      "kind": "route"
+    },
+    "Route 227": {
+      "cn": "227号道路",
+      "kind": "route"
+    },
+    "Route 228": {
+      "cn": "228号道路",
+      "kind": "route"
+    },
+    "Route 229": {
+      "cn": "229号道路",
+      "kind": "route"
+    },
+    "Route 23": {
+      "cn": "23号道路",
+      "kind": "route"
+    },
+    "Route 230": {
+      "cn": "230号道路",
+      "kind": "route"
+    },
+    "Route 24": {
+      "cn": "24号道路",
+      "kind": "route"
+    },
+    "Route 25": {
+      "cn": "25号道路",
+      "kind": "route"
+    },
+    "Route 26": {
+      "cn": "26号道路",
+      "kind": "route"
+    },
+    "Route 27": {
+      "cn": "27号道路",
+      "kind": "route"
+    },
+    "Route 28": {
+      "cn": "28号道路",
+      "kind": "route"
+    },
+    "Route 29": {
+      "cn": "29号道路",
+      "kind": "route"
+    },
+    "Route 3": {
+      "cn": "3号道路",
+      "kind": "route"
+    },
+    "Route 30": {
+      "cn": "30号道路",
+      "kind": "route"
+    },
+    "Route 31": {
+      "cn": "31号道路",
+      "kind": "route"
+    },
+    "Route 32": {
+      "cn": "32号道路",
+      "kind": "route"
+    },
+    "Route 33": {
+      "cn": "33号道路",
+      "kind": "route"
+    },
+    "Route 34": {
+      "cn": "34号道路",
+      "kind": "route"
+    },
+    "Route 35": {
+      "cn": "35号道路",
+      "kind": "route"
+    },
+    "Route 36": {
+      "cn": "36号道路",
+      "kind": "route"
+    },
+    "Route 37": {
+      "cn": "37号道路",
+      "kind": "route"
+    },
+    "Route 38": {
+      "cn": "38号道路",
+      "kind": "route"
+    },
+    "Route 39": {
+      "cn": "39号道路",
+      "kind": "route"
+    },
+    "Route 4": {
+      "cn": "4号道路",
+      "kind": "route"
+    },
+    "Route 40": {
+      "cn": "40号道路",
+      "kind": "route"
+    },
+    "Route 41": {
+      "cn": "41号道路",
+      "kind": "route"
+    },
+    "Route 42": {
+      "cn": "42号道路",
+      "kind": "route"
+    },
+    "Route 43": {
+      "cn": "43号道路",
+      "kind": "route"
+    },
+    "Route 44": {
+      "cn": "44号道路",
+      "kind": "route"
+    },
+    "Route 45": {
+      "cn": "45号道路",
+      "kind": "route"
+    },
+    "Route 46": {
+      "cn": "46号道路",
+      "kind": "route"
+    },
+    "Route 47": {
+      "cn": "47号道路",
+      "kind": "route"
+    },
+    "Route 48": {
+      "cn": "48号道路",
+      "kind": "route"
+    },
+    "Route 5": {
+      "cn": "5号道路",
+      "kind": "route"
+    },
+    "Route 6": {
+      "cn": "6号道路",
+      "kind": "route"
+    },
+    "Route 7": {
+      "cn": "7号道路",
+      "kind": "route"
+    },
+    "Route 8": {
+      "cn": "8号道路",
+      "kind": "route"
+    },
+    "Route 9": {
+      "cn": "9号道路",
+      "kind": "route"
+    },
+    "Ruin Valley": {
+      "cn": "遗迹山谷",
+      "kind": "special"
+    },
+    "Ruins of Alph": {
+      "cn": "阿露福遗迹",
+      "kind": "special"
+    },
+    "Rusturf Tunnel": {
+      "cn": "卡绿隧道",
+      "kind": "special"
+    },
+    "Safari Zone": {
+      "cn": "狩猎地带",
+      "kind": "special"
+    },
+    "Scorched Slab": {
+      "cn": "天旱石窟",
+      "kind": "special"
+    },
+    "Seafloor Cavern": {
+      "cn": "海底洞窟",
+      "kind": "special"
+    },
+    "Seafoam Islands": {
+      "cn": "双子岛",
+      "kind": "special"
+    },
+    "Sendoff Spring": {
+      "cn": "送行之泉",
+      "kind": "special"
+    },
+    "Sevault Canyon": {
+      "cn": "七宝溪谷",
+      "kind": "special"
+    },
+    "Seven Island": {
+      "cn": "第七岛",
+      "kind": "special"
+    },
+    "Shoal Cave": {
+      "cn": "浅滩洞穴",
+      "kind": "special"
+    },
+    "Six Island": {
+      "cn": "第六岛",
+      "kind": "special"
+    },
+    "Sky Pillar": {
+      "cn": "天空之柱",
+      "kind": "special"
+    },
+    "Slowpoke Well": {
+      "cn": "呆呆兽之井",
+      "kind": "special"
+    },
+    "Snowpoint Temple": {
+      "cn": "雪峰神殿",
+      "kind": "special"
+    },
+    "Sootopolis City": {
+      "cn": "琉璃市",
+      "kind": "other"
+    },
+    "Spear Pillar": {
+      "cn": "枪之柱",
+      "kind": "special"
+    },
+    "Sprout Tower": {
+      "cn": "喇叭芽之塔",
+      "kind": "special"
+    },
+    "Stark Mountain": {
+      "cn": "严酷山",
+      "kind": "special"
+    },
+    "Striaton City": {
+      "cn": "三曜市",
+      "kind": "other"
+    },
+    "Tanoby Ruins": {
+      "cn": "阿斯卡纳遗迹",
+      "kind": "special"
+    },
+    "Team Rocket HQ": {
+      "cn": "火箭队基地",
+      "kind": "special"
+    },
+    "Three Island": {
+      "cn": "第三岛",
+      "kind": "special"
+    },
+    "Tohjo Falls": {
+      "cn": "都城瀑布",
+      "kind": "special"
+    },
+    "Trainer Tower": {
+      "cn": "训练家塔",
+      "kind": "special"
+    },
+    "Treasure Beach": {
+      "cn": "宝物海滩",
+      "kind": "special"
+    },
+    "Trophy Garden": {
+      "cn": "自豪的后院",
+      "kind": "special"
+    },
+    "Turnback Cave": {
+      "cn": "归途洞窟",
+      "kind": "special"
+    },
+    "Twist Mountain": {
+      "cn": "罗斯山",
+      "kind": "special"
+    },
+    "Two Island": {
+      "cn": "第二岛",
+      "kind": "special"
+    },
+    "Undella Bay": {
+      "cn": "涟漪湾",
+      "kind": "special"
+    },
+    "Undella Town": {
+      "cn": "涟漪镇",
+      "kind": "other"
+    },
+    "Underwater": {
+      "cn": "水中",
+      "kind": "other"
+    },
+    "Union Cave": {
+      "cn": "互连洞",
+      "kind": "special"
+    },
+    "Valley Windworks": {
+      "cn": "山谷发电厂",
+      "kind": "special"
+    },
+    "Valor Lakefront": {
+      "cn": "立志湖畔",
+      "kind": "special"
+    },
+    "Vermilion City": {
+      "cn": "枯叶市",
+      "kind": "other"
+    },
+    "Victory Road": {
+      "cn": "冠军之路",
+      "kind": "special"
+    },
+    "Village Bridge": {
+      "cn": "村庄桥",
+      "kind": "special"
+    },
+    "Viridian Forest": {
+      "cn": "常青森林",
+      "kind": "special"
+    },
+    "Water Labyrinth": {
+      "cn": "水之迷宫",
+      "kind": "special"
+    },
+    "Water Path": {
+      "cn": "水之步道",
+      "kind": "special"
+    },
+    "Wayward Cave": {
+      "cn": "迷幻洞窟",
+      "kind": "special"
+    },
+    "Wellspring Cave": {
+      "cn": "泉源洞穴",
+      "kind": "special"
+    },
+    "Whirl Islands": {
+      "cn": "漩涡岛",
+      "kind": "special"
+    }
+  },
+  "regions": {
+    "Hoenn": "丰缘地区",
+    "Johto": "城都地区",
+    "Kanto": "关都地区",
+    "Sinnoh": "神奥地区",
+    "Unova": "合众地区"
+  }
+}

@@ -1,0 +1,12 @@
+# 构建镜像时排除：运行期数据和本机密钥不能烘进镜像层
+.git
+.github
+node_modules
+data/db.json
+data/db.json.tmp
+data/db.json.bak-*
+data/upstream/.fetched-at
+config.json
+*.log
+DEPLOY.md
+README.md

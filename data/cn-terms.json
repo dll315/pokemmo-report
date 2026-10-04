@@ -1,0 +1,3351 @@
+{
+  "moves": {
+    "Absorb": {
+      "cn": "吸取",
+      "source": "pokeapi"
+    },
+    "Acid": {
+      "cn": "溶解液",
+      "source": "pokeapi"
+    },
+    "Acid Armor": {
+      "cn": "溶化",
+      "source": "pokeapi"
+    },
+    "Acid Spray": {
+      "cn": "酸液炸弹",
+      "source": "pokeapi"
+    },
+    "Acrobatics": {
+      "cn": "杂技",
+      "source": "pokeapi"
+    },
+    "Acupressure": {
+      "cn": "点穴",
+      "source": "pokeapi"
+    },
+    "Aerial Ace": {
+      "cn": "燕返",
+      "source": "pokeapi"
+    },
+    "Aeroblast": {
+      "cn": "气旋攻击",
+      "source": "pokeapi"
+    },
+    "After You": {
+      "cn": "您先请",
+      "source": "pokeapi"
+    },
+    "Agility": {
+      "cn": "高速移动",
+      "source": "pokeapi"
+    },
+    "Air Cutter": {
+      "cn": "空气利刃",
+      "source": "pokeapi"
+    },
+    "Air Slash": {
+      "cn": "空气斩",
+      "source": "pokeapi"
+    },
+    "Ally Switch": {
+      "cn": "交换场地",
+      "source": "pokeapi"
+    },
+    "Amnesia": {
+      "cn": "瞬间失忆",
+      "source": "pokeapi"
+    },
+    "AncientPower": {
+      "cn": "原始之力",
+      "source": "pokeapi"
+    },
+    "Aqua Jet": {
+      "cn": "水流喷射",
+      "source": "pokeapi"
+    },
+    "Aqua Ring": {
+      "cn": "水流环",
+      "source": "pokeapi"
+    },
+    "Aqua Tail": {
+      "cn": "水流尾",
+      "source": "pokeapi"
+    },
+    "Arm Thrust": {
+      "cn": "猛推",
+      "source": "pokeapi"
+    },
+    "Aromatherapy": {
+      "cn": "芳香治疗",
+      "source": "pokeapi"
+    },
+    "Assist": {
+      "cn": "借助",
+      "source": "pokeapi"
+    },
+    "Assurance": {
+      "cn": "恶意追击",
+      "source": "pokeapi"
+    },
+    "Astonish": {
+      "cn": "惊吓",
+      "source": "pokeapi"
+    },
+    "Attack Order": {
+      "cn": "攻击指令",
+      "source": "pokeapi"
+    },
+    "Attract": {
+      "cn": "迷人",
+      "source": "pokeapi"
+    },
+    "Aura Sphere": {
+      "cn": "波导弹",
+      "source": "pokeapi"
+    },
+    "Aurora Beam": {
+      "cn": "极光束",
+      "source": "pokeapi"
+    },
+    "Autotomize": {
+      "cn": "身体轻量化",
+      "source": "pokeapi"
+    },
+    "Avalanche": {
+      "cn": "雪崩",
+      "source": "pokeapi"
+    },
+    "Barrage": {
+      "cn": "投球",
+      "source": "pokeapi"
+    },
+    "Barrier": {
+      "cn": "屏障",
+      "source": "pokeapi"
+    },
+    "Baton Pass": {
+      "cn": "接棒",
+      "source": "pokeapi"
+    },
+    "Beat Up": {
+      "cn": "围攻",
+      "source": "pokeapi"
+    },
+    "Belly Drum": {
+      "cn": "腹鼓",
+      "source": "pokeapi"
+    },
+    "Bestow": {
+      "cn": "传递礼物",
+      "source": "pokeapi"
+    },
+    "Bide": {
+      "cn": "忍耐",
+      "source": "pokeapi"
+    },
+    "Bind": {
+      "cn": "绑紧",
+      "source": "pokeapi"
+    },
+    "Bite": {
+      "cn": "咬住",
+      "source": "pokeapi"
+    },
+    "Blast Burn": {
+      "cn": "爆炸烈焰",
+      "source": "pokeapi"
+    },
+    "Blaze Kick": {
+      "cn": "火焰踢",
+      "source": "pokeapi"
+    },
+    "Blizzard": {
+      "cn": "暴风雪",
+      "source": "pokeapi"
+    },
+    "Block": {
+      "cn": "挡路",
+      "source": "pokeapi"
+    },
+    "Blue Flare": {
+      "cn": "青焰",
+      "source": "pokeapi"
+    },
+    "Body Slam": {
+      "cn": "泰山压顶",
+      "source": "pokeapi"
+    },
+    "Bolt Strike": {
+      "cn": "雷击",
+      "source": "pokeapi"
+    },
+    "Bone Club": {
+      "cn": "骨棒",
+      "source": "pokeapi"
+    },
+    "Bone Rush": {
+      "cn": "骨棒乱打",
+      "source": "pokeapi"
+    },
+    "Bonemerang": {
+      "cn": "骨头回力镖",
+      "source": "pokeapi"
+    },
+    "Bounce": {
+      "cn": "弹跳",
+      "source": "pokeapi"
+    },
+    "Brave Bird": {
+      "cn": "勇鸟猛攻",
+      "source": "pokeapi"
+    },
+    "Brick Break": {
+      "cn": "劈瓦",
+      "source": "pokeapi"
+    },
+    "Brine": {
+      "cn": "盐水",
+      "source": "pokeapi"
+    },
+    "Bubble": {
+      "cn": "泡沫",
+      "source": "pokeapi"
+    },
+    "BubbleBeam": {
+      "cn": "泡沫光线",
+      "source": "pokeapi"
+    },
+    "Bug Bite": {
+      "cn": "虫咬",
+      "source": "pokeapi"
+    },
+    "Bug Buzz": {
+      "cn": "虫鸣",
+      "source": "pokeapi"
+    },
+    "Bulk Up": {
+      "cn": "健美",
+      "source": "pokeapi"
+    },
+    "Bulldoze": {
+      "cn": "重踏",
+      "source": "pokeapi"
+    },
+    "Bullet Punch": {
+      "cn": "子弹拳",
+      "source": "pokeapi"
+    },
+    "Bullet Seed": {
+      "cn": "种子机关枪",
+      "source": "pokeapi"
+    },
+    "Calm Mind": {
+      "cn": "冥想",
+      "source": "pokeapi"
+    },
+    "Camouflage": {
+      "cn": "保护色",
+      "source": "pokeapi"
+    },
+    "Captivate": {
+      "cn": "诱惑",
+      "source": "pokeapi"
+    },
+    "Charge": {
+      "cn": "充电",
+      "source": "pokeapi"
+    },
+    "Charge Beam": {
+      "cn": "充电光束",
+      "source": "pokeapi"
+    },
+    "Charm": {
+      "cn": "撒娇",
+      "source": "pokeapi"
+    },
+    "Chatter": {
+      "cn": "喋喋不休",
+      "source": "pokeapi"
+    },
+    "Chip Away": {
+      "cn": "逐步击破",
+      "source": "pokeapi"
+    },
+    "Circle Throw": {
+      "cn": "巴投",
+      "source": "pokeapi"
+    },
+    "Clamp": {
+      "cn": "贝壳夹击",
+      "source": "pokeapi"
+    },
+    "Clear Smog": {
+      "cn": "清除之烟",
+      "source": "pokeapi"
+    },
+    "Close Combat": {
+      "cn": "近身战",
+      "source": "pokeapi"
+    },
+    "Coil": {
+      "cn": "盘蜷",
+      "source": "pokeapi"
+    },
+    "Comet Punch": {
+      "cn": "连续拳",
+      "source": "pokeapi"
+    },
+    "Confuse Ray": {
+      "cn": "奇异之光",
+      "source": "pokeapi"
+    },
+    "Confusion": {
+      "cn": "念力",
+      "source": "pokeapi"
+    },
+    "Constrict": {
+      "cn": "缠绕",
+      "source": "pokeapi"
+    },
+    "Conversion": {
+      "cn": "纹理",
+      "source": "pokeapi"
+    },
+    "Conversion 2": {
+      "cn": "纹理２",
+      "source": "pokeapi"
+    },
+    "Copycat": {
+      "cn": "仿效",
+      "source": "pokeapi"
+    },
+    "Cosmic Power": {
+      "cn": "宇宙力量",
+      "source": "pokeapi"
+    },
+    "Cotton Guard": {
+      "cn": "棉花防守",
+      "source": "pokeapi"
+    },
+    "Cotton Spore": {
+      "cn": "棉孢子",
+      "source": "pokeapi"
+    },
+    "Counter": {
+      "cn": "双倍奉还",
+      "source": "pokeapi"
+    },
+    "Covet": {
+      "cn": "渴望",
+      "source": "pokeapi"
+    },
+    "Crabhammer": {
+      "cn": "蟹钳锤",
+      "source": "pokeapi"
+    },
+    "Cross Chop": {
+      "cn": "十字劈",
+      "source": "pokeapi"
+    },
+    "Cross Poison": {
+      "cn": "十字毒刃",
+      "source": "pokeapi"
+    },
+    "Crunch": {
+      "cn": "咬碎",
+      "source": "pokeapi"
+    },
+    "Crush Claw": {
+      "cn": "撕裂爪",
+      "source": "pokeapi"
+    },
+    "Crush Grip": {
+      "cn": "捏碎",
+      "source": "pokeapi"
+    },
+    "Curse": {
+      "cn": "诅咒",
+      "source": "pokeapi"
+    },
+    "Cut": {
+      "cn": "居合斩",
+      "source": "pokeapi"
+    },
+    "Dark Pulse": {
+      "cn": "恶之波动",
+      "source": "pokeapi"
+    },
+    "Dark Void": {
+      "cn": "暗黑洞",
+      "source": "pokeapi"
+    },
+    "Defend Order": {
+      "cn": "防御指令",
+      "source": "pokeapi"
+    },
+    "Defense Curl": {
+      "cn": "变圆",
+      "source": "pokeapi"
+    },
+    "Defog": {
+      "cn": "清除浓雾",
+      "source": "pokeapi"
+    },
+    "Destiny Bond": {
+      "cn": "同命",
+      "source": "pokeapi"
+    },
+    "Detect": {
+      "cn": "看穿",
+      "source": "pokeapi"
+    },
+    "Dig": {
+      "cn": "挖洞",
+      "source": "pokeapi"
+    },
+    "Disable": {
+      "cn": "定身法",
+      "source": "pokeapi"
+    },
+    "Discharge": {
+      "cn": "放电",
+      "source": "pokeapi"
+    },
+    "Dive": {
+      "cn": "潜水",
+      "source": "pokeapi"
+    },
+    "Dizzy Punch": {
+      "cn": "迷昏拳",
+      "source": "pokeapi"
+    },
+    "Doom Desire": {
+      "cn": "破灭之愿",
+      "source": "pokeapi"
+    },
+    "Double Hit": {
+      "cn": "二连击",
+      "source": "pokeapi"
+    },
+    "Double Kick": {
+      "cn": "二连踢",
+      "source": "pokeapi"
+    },
+    "Double Team": {
+      "cn": "影子分身",
+      "source": "pokeapi"
+    },
+    "Double-Edge": {
+      "cn": "舍身冲撞",
+      "source": "pokeapi"
+    },
+    "DoubleSlap": {
+      "cn": "连环巴掌",
+      "source": "pokeapi"
+    },
+    "Draco Meteor": {
+      "cn": "流星群",
+      "source": "pokeapi"
+    },
+    "Dragon Claw": {
+      "cn": "龙爪",
+      "source": "pokeapi"
+    },
+    "Dragon Dance": {
+      "cn": "龙之舞",
+      "source": "pokeapi"
+    },
+    "Dragon Pulse": {
+      "cn": "龙之波动",
+      "source": "pokeapi"
+    },
+    "Dragon Rage": {
+      "cn": "龙之怒",
+      "source": "pokeapi"
+    },
+    "Dragon Rush": {
+      "cn": "龙之俯冲",
+      "source": "pokeapi"
+    },
+    "Dragon Tail": {
+      "cn": "龙尾",
+      "source": "pokeapi"
+    },
+    "DragonBreath": {
+      "cn": "龙息",
+      "source": "pokeapi"
+    },
+    "Drain Punch": {
+      "cn": "吸取拳",
+      "source": "pokeapi"
+    },
+    "Dream Eater": {
+      "cn": "食梦",
+      "source": "pokeapi"
+    },
+    "Drill Peck": {
+      "cn": "啄钻",
+      "source": "pokeapi"
+    },
+    "Drill Run": {
+      "cn": "直冲钻",
+      "source": "pokeapi"
+    },
+    "Dual Chop": {
+      "cn": "二连劈",
+      "source": "pokeapi"
+    },
+    "DynamicPunch": {
+      "cn": "爆裂拳",
+      "source": "pokeapi"
+    },
+    "Earth Power": {
+      "cn": "大地之力",
+      "source": "pokeapi"
+    },
+    "Earthquake": {
+      "cn": "地震",
+      "source": "pokeapi"
+    },
+    "Echoed Voice": {
+      "cn": "回声",
+      "source": "pokeapi"
+    },
+    "Egg Bomb": {
+      "cn": "炸蛋",
+      "source": "pokeapi"
+    },
+    "Electro Ball": {
+      "cn": "电球",
+      "source": "pokeapi"
+    },
+    "Electroweb": {
+      "cn": "电网",
+      "source": "pokeapi"
+    },
+    "Embargo": {
+      "cn": "查封",
+      "source": "pokeapi"
+    },
+    "Ember": {
+      "cn": "火花",
+      "source": "pokeapi"
+    },
+    "Encore": {
+      "cn": "再来一次",
+      "source": "pokeapi"
+    },
+    "Endeavor": {
+      "cn": "蛮干",
+      "source": "pokeapi"
+    },
+    "Endure": {
+      "cn": "挺住",
+      "source": "pokeapi"
+    },
+    "Energy Ball": {
+      "cn": "能量球",
+      "source": "pokeapi"
+    },
+    "Entrainment": {
+      "cn": "找伙伴",
+      "source": "pokeapi"
+    },
+    "Eruption": {
+      "cn": "喷火",
+      "source": "pokeapi"
+    },
+    "Explosion": {
+      "cn": "大爆炸",
+      "source": "pokeapi"
+    },
+    "Extrasensory": {
+      "cn": "神通力",
+      "source": "pokeapi"
+    },
+    "ExtremeSpeed": {
+      "cn": "神速",
+      "source": "pokeapi"
+    },
+    "Facade": {
+      "cn": "硬撑",
+      "source": "pokeapi"
+    },
+    "Faint Attack": {
+      "cn": "出奇一击",
+      "source": "manual",
+      "note": "legacy pokemmo label: Feint Attack (pokeapi move/feint-attack)"
+    },
+    "Fake Out": {
+      "cn": "击掌奇袭",
+      "source": "pokeapi"
+    },
+    "Fake Tears": {
+      "cn": "假哭",
+      "source": "pokeapi"
+    },
+    "False Swipe": {
+      "cn": "点到为止",
+      "source": "pokeapi"
+    },
+    "FeatherDance": {
+      "cn": "羽毛舞",
+      "source": "pokeapi"
+    },
+    "Feint": {
+      "cn": "佯攻",
+      "source": "pokeapi"
+    },
+    "Fiery Dance": {
+      "cn": "火之舞",
+      "source": "pokeapi"
+    },
+    "Final Gambit": {
+      "cn": "搏命",
+      "source": "pokeapi"
+    },
+    "Fire Blast": {
+      "cn": "大字爆炎",
+      "source": "pokeapi"
+    },
+    "Fire Fang": {
+      "cn": "火焰牙",
+      "source": "pokeapi"
+    },
+    "Fire Pledge": {
+      "cn": "火之誓约",
+      "source": "pokeapi"
+    },
+    "Fire Punch": {
+      "cn": "火焰拳",
+      "source": "pokeapi"
+    },
+    "Fire Spin": {
+      "cn": "火焰旋涡",
+      "source": "pokeapi"
+    },
+    "Fissure": {
+      "cn": "地裂",
+      "source": "pokeapi"
+    },
+    "Flail": {
+      "cn": "抓狂",
+      "source": "pokeapi"
+    },
+    "Flame Burst": {
+      "cn": "烈焰溅射",
+      "source": "pokeapi"
+    },
+    "Flame Charge": {
+      "cn": "蓄能焰袭",
+      "source": "pokeapi"
+    },
+    "Flame Wheel": {
+      "cn": "火焰轮",
+      "source": "pokeapi"
+    },
+    "Flamethrower": {
+      "cn": "喷射火焰",
+      "source": "pokeapi"
+    },
+    "Flare Blitz": {
+      "cn": "闪焰冲锋",
+      "source": "pokeapi"
+    },
+    "Flash": {
+      "cn": "闪光",
+      "source": "pokeapi"
+    },
+    "Flash Cannon": {
+      "cn": "加农光炮",
+      "source": "pokeapi"
+    },
+    "Flatter": {
+      "cn": "吹捧",
+      "source": "pokeapi"
+    },
+    "Fling": {
+      "cn": "投掷",
+      "source": "pokeapi"
+    },
+    "Fly": {
+      "cn": "飞翔",
+      "source": "pokeapi"
+    },
+    "Focus Blast": {
+      "cn": "真气弹",
+      "source": "pokeapi"
+    },
+    "Focus Energy": {
+      "cn": "聚气",
+      "source": "pokeapi"
+    },
+    "Focus Punch": {
+      "cn": "真气拳",
+      "source": "pokeapi"
+    },
+    "Follow Me": {
+      "cn": "看我嘛",
+      "source": "pokeapi"
+    },
+    "Force Palm": {
+      "cn": "发劲",
+      "source": "pokeapi"
+    },
+    "Foresight": {
+      "cn": "识破",
+      "source": "pokeapi"
+    },
+    "Foul Play": {
+      "cn": "欺诈",
+      "source": "pokeapi"
+    },
+    "Frenzy Plant": {
+      "cn": "疯狂植物",
+      "source": "pokeapi"
+    },
+    "Frost Breath": {
+      "cn": "冰息",
+      "source": "pokeapi"
+    },
+    "Frustration": {
+      "cn": "迁怒",
+      "source": "pokeapi"
+    },
+    "Fury Attack": {
+      "cn": "乱击",
+      "source": "pokeapi"
+    },
+    "Fury Cutter": {
+      "cn": "连斩",
+      "source": "pokeapi"
+    },
+    "Fury Swipes": {
+      "cn": "乱抓",
+      "source": "pokeapi"
+    },
+    "Fusion Bolt": {
+      "cn": "交错闪电",
+      "source": "pokeapi"
+    },
+    "Fusion Flare": {
+      "cn": "交错火焰",
+      "source": "pokeapi"
+    },
+    "Future Sight": {
+      "cn": "预知未来",
+      "source": "pokeapi"
+    },
+    "Gastro Acid": {
+      "cn": "胃液",
+      "source": "pokeapi"
+    },
+    "Gear Grind": {
+      "cn": "齿轮飞盘",
+      "source": "pokeapi"
+    },
+    "Giga Drain": {
+      "cn": "终极吸取",
+      "source": "pokeapi"
+    },
+    "Giga Impact": {
+      "cn": "终极冲击",
+      "source": "pokeapi"
+    },
+    "Glaciate": {
+      "cn": "冰封世界",
+      "source": "pokeapi"
+    },
+    "Glare": {
+      "cn": "大蛇瞪眼",
+      "source": "pokeapi"
+    },
+    "Grass Knot": {
+      "cn": "打草结",
+      "source": "pokeapi"
+    },
+    "Grass Pledge": {
+      "cn": "草之誓约",
+      "source": "pokeapi"
+    },
+    "GrassWhistle": {
+      "cn": "草笛",
+      "source": "pokeapi"
+    },
+    "Gravity": {
+      "cn": "重力",
+      "source": "pokeapi"
+    },
+    "Growl": {
+      "cn": "叫声",
+      "source": "pokeapi"
+    },
+    "Growth": {
+      "cn": "生长",
+      "source": "pokeapi"
+    },
+    "Grudge": {
+      "cn": "怨念",
+      "source": "pokeapi"
+    },
+    "Guard Split": {
+      "cn": "防守平分",
+      "source": "pokeapi"
+    },
+    "Guard Swap": {
+      "cn": "防守互换",
+      "source": "pokeapi"
+    },
+    "Guillotine": {
+      "cn": "断头钳",
+      "source": "pokeapi"
+    },
+    "Gunk Shot": {
+      "cn": "垃圾射击",
+      "source": "pokeapi"
+    },
+    "Gust": {
+      "cn": "起风",
+      "source": "pokeapi"
+    },
+    "Gyro Ball": {
+      "cn": "陀螺球",
+      "source": "pokeapi"
+    },
+    "Hammer Arm": {
+      "cn": "臂锤",
+      "source": "pokeapi"
+    },
+    "Harden": {
+      "cn": "变硬",
+      "source": "pokeapi"
+    },
+    "Haze": {
+      "cn": "黑雾",
+      "source": "pokeapi"
+    },
+    "Head Charge": {
+      "cn": "爆炸头突击",
+      "source": "pokeapi"
+    },
+    "Head Smash": {
+      "cn": "双刃头锤",
+      "source": "pokeapi"
+    },
+    "Headbutt": {
+      "cn": "头锤",
+      "source": "pokeapi"
+    },
+    "Heal Bell": {
+      "cn": "治愈铃声",
+      "source": "pokeapi"
+    },
+    "Heal Block": {
+      "cn": "回复封锁",
+      "source": "pokeapi"
+    },
+    "Heal Order": {
+      "cn": "回复指令",
+      "source": "pokeapi"
+    },
+    "Heal Pulse": {
+      "cn": "治愈波动",
+      "source": "pokeapi"
+    },
+    "Healing Wish": {
+      "cn": "治愈之愿",
+      "source": "pokeapi"
+    },
+    "Heart Stamp": {
+      "cn": "爱心印章",
+      "source": "pokeapi"
+    },
+    "Heart Swap": {
+      "cn": "心灵互换",
+      "source": "pokeapi"
+    },
+    "Heat Crash": {
+      "cn": "高温重压",
+      "source": "pokeapi"
+    },
+    "Heat Wave": {
+      "cn": "热风",
+      "source": "pokeapi"
+    },
+    "Heavy Slam": {
+      "cn": "重磅冲撞",
+      "source": "pokeapi"
+    },
+    "Helping Hand": {
+      "cn": "帮助",
+      "source": "pokeapi"
+    },
+    "Hex": {
+      "cn": "祸不单行",
+      "source": "pokeapi"
+    },
+    "Hi Jump Kick": {
+      "cn": "飞膝踢",
+      "source": "manual",
+      "note": "legacy pokemmo label: High Jump Kick (pokeapi move/high-jump-kick)"
+    },
+    "Hidden Power": {
+      "cn": "觉醒力量",
+      "source": "pokeapi"
+    },
+    "Hone Claws": {
+      "cn": "磨爪",
+      "source": "pokeapi"
+    },
+    "Horn Attack": {
+      "cn": "角撞",
+      "source": "pokeapi"
+    },
+    "Horn Drill": {
+      "cn": "角钻",
+      "source": "pokeapi"
+    },
+    "Horn Leech": {
+      "cn": "木角",
+      "source": "pokeapi"
+    },
+    "Howl": {
+      "cn": "长嚎",
+      "source": "pokeapi"
+    },
+    "Hurricane": {
+      "cn": "暴风",
+      "source": "pokeapi"
+    },
+    "Hydro Cannon": {
+      "cn": "加农水炮",
+      "source": "pokeapi"
+    },
+    "Hydro Pump": {
+      "cn": "水炮",
+      "source": "pokeapi"
+    },
+    "Hyper Beam": {
+      "cn": "破坏光线",
+      "source": "pokeapi"
+    },
+    "Hyper Fang": {
+      "cn": "必杀门牙",
+      "source": "pokeapi"
+    },
+    "Hyper Voice": {
+      "cn": "巨声",
+      "source": "pokeapi"
+    },
+    "Hypnosis": {
+      "cn": "催眠术",
+      "source": "pokeapi"
+    },
+    "Ice Ball": {
+      "cn": "冰球",
+      "source": "pokeapi"
+    },
+    "Ice Beam": {
+      "cn": "冰冻光束",
+      "source": "pokeapi"
+    },
+    "Ice Fang": {
+      "cn": "冰冻牙",
+      "source": "pokeapi"
+    },
+    "Ice Punch": {
+      "cn": "冰冻拳",
+      "source": "pokeapi"
+    },
+    "Ice Shard": {
+      "cn": "冰砾",
+      "source": "pokeapi"
+    },
+    "Icicle Crash": {
+      "cn": "冰柱坠击",
+      "source": "pokeapi"
+    },
+    "Icicle Spear": {
+      "cn": "冰锥",
+      "source": "pokeapi"
+    },
+    "Icy Wind": {
+      "cn": "冰冻之风",
+      "source": "pokeapi"
+    },
+    "Imprison": {
+      "cn": "封印",
+      "source": "pokeapi"
+    },
+    "Incinerate": {
+      "cn": "烧尽",
+      "source": "pokeapi"
+    },
+    "Inferno": {
+      "cn": "炼狱",
+      "source": "pokeapi"
+    },
+    "Ingrain": {
+      "cn": "扎根",
+      "source": "pokeapi"
+    },
+    "Iron Defense": {
+      "cn": "铁壁",
+      "source": "pokeapi"
+    },
+    "Iron Head": {
+      "cn": "铁头",
+      "source": "pokeapi"
+    },
+    "Iron Tail": {
+      "cn": "铁尾",
+      "source": "pokeapi"
+    },
+    "Judgment": {
+      "cn": "制裁光砾",
+      "source": "pokeapi"
+    },
+    "Jump Kick": {
+      "cn": "飞踢",
+      "source": "pokeapi"
+    },
+    "Karate Chop": {
+      "cn": "空手劈",
+      "source": "pokeapi"
+    },
+    "Kinesis": {
+      "cn": "折弯汤匙",
+      "source": "pokeapi"
+    },
+    "Knock Off": {
+      "cn": "拍落",
+      "source": "pokeapi"
+    },
+    "Last Resort": {
+      "cn": "珍藏",
+      "source": "pokeapi"
+    },
+    "Lava Plume": {
+      "cn": "喷烟",
+      "source": "pokeapi"
+    },
+    "Leaf Blade": {
+      "cn": "叶刃",
+      "source": "pokeapi"
+    },
+    "Leaf Storm": {
+      "cn": "飞叶风暴",
+      "source": "pokeapi"
+    },
+    "Leaf Tornado": {
+      "cn": "青草搅拌器",
+      "source": "pokeapi"
+    },
+    "Leech Life": {
+      "cn": "吸血",
+      "source": "pokeapi"
+    },
+    "Leech Seed": {
+      "cn": "寄生种子",
+      "source": "pokeapi"
+    },
+    "Leer": {
+      "cn": "瞪眼",
+      "source": "pokeapi"
+    },
+    "Lick": {
+      "cn": "舌舔",
+      "source": "pokeapi"
+    },
+    "Light Screen": {
+      "cn": "光墙",
+      "source": "pokeapi"
+    },
+    "Lock-On": {
+      "cn": "锁定",
+      "source": "pokeapi"
+    },
+    "Lovely Kiss": {
+      "cn": "恶魔之吻",
+      "source": "pokeapi"
+    },
+    "Low Kick": {
+      "cn": "踢倒",
+      "source": "pokeapi"
+    },
+    "Low Sweep": {
+      "cn": "下盘踢",
+      "source": "pokeapi"
+    },
+    "Lucky Chant": {
+      "cn": "幸运咒语",
+      "source": "pokeapi"
+    },
+    "Lunar Dance": {
+      "cn": "新月舞",
+      "source": "pokeapi"
+    },
+    "Luster Purge": {
+      "cn": "洁净光芒",
+      "source": "pokeapi"
+    },
+    "Mach Punch": {
+      "cn": "音速拳",
+      "source": "pokeapi"
+    },
+    "Magic Coat": {
+      "cn": "魔法反射",
+      "source": "pokeapi"
+    },
+    "Magic Room": {
+      "cn": "魔法空间",
+      "source": "pokeapi"
+    },
+    "Magical Leaf": {
+      "cn": "魔法叶",
+      "source": "pokeapi"
+    },
+    "Magma Storm": {
+      "cn": "熔岩风暴",
+      "source": "pokeapi"
+    },
+    "Magnet Bomb": {
+      "cn": "磁铁炸弹",
+      "source": "pokeapi"
+    },
+    "Magnet Rise": {
+      "cn": "电磁飘浮",
+      "source": "pokeapi"
+    },
+    "Magnitude": {
+      "cn": "震级",
+      "source": "pokeapi"
+    },
+    "Me First": {
+      "cn": "抢先一步",
+      "source": "pokeapi"
+    },
+    "Mean Look": {
+      "cn": "黑色目光",
+      "source": "pokeapi"
+    },
+    "Meditate": {
+      "cn": "瑜伽姿势",
+      "source": "pokeapi"
+    },
+    "Mega Drain": {
+      "cn": "超级吸取",
+      "source": "pokeapi"
+    },
+    "Mega Kick": {
+      "cn": "百万吨重踢",
+      "source": "pokeapi"
+    },
+    "Mega Punch": {
+      "cn": "百万吨重拳",
+      "source": "pokeapi"
+    },
+    "Megahorn": {
+      "cn": "超级角击",
+      "source": "pokeapi"
+    },
+    "Memento": {
+      "cn": "临别礼物",
+      "source": "pokeapi"
+    },
+    "Metal Burst": {
+      "cn": "金属爆炸",
+      "source": "pokeapi"
+    },
+    "Metal Claw": {
+      "cn": "金属爪",
+      "source": "pokeapi"
+    },
+    "Metal Sound": {
+      "cn": "金属音",
+      "source": "pokeapi"
+    },
+    "Meteor Mash": {
+      "cn": "彗星拳",
+      "source": "pokeapi"
+    },
+    "Metronome": {
+      "cn": "挥指",
+      "source": "pokeapi"
+    },
+    "Milk Drink": {
+      "cn": "喝牛奶",
+      "source": "pokeapi"
+    },
+    "Mimic": {
+      "cn": "模仿",
+      "source": "pokeapi"
+    },
+    "Mind Reader": {
+      "cn": "心之眼",
+      "source": "pokeapi"
+    },
+    "Minimize": {
+      "cn": "变小",
+      "source": "pokeapi"
+    },
+    "Miracle Eye": {
+      "cn": "奇迹之眼",
+      "source": "pokeapi"
+    },
+    "Mirror Coat": {
+      "cn": "镜面反射",
+      "source": "pokeapi"
+    },
+    "Mirror Move": {
+      "cn": "鹦鹉学舌",
+      "source": "pokeapi"
+    },
+    "Mirror Shot": {
+      "cn": "镜光射击",
+      "source": "pokeapi"
+    },
+    "Mist": {
+      "cn": "白雾",
+      "source": "pokeapi"
+    },
+    "Mist Ball": {
+      "cn": "薄雾球",
+      "source": "pokeapi"
+    },
+    "Moonlight": {
+      "cn": "月光",
+      "source": "pokeapi"
+    },
+    "Morning Sun": {
+      "cn": "晨光",
+      "source": "pokeapi"
+    },
+    "Mud Bomb": {
+      "cn": "泥巴炸弹",
+      "source": "pokeapi"
+    },
+    "Mud Shot": {
+      "cn": "泥巴射击",
+      "source": "pokeapi"
+    },
+    "Mud Sport": {
+      "cn": "玩泥巴",
+      "source": "pokeapi"
+    },
+    "Mud-Slap": {
+      "cn": "掷泥",
+      "source": "pokeapi"
+    },
+    "Muddy Water": {
+      "cn": "浊流",
+      "source": "pokeapi"
+    },
+    "Nasty Plot": {
+      "cn": "诡计",
+      "source": "pokeapi"
+    },
+    "Natural Gift": {
+      "cn": "自然之恩",
+      "source": "pokeapi"
+    },
+    "Nature Power": {
+      "cn": "自然之力",
+      "source": "pokeapi"
+    },
+    "Needle Arm": {
+      "cn": "尖刺臂",
+      "source": "pokeapi"
+    },
+    "Night Daze": {
+      "cn": "暗黑爆破",
+      "source": "pokeapi"
+    },
+    "Night Shade": {
+      "cn": "黑夜魔影",
+      "source": "pokeapi"
+    },
+    "Night Slash": {
+      "cn": "暗袭要害",
+      "source": "pokeapi"
+    },
+    "Nightmare": {
+      "cn": "恶梦",
+      "source": "pokeapi"
+    },
+    "Octazooka": {
+      "cn": "章鱼桶炮",
+      "source": "pokeapi"
+    },
+    "Odor Sleuth": {
+      "cn": "气味侦测",
+      "source": "pokeapi"
+    },
+    "Ominous Wind": {
+      "cn": "奇异之风",
+      "source": "pokeapi"
+    },
+    "Outrage": {
+      "cn": "逆鳞",
+      "source": "pokeapi"
+    },
+    "Overheat": {
+      "cn": "过热",
+      "source": "pokeapi"
+    },
+    "Pain Split": {
+      "cn": "分担痛楚",
+      "source": "pokeapi"
+    },
+    "Pay Day": {
+      "cn": "聚宝功",
+      "source": "pokeapi"
+    },
+    "Payback": {
+      "cn": "以牙还牙",
+      "source": "pokeapi"
+    },
+    "Peck": {
+      "cn": "啄",
+      "source": "pokeapi"
+    },
+    "Perish Song": {
+      "cn": "灭亡之歌",
+      "source": "pokeapi"
+    },
+    "Petal Dance": {
+      "cn": "花瓣舞",
+      "source": "pokeapi"
+    },
+    "Pin Missile": {
+      "cn": "飞弹针",
+      "source": "pokeapi"
+    },
+    "Pluck": {
+      "cn": "啄食",
+      "source": "pokeapi"
+    },
+    "Poison Fang": {
+      "cn": "剧毒牙",
+      "source": "pokeapi"
+    },
+    "Poison Gas": {
+      "cn": "毒瓦斯",
+      "source": "pokeapi"
+    },
+    "Poison Jab": {
+      "cn": "毒击",
+      "source": "pokeapi"
+    },
+    "Poison Sting": {
+      "cn": "毒针",
+      "source": "pokeapi"
+    },
+    "Poison Tail": {
+      "cn": "毒尾",
+      "source": "pokeapi"
+    },
+    "PoisonPowder": {
+      "cn": "毒粉",
+      "source": "pokeapi"
+    },
+    "Pound": {
+      "cn": "拍击",
+      "source": "pokeapi"
+    },
+    "Powder Snow": {
+      "cn": "细雪",
+      "source": "pokeapi"
+    },
+    "Power Gem": {
+      "cn": "力量宝石",
+      "source": "pokeapi"
+    },
+    "Power Split": {
+      "cn": "力量平分",
+      "source": "pokeapi"
+    },
+    "Power Swap": {
+      "cn": "力量互换",
+      "source": "pokeapi"
+    },
+    "Power Trick": {
+      "cn": "力量戏法",
+      "source": "pokeapi"
+    },
+    "Power Whip": {
+      "cn": "强力鞭打",
+      "source": "pokeapi"
+    },
+    "Present": {
+      "cn": "礼物",
+      "source": "pokeapi"
+    },
+    "Protect": {
+      "cn": "守住",
+      "source": "pokeapi"
+    },
+    "Psybeam": {
+      "cn": "幻象光线",
+      "source": "pokeapi"
+    },
+    "Psych Up": {
+      "cn": "自我暗示",
+      "source": "pokeapi"
+    },
+    "Psychic": {
+      "cn": "精神强念",
+      "source": "pokeapi"
+    },
+    "Psycho Boost": {
+      "cn": "精神突进",
+      "source": "pokeapi"
+    },
+    "Psycho Cut": {
+      "cn": "精神利刃",
+      "source": "pokeapi"
+    },
+    "Psycho Shift": {
+      "cn": "精神转移",
+      "source": "pokeapi"
+    },
+    "Psyshock": {
+      "cn": "精神冲击",
+      "source": "pokeapi"
+    },
+    "Psystrike": {
+      "cn": "精神击破",
+      "source": "pokeapi"
+    },
+    "Psywave": {
+      "cn": "精神波",
+      "source": "pokeapi"
+    },
+    "Punishment": {
+      "cn": "惩罚",
+      "source": "pokeapi"
+    },
+    "Pursuit": {
+      "cn": "追打",
+      "source": "pokeapi"
+    },
+    "Quash": {
+      "cn": "延后",
+      "source": "pokeapi"
+    },
+    "Quick Attack": {
+      "cn": "电光一闪",
+      "source": "pokeapi"
+    },
+    "Quick Guard": {
+      "cn": "快速防守",
+      "source": "pokeapi"
+    },
+    "Quiver Dance": {
+      "cn": "蝶舞",
+      "source": "pokeapi"
+    },
+    "Rage": {
+      "cn": "愤怒",
+      "source": "pokeapi"
+    },
+    "Rage Powder": {
+      "cn": "愤怒粉",
+      "source": "pokeapi"
+    },
+    "Rain Dance": {
+      "cn": "求雨",
+      "source": "pokeapi"
+    },
+    "Rapid Spin": {
+      "cn": "高速旋转",
+      "source": "pokeapi"
+    },
+    "Razor Leaf": {
+      "cn": "飞叶快刀",
+      "source": "pokeapi"
+    },
+    "Razor Shell": {
+      "cn": "贝壳刃",
+      "source": "pokeapi"
+    },
+    "Razor Wind": {
+      "cn": "旋风刀",
+      "source": "pokeapi"
+    },
+    "Recover": {
+      "cn": "自我再生",
+      "source": "pokeapi"
+    },
+    "Recycle": {
+      "cn": "回收利用",
+      "source": "pokeapi"
+    },
+    "Reflect": {
+      "cn": "反射壁",
+      "source": "pokeapi"
+    },
+    "Reflect Type": {
+      "cn": "镜面属性",
+      "source": "pokeapi"
+    },
+    "Refresh": {
+      "cn": "焕然一新",
+      "source": "pokeapi"
+    },
+    "Relic Song": {
+      "cn": "古老之歌",
+      "source": "pokeapi"
+    },
+    "Rest": {
+      "cn": "睡觉",
+      "source": "pokeapi"
+    },
+    "Retaliate": {
+      "cn": "报仇",
+      "source": "pokeapi"
+    },
+    "Return": {
+      "cn": "报恩",
+      "source": "pokeapi"
+    },
+    "Revenge": {
+      "cn": "报复",
+      "source": "pokeapi"
+    },
+    "Reversal": {
+      "cn": "起死回生",
+      "source": "pokeapi"
+    },
+    "Roar": {
+      "cn": "吼叫",
+      "source": "pokeapi"
+    },
+    "Roar of Time": {
+      "cn": "时光咆哮",
+      "source": "pokeapi"
+    },
+    "Rock Blast": {
+      "cn": "岩石爆击",
+      "source": "pokeapi"
+    },
+    "Rock Climb": {
+      "cn": "攀岩",
+      "source": "pokeapi"
+    },
+    "Rock Polish": {
+      "cn": "岩石打磨",
+      "source": "pokeapi"
+    },
+    "Rock Slide": {
+      "cn": "岩崩",
+      "source": "pokeapi"
+    },
+    "Rock Smash": {
+      "cn": "碎岩",
+      "source": "pokeapi"
+    },
+    "Rock Throw": {
+      "cn": "落石",
+      "source": "pokeapi"
+    },
+    "Rock Tomb": {
+      "cn": "岩石封锁",
+      "source": "pokeapi"
+    },
+    "Rock Wrecker": {
+      "cn": "岩石炮",
+      "source": "pokeapi"
+    },
+    "Role Play": {
+      "cn": "扮演",
+      "source": "pokeapi"
+    },
+    "Rolling Kick": {
+      "cn": "回旋踢",
+      "source": "pokeapi"
+    },
+    "Rollout": {
+      "cn": "滚动",
+      "source": "pokeapi"
+    },
+    "Roost": {
+      "cn": "羽栖",
+      "source": "pokeapi"
+    },
+    "Round": {
+      "cn": "轮唱",
+      "source": "pokeapi"
+    },
+    "Sacred Fire": {
+      "cn": "神圣之火",
+      "source": "pokeapi"
+    },
+    "Sacred Sword": {
+      "cn": "圣剑",
+      "source": "pokeapi"
+    },
+    "Safeguard": {
+      "cn": "神秘守护",
+      "source": "pokeapi"
+    },
+    "Sand Tomb": {
+      "cn": "流沙地狱",
+      "source": "pokeapi"
+    },
+    "Sand-Attack": {
+      "cn": "泼沙",
+      "source": "pokeapi"
+    },
+    "Sandstorm": {
+      "cn": "沙暴",
+      "source": "pokeapi"
+    },
+    "Scald": {
+      "cn": "热水",
+      "source": "pokeapi"
+    },
+    "Scary Face": {
+      "cn": "鬼面",
+      "source": "pokeapi"
+    },
+    "Scratch": {
+      "cn": "抓",
+      "source": "pokeapi"
+    },
+    "Screech": {
+      "cn": "刺耳声",
+      "source": "pokeapi"
+    },
+    "Searing Shot": {
+      "cn": "火焰弹",
+      "source": "pokeapi"
+    },
+    "Secret Power": {
+      "cn": "秘密之力",
+      "source": "pokeapi"
+    },
+    "Secret Sword": {
+      "cn": "神秘之剑",
+      "source": "pokeapi"
+    },
+    "Seed Bomb": {
+      "cn": "种子炸弹",
+      "source": "pokeapi"
+    },
+    "Seed Flare": {
+      "cn": "种子闪光",
+      "source": "pokeapi"
+    },
+    "Seismic Toss": {
+      "cn": "地球上投",
+      "source": "pokeapi"
+    },
+    "Selfdestruct": {
+      "cn": "自爆",
+      "source": "pokeapi"
+    },
+    "Shadow Ball": {
+      "cn": "暗影球",
+      "source": "pokeapi"
+    },
+    "Shadow Claw": {
+      "cn": "暗影爪",
+      "source": "pokeapi"
+    },
+    "Shadow Force": {
+      "cn": "暗影潜袭",
+      "source": "pokeapi"
+    },
+    "Shadow Punch": {
+      "cn": "暗影拳",
+      "source": "pokeapi"
+    },
+    "Shadow Sneak": {
+      "cn": "影子偷袭",
+      "source": "pokeapi"
+    },
+    "Sharpen": {
+      "cn": "棱角化",
+      "source": "pokeapi"
+    },
+    "Sheer Cold": {
+      "cn": "绝对零度",
+      "source": "pokeapi"
+    },
+    "Shell Smash": {
+      "cn": "破壳",
+      "source": "pokeapi"
+    },
+    "Shift Gear": {
+      "cn": "换档",
+      "source": "pokeapi"
+    },
+    "Shock Wave": {
+      "cn": "电击波",
+      "source": "pokeapi"
+    },
+    "Signal Beam": {
+      "cn": "信号光束",
+      "source": "pokeapi"
+    },
+    "Silver Wind": {
+      "cn": "银色旋风",
+      "source": "pokeapi"
+    },
+    "Simple Beam": {
+      "cn": "单纯光束",
+      "source": "pokeapi"
+    },
+    "Sing": {
+      "cn": "唱歌",
+      "source": "pokeapi"
+    },
+    "Sketch": {
+      "cn": "写生",
+      "source": "pokeapi"
+    },
+    "Skill Swap": {
+      "cn": "特性互换",
+      "source": "pokeapi"
+    },
+    "Skull Bash": {
+      "cn": "火箭头锤",
+      "source": "pokeapi"
+    },
+    "Sky Attack": {
+      "cn": "神鸟猛击",
+      "source": "pokeapi"
+    },
+    "Sky Drop": {
+      "cn": "自由落体",
+      "source": "pokeapi"
+    },
+    "Sky Uppercut": {
+      "cn": "冲天拳",
+      "source": "pokeapi"
+    },
+    "Slack Off": {
+      "cn": "偷懒",
+      "source": "pokeapi"
+    },
+    "Slam": {
+      "cn": "摔打",
+      "source": "pokeapi"
+    },
+    "Slash": {
+      "cn": "劈开",
+      "source": "pokeapi"
+    },
+    "Sleep Powder": {
+      "cn": "催眠粉",
+      "source": "pokeapi"
+    },
+    "Sleep Talk": {
+      "cn": "梦话",
+      "source": "pokeapi"
+    },
+    "Sludge": {
+      "cn": "污泥攻击",
+      "source": "pokeapi"
+    },
+    "Sludge Bomb": {
+      "cn": "污泥炸弹",
+      "source": "pokeapi"
+    },
+    "Sludge Wave": {
+      "cn": "污泥波",
+      "source": "pokeapi"
+    },
+    "Smack Down": {
+      "cn": "击落",
+      "source": "pokeapi"
+    },
+    "SmellingSalt": {
+      "cn": "清醒",
+      "source": "manual",
+      "note": "legacy pokemmo label: Smelling Salts (pokeapi move/smelling-salts)"
+    },
+    "Smog": {
+      "cn": "浊雾",
+      "source": "pokeapi"
+    },
+    "SmokeScreen": {
+      "cn": "烟幕",
+      "source": "pokeapi"
+    },
+    "Snarl": {
+      "cn": "大声咆哮",
+      "source": "pokeapi"
+    },
+    "Snatch": {
+      "cn": "抢夺",
+      "source": "pokeapi"
+    },
+    "Snore": {
+      "cn": "打鼾",
+      "source": "pokeapi"
+    },
+    "Snowscape": {
+      "cn": "雪景",
+      "source": "pokeapi"
+    },
+    "Soak": {
+      "cn": "浸水",
+      "source": "pokeapi"
+    },
+    "Softboiled": {
+      "cn": "生蛋",
+      "source": "pokeapi"
+    },
+    "SolarBeam": {
+      "cn": "日光束",
+      "source": "pokeapi"
+    },
+    "SonicBoom": {
+      "cn": "音爆",
+      "source": "pokeapi"
+    },
+    "Spacial Rend": {
+      "cn": "亚空裂斩",
+      "source": "pokeapi"
+    },
+    "Spark": {
+      "cn": "电光",
+      "source": "pokeapi"
+    },
+    "Spider Web": {
+      "cn": "蛛网",
+      "source": "pokeapi"
+    },
+    "Spike Cannon": {
+      "cn": "尖刺加农炮",
+      "source": "pokeapi"
+    },
+    "Spikes": {
+      "cn": "撒菱",
+      "source": "pokeapi"
+    },
+    "Spit Up": {
+      "cn": "喷出",
+      "source": "pokeapi"
+    },
+    "Spite": {
+      "cn": "怨恨",
+      "source": "pokeapi"
+    },
+    "Splash": {
+      "cn": "跃起",
+      "source": "pokeapi"
+    },
+    "Spore": {
+      "cn": "蘑菇孢子",
+      "source": "pokeapi"
+    },
+    "Stealth Rock": {
+      "cn": "隐形岩",
+      "source": "pokeapi"
+    },
+    "Steamroller": {
+      "cn": "疯狂滚压",
+      "source": "pokeapi"
+    },
+    "Steel Wing": {
+      "cn": "钢翼",
+      "source": "pokeapi"
+    },
+    "Stockpile": {
+      "cn": "蓄力",
+      "source": "pokeapi"
+    },
+    "Stomp": {
+      "cn": "踩踏",
+      "source": "pokeapi"
+    },
+    "Stone Edge": {
+      "cn": "尖石攻击",
+      "source": "pokeapi"
+    },
+    "Stored Power": {
+      "cn": "辅助力量",
+      "source": "pokeapi"
+    },
+    "Storm Throw": {
+      "cn": "山岚摔",
+      "source": "pokeapi"
+    },
+    "Strength": {
+      "cn": "怪力",
+      "source": "pokeapi"
+    },
+    "String Shot": {
+      "cn": "吐丝",
+      "source": "pokeapi"
+    },
+    "Struggle Bug": {
+      "cn": "虫之抵抗",
+      "source": "pokeapi"
+    },
+    "Stun Spore": {
+      "cn": "麻痹粉",
+      "source": "pokeapi"
+    },
+    "Submission": {
+      "cn": "地狱翻滚",
+      "source": "pokeapi"
+    },
+    "Substitute": {
+      "cn": "替身",
+      "source": "pokeapi"
+    },
+    "Sucker Punch": {
+      "cn": "突袭",
+      "source": "pokeapi"
+    },
+    "Sunny Day": {
+      "cn": "大晴天",
+      "source": "pokeapi"
+    },
+    "Super Fang": {
+      "cn": "愤怒门牙",
+      "source": "pokeapi"
+    },
+    "Superpower": {
+      "cn": "蛮力",
+      "source": "pokeapi"
+    },
+    "Supersonic": {
+      "cn": "超音波",
+      "source": "pokeapi"
+    },
+    "Surf": {
+      "cn": "冲浪",
+      "source": "pokeapi"
+    },
+    "Swagger": {
+      "cn": "虚张声势",
+      "source": "pokeapi"
+    },
+    "Swallow": {
+      "cn": "吞下",
+      "source": "pokeapi"
+    },
+    "Sweet Kiss": {
+      "cn": "天使之吻",
+      "source": "pokeapi"
+    },
+    "Sweet Scent": {
+      "cn": "甜甜香气",
+      "source": "pokeapi"
+    },
+    "Swift": {
+      "cn": "高速星星",
+      "source": "pokeapi"
+    },
+    "Switcheroo": {
+      "cn": "掉包",
+      "source": "pokeapi"
+    },
+    "Swords Dance": {
+      "cn": "剑舞",
+      "source": "pokeapi"
+    },
+    "Synchronoise": {
+      "cn": "同步干扰",
+      "source": "pokeapi"
+    },
+    "Synthesis": {
+      "cn": "光合作用",
+      "source": "pokeapi"
+    },
+    "Tackle": {
+      "cn": "撞击",
+      "source": "pokeapi"
+    },
+    "Tail Glow": {
+      "cn": "萤火",
+      "source": "pokeapi"
+    },
+    "Tail Slap": {
+      "cn": "扫尾拍打",
+      "source": "pokeapi"
+    },
+    "Tail Whip": {
+      "cn": "摇尾巴",
+      "source": "pokeapi"
+    },
+    "Tailwind": {
+      "cn": "顺风",
+      "source": "pokeapi"
+    },
+    "Take Down": {
+      "cn": "猛撞",
+      "source": "pokeapi"
+    },
+    "Taunt": {
+      "cn": "挑衅",
+      "source": "pokeapi"
+    },
+    "Techno Blast": {
+      "cn": "高科技光炮",
+      "source": "pokeapi"
+    },
+    "Teeter Dance": {
+      "cn": "摇晃舞",
+      "source": "pokeapi"
+    },
+    "Telekinesis": {
+      "cn": "意念移物",
+      "source": "pokeapi"
+    },
+    "Teleport": {
+      "cn": "瞬间移动",
+      "source": "pokeapi"
+    },
+    "Thief": {
+      "cn": "小偷",
+      "source": "pokeapi"
+    },
+    "Thrash": {
+      "cn": "大闹一番",
+      "source": "pokeapi"
+    },
+    "Thunder": {
+      "cn": "打雷",
+      "source": "pokeapi"
+    },
+    "Thunder Fang": {
+      "cn": "雷电牙",
+      "source": "pokeapi"
+    },
+    "Thunder Wave": {
+      "cn": "电磁波",
+      "source": "pokeapi"
+    },
+    "ThunderPunch": {
+      "cn": "雷电拳",
+      "source": "pokeapi"
+    },
+    "ThunderShock": {
+      "cn": "电击",
+      "source": "pokeapi"
+    },
+    "Thunderbolt": {
+      "cn": "十万伏特",
+      "source": "pokeapi"
+    },
+    "Tickle": {
+      "cn": "挠痒",
+      "source": "pokeapi"
+    },
+    "Torment": {
+      "cn": "无理取闹",
+      "source": "pokeapi"
+    },
+    "Toxic": {
+      "cn": "剧毒",
+      "source": "pokeapi"
+    },
+    "Toxic Spikes": {
+      "cn": "毒菱",
+      "source": "pokeapi"
+    },
+    "Transform": {
+      "cn": "变身",
+      "source": "pokeapi"
+    },
+    "Tri Attack": {
+      "cn": "三重攻击",
+      "source": "pokeapi"
+    },
+    "Trick": {
+      "cn": "戏法",
+      "source": "pokeapi"
+    },
+    "Trick Room": {
+      "cn": "戏法空间",
+      "source": "pokeapi"
+    },
+    "Triple Kick": {
+      "cn": "三连踢",
+      "source": "pokeapi"
+    },
+    "Trump Card": {
+      "cn": "王牌",
+      "source": "pokeapi"
+    },
+    "Twineedle": {
+      "cn": "双针",
+      "source": "pokeapi"
+    },
+    "Twister": {
+      "cn": "龙卷风",
+      "source": "pokeapi"
+    },
+    "U-turn": {
+      "cn": "急速折返",
+      "source": "pokeapi"
+    },
+    "Uproar": {
+      "cn": "吵闹",
+      "source": "pokeapi"
+    },
+    "V-create": {
+      "cn": "Ｖ热焰",
+      "source": "pokeapi"
+    },
+    "Vacuum Wave": {
+      "cn": "真空波",
+      "source": "pokeapi"
+    },
+    "Venoshock": {
+      "cn": "毒液冲击",
+      "source": "pokeapi"
+    },
+    "ViceGrip": {
+      "cn": "夹住",
+      "source": "pokeapi"
+    },
+    "Vine Whip": {
+      "cn": "藤鞭",
+      "source": "pokeapi"
+    },
+    "Vital Throw": {
+      "cn": "借力摔",
+      "source": "pokeapi"
+    },
+    "Volt Switch": {
+      "cn": "伏特替换",
+      "source": "pokeapi"
+    },
+    "Volt Tackle": {
+      "cn": "伏特攻击",
+      "source": "pokeapi"
+    },
+    "Wake-Up Slap": {
+      "cn": "唤醒巴掌",
+      "source": "pokeapi"
+    },
+    "Water Gun": {
+      "cn": "水枪",
+      "source": "pokeapi"
+    },
+    "Water Pledge": {
+      "cn": "水之誓约",
+      "source": "pokeapi"
+    },
+    "Water Pulse": {
+      "cn": "水之波动",
+      "source": "pokeapi"
+    },
+    "Water Sport": {
+      "cn": "玩水",
+      "source": "pokeapi"
+    },
+    "Water Spout": {
+      "cn": "喷水",
+      "source": "pokeapi"
+    },
+    "Waterfall": {
+      "cn": "攀瀑",
+      "source": "pokeapi"
+    },
+    "Weather Ball": {
+      "cn": "气象球",
+      "source": "pokeapi"
+    },
+    "Whirlpool": {
+      "cn": "潮旋",
+      "source": "pokeapi"
+    },
+    "Whirlwind": {
+      "cn": "吹飞",
+      "source": "pokeapi"
+    },
+    "Wide Guard": {
+      "cn": "广域防守",
+      "source": "pokeapi"
+    },
+    "Wild Charge": {
+      "cn": "疯狂伏特",
+      "source": "pokeapi"
+    },
+    "Will-O-Wisp": {
+      "cn": "鬼火",
+      "source": "pokeapi"
+    },
+    "Wing Attack": {
+      "cn": "翅膀攻击",
+      "source": "pokeapi"
+    },
+    "Wish": {
+      "cn": "祈愿",
+      "source": "pokeapi"
+    },
+    "Withdraw": {
+      "cn": "缩入壳中",
+      "source": "pokeapi"
+    },
+    "Wonder Room": {
+      "cn": "奇妙空间",
+      "source": "pokeapi"
+    },
+    "Wood Hammer": {
+      "cn": "木槌",
+      "source": "pokeapi"
+    },
+    "Work Up": {
+      "cn": "自我激励",
+      "source": "pokeapi"
+    },
+    "Worry Seed": {
+      "cn": "烦恼种子",
+      "source": "pokeapi"
+    },
+    "Wrap": {
+      "cn": "紧束",
+      "source": "pokeapi"
+    },
+    "Wring Out": {
+      "cn": "绞紧",
+      "source": "pokeapi"
+    },
+    "X-Scissor": {
+      "cn": "十字剪",
+      "source": "pokeapi"
+    },
+    "Yawn": {
+      "cn": "哈欠",
+      "source": "pokeapi"
+    },
+    "Zap Cannon": {
+      "cn": "电磁炮",
+      "source": "pokeapi"
+    },
+    "Zen Headbutt": {
+      "cn": "意念头锤",
+      "source": "pokeapi"
+    }
+  },
+  "abilities": {
+    "Adaptability": {
+      "cn": "适应力",
+      "source": "pokeapi"
+    },
+    "Aftermath": {
+      "cn": "引爆",
+      "source": "pokeapi"
+    },
+    "Air Lock": {
+      "cn": "气闸",
+      "source": "pokeapi"
+    },
+    "Analytic": {
+      "cn": "分析",
+      "source": "pokeapi"
+    },
+    "Anger Point": {
+      "cn": "愤怒穴位",
+      "source": "pokeapi"
+    },
+    "Anticipation": {
+      "cn": "危险预知",
+      "source": "pokeapi"
+    },
+    "Arena Trap": {
+      "cn": "沙穴",
+      "source": "pokeapi"
+    },
+    "Bad Dreams": {
+      "cn": "梦魇",
+      "source": "pokeapi"
+    },
+    "Battle Armor": {
+      "cn": "战斗盔甲",
+      "source": "pokeapi"
+    },
+    "Big Pecks": {
+      "cn": "健壮胸肌",
+      "source": "pokeapi"
+    },
+    "Blaze": {
+      "cn": "猛火",
+      "source": "pokeapi"
+    },
+    "Chlorophyll": {
+      "cn": "叶绿素",
+      "source": "pokeapi"
+    },
+    "Clear Body": {
+      "cn": "恒净之躯",
+      "source": "pokeapi"
+    },
+    "Cloud Nine": {
+      "cn": "无关天气",
+      "source": "pokeapi"
+    },
+    "Color Change": {
+      "cn": "变色",
+      "source": "pokeapi"
+    },
+    "Competitive": {
+      "cn": "好胜",
+      "source": "pokeapi"
+    },
+    "Compoundeyes": {
+      "cn": "复眼",
+      "source": "pokeapi"
+    },
+    "Contrary": {
+      "cn": "唱反调",
+      "source": "pokeapi"
+    },
+    "Cursed Body": {
+      "cn": "诅咒之躯",
+      "source": "pokeapi"
+    },
+    "Cute Charm": {
+      "cn": "迷人之躯",
+      "source": "pokeapi"
+    },
+    "Damp": {
+      "cn": "湿气",
+      "source": "pokeapi"
+    },
+    "Defeatist": {
+      "cn": "软弱",
+      "source": "pokeapi"
+    },
+    "Defiant": {
+      "cn": "不服输",
+      "source": "pokeapi"
+    },
+    "Download": {
+      "cn": "下载",
+      "source": "pokeapi"
+    },
+    "Drizzle": {
+      "cn": "降雨",
+      "source": "pokeapi"
+    },
+    "Drought": {
+      "cn": "日照",
+      "source": "pokeapi"
+    },
+    "Dry Skin": {
+      "cn": "干燥皮肤",
+      "source": "pokeapi"
+    },
+    "Early Bird": {
+      "cn": "早起",
+      "source": "pokeapi"
+    },
+    "Effect Spore": {
+      "cn": "孢子",
+      "source": "pokeapi"
+    },
+    "Filter": {
+      "cn": "过滤",
+      "source": "pokeapi"
+    },
+    "Flame Body": {
+      "cn": "火焰之躯",
+      "source": "pokeapi"
+    },
+    "Flare Boost": {
+      "cn": "受热激升",
+      "source": "pokeapi"
+    },
+    "Flash Fire": {
+      "cn": "引火",
+      "source": "pokeapi"
+    },
+    "Flower Gift": {
+      "cn": "花之礼",
+      "source": "pokeapi"
+    },
+    "Forecast": {
+      "cn": "阴晴不定",
+      "source": "pokeapi"
+    },
+    "Forewarn": {
+      "cn": "预知梦",
+      "source": "pokeapi"
+    },
+    "Friend Guard": {
+      "cn": "友情防守",
+      "source": "pokeapi"
+    },
+    "Frisk": {
+      "cn": "察觉",
+      "source": "pokeapi"
+    },
+    "Gluttony": {
+      "cn": "贪吃鬼",
+      "source": "pokeapi"
+    },
+    "Guts": {
+      "cn": "毅力",
+      "source": "pokeapi"
+    },
+    "Harvest": {
+      "cn": "收获",
+      "source": "pokeapi"
+    },
+    "Healer": {
+      "cn": "治愈之心",
+      "source": "pokeapi"
+    },
+    "Heatproof": {
+      "cn": "耐热",
+      "source": "pokeapi"
+    },
+    "Heavy Metal": {
+      "cn": "重金属",
+      "source": "pokeapi"
+    },
+    "Honey Gather": {
+      "cn": "采蜜",
+      "source": "pokeapi"
+    },
+    "Huge Power": {
+      "cn": "大力士",
+      "source": "pokeapi"
+    },
+    "Hustle": {
+      "cn": "活力",
+      "source": "pokeapi"
+    },
+    "Hydration": {
+      "cn": "湿润之躯",
+      "source": "pokeapi"
+    },
+    "Hyper Cutter": {
+      "cn": "怪力钳",
+      "source": "pokeapi"
+    },
+    "Ice Body": {
+      "cn": "冰冻之躯",
+      "source": "pokeapi"
+    },
+    "Illuminate": {
+      "cn": "发光",
+      "source": "pokeapi"
+    },
+    "Illusion": {
+      "cn": "幻觉",
+      "source": "pokeapi"
+    },
+    "Immunity": {
+      "cn": "免疫",
+      "source": "pokeapi"
+    },
+    "Imposter": {
+      "cn": "变身者",
+      "source": "pokeapi"
+    },
+    "Infiltrator": {
+      "cn": "穿透",
+      "source": "pokeapi"
+    },
+    "Inner Focus": {
+      "cn": "精神力",
+      "source": "pokeapi"
+    },
+    "Insomnia": {
+      "cn": "不眠",
+      "source": "pokeapi"
+    },
+    "Intimidate": {
+      "cn": "威吓",
+      "source": "pokeapi"
+    },
+    "Iron Barbs": {
+      "cn": "铁刺",
+      "source": "pokeapi"
+    },
+    "Iron Fist": {
+      "cn": "铁拳",
+      "source": "pokeapi"
+    },
+    "Justified": {
+      "cn": "正义之心",
+      "source": "pokeapi"
+    },
+    "Keen Eye": {
+      "cn": "锐利目光",
+      "source": "pokeapi"
+    },
+    "Klutz": {
+      "cn": "笨拙",
+      "source": "pokeapi"
+    },
+    "Leaf Guard": {
+      "cn": "叶子防守",
+      "source": "pokeapi"
+    },
+    "Levitate": {
+      "cn": "飘浮",
+      "source": "pokeapi"
+    },
+    "Light Metal": {
+      "cn": "轻金属",
+      "source": "pokeapi"
+    },
+    "Lightning Rod": {
+      "cn": "避雷针",
+      "source": "pokeapi"
+    },
+    "Lightningrod": {
+      "cn": "避雷针",
+      "source": "pokeapi"
+    },
+    "Limber": {
+      "cn": "柔软",
+      "source": "pokeapi"
+    },
+    "Liquid Ooze": {
+      "cn": "污泥浆",
+      "source": "pokeapi"
+    },
+    "Magic Bounce": {
+      "cn": "魔法镜",
+      "source": "pokeapi"
+    },
+    "Magic Guard": {
+      "cn": "魔法防守",
+      "source": "pokeapi"
+    },
+    "Magma Armor": {
+      "cn": "熔岩铠甲",
+      "source": "pokeapi"
+    },
+    "Magnet Pull": {
+      "cn": "磁力",
+      "source": "pokeapi"
+    },
+    "Marvel Scale": {
+      "cn": "神奇鳞片",
+      "source": "pokeapi"
+    },
+    "Minus": {
+      "cn": "负电",
+      "source": "pokeapi"
+    },
+    "Mold Breaker": {
+      "cn": "破格",
+      "source": "pokeapi"
+    },
+    "Moody": {
+      "cn": "心情不定",
+      "source": "pokeapi"
+    },
+    "Motor Drive": {
+      "cn": "电气引擎",
+      "source": "pokeapi"
+    },
+    "Moxie": {
+      "cn": "自信过度",
+      "source": "pokeapi"
+    },
+    "Multiscale": {
+      "cn": "多重鳞片",
+      "source": "pokeapi"
+    },
+    "Multitype": {
+      "cn": "多属性",
+      "source": "pokeapi"
+    },
+    "Mummy": {
+      "cn": "木乃伊",
+      "source": "pokeapi"
+    },
+    "Natural Cure": {
+      "cn": "自然回复",
+      "source": "pokeapi"
+    },
+    "No Guard": {
+      "cn": "无防守",
+      "source": "pokeapi"
+    },
+    "Normalize": {
+      "cn": "一般皮肤",
+      "source": "pokeapi"
+    },
+    "Oblivious": {
+      "cn": "迟钝",
+      "source": "pokeapi"
+    },
+    "Overcoat": {
+      "cn": "防尘",
+      "source": "pokeapi"
+    },
+    "Overgrow": {
+      "cn": "茂盛",
+      "source": "pokeapi"
+    },
+    "Own Tempo": {
+      "cn": "我行我素",
+      "source": "pokeapi"
+    },
+    "Pickpocket": {
+      "cn": "顺手牵羊",
+      "source": "pokeapi"
+    },
+    "Pickup": {
+      "cn": "捡拾",
+      "source": "pokeapi"
+    },
+    "Plus": {
+      "cn": "正电",
+      "source": "pokeapi"
+    },
+    "Poison Heal": {
+      "cn": "毒疗",
+      "source": "pokeapi"
+    },
+    "Poison Point": {
+      "cn": "毒刺",
+      "source": "pokeapi"
+    },
+    "Poison Touch": {
+      "cn": "毒手",
+      "source": "pokeapi"
+    },
+    "Prankster": {
+      "cn": "恶作剧之心",
+      "source": "pokeapi"
+    },
+    "Pressure": {
+      "cn": "压迫感",
+      "source": "pokeapi"
+    },
+    "Protean": {
+      "cn": "变幻自如",
+      "source": "pokeapi"
+    },
+    "Pure Power": {
+      "cn": "瑜伽之力",
+      "source": "pokeapi"
+    },
+    "Quick Feet": {
+      "cn": "飞毛腿",
+      "source": "pokeapi"
+    },
+    "Rain Dish": {
+      "cn": "雨盘",
+      "source": "pokeapi"
+    },
+    "Rattled": {
+      "cn": "胆怯",
+      "source": "pokeapi"
+    },
+    "Reactive Gas": {
+      "cn": "化学变化气体",
+      "source": "manual",
+      "note": "legacy pokemmo label: Neutralizing Gas (pokeapi ability/neutralizing-gas)"
+    },
+    "Reckless": {
+      "cn": "舍身",
+      "source": "pokeapi"
+    },
+    "Regenerator": {
+      "cn": "再生力",
+      "source": "pokeapi"
+    },
+    "Rivalry": {
+      "cn": "斗争心",
+      "source": "pokeapi"
+    },
+    "Rock Head": {
+      "cn": "坚硬脑袋",
+      "source": "pokeapi"
+    },
+    "Rough Skin": {
+      "cn": "粗糙皮肤",
+      "source": "pokeapi"
+    },
+    "Run Away": {
+      "cn": "逃跑",
+      "source": "pokeapi"
+    },
+    "Sand Force": {
+      "cn": "沙之力",
+      "source": "pokeapi"
+    },
+    "Sand Rush": {
+      "cn": "拨沙",
+      "source": "pokeapi"
+    },
+    "Sand Stream": {
+      "cn": "扬沙",
+      "source": "pokeapi"
+    },
+    "Sand Veil": {
+      "cn": "沙隐",
+      "source": "pokeapi"
+    },
+    "Sap Sipper": {
+      "cn": "食草",
+      "source": "pokeapi"
+    },
+    "Scrappy": {
+      "cn": "胆量",
+      "source": "pokeapi"
+    },
+    "Serene Grace": {
+      "cn": "天恩",
+      "source": "pokeapi"
+    },
+    "Shadow Tag": {
+      "cn": "踩影",
+      "source": "pokeapi"
+    },
+    "Sharpness": {
+      "cn": "锋锐",
+      "source": "pokeapi"
+    },
+    "Shed Skin": {
+      "cn": "蜕皮",
+      "source": "pokeapi"
+    },
+    "Sheer Force": {
+      "cn": "强行",
+      "source": "pokeapi"
+    },
+    "Shell Armor": {
+      "cn": "硬壳盔甲",
+      "source": "pokeapi"
+    },
+    "Shield Dust": {
+      "cn": "鳞粉",
+      "source": "pokeapi"
+    },
+    "Simple": {
+      "cn": "单纯",
+      "source": "pokeapi"
+    },
+    "Skill Link": {
+      "cn": "连续攻击",
+      "source": "pokeapi"
+    },
+    "Slow Start": {
+      "cn": "慢启动",
+      "source": "pokeapi"
+    },
+    "Sniper": {
+      "cn": "狙击手",
+      "source": "pokeapi"
+    },
+    "Snow Cloak": {
+      "cn": "雪隐",
+      "source": "pokeapi"
+    },
+    "Snow Plow": {
+      "cn": "拨雪",
+      "source": "manual",
+      "note": "legacy pokemmo label: Slush Rush (pokeapi ability/slush-rush)"
+    },
+    "Snow Warning": {
+      "cn": "降雪",
+      "source": "pokeapi"
+    },
+    "Solar Power": {
+      "cn": "太阳之力",
+      "source": "pokeapi"
+    },
+    "Solid Rock": {
+      "cn": "坚硬岩石",
+      "source": "pokeapi"
+    },
+    "Soundproof": {
+      "cn": "隔音",
+      "source": "pokeapi"
+    },
+    "Speed Boost": {
+      "cn": "加速",
+      "source": "pokeapi"
+    },
+    "Stall": {
+      "cn": "慢出",
+      "source": "pokeapi"
+    },
+    "Static": {
+      "cn": "静电",
+      "source": "pokeapi"
+    },
+    "Steadfast": {
+      "cn": "不屈之心",
+      "source": "pokeapi"
+    },
+    "Stench": {
+      "cn": "恶臭",
+      "source": "pokeapi"
+    },
+    "Sticky Hold": {
+      "cn": "黏着",
+      "source": "pokeapi"
+    },
+    "Storm Drain": {
+      "cn": "引水",
+      "source": "pokeapi"
+    },
+    "Sturdy": {
+      "cn": "结实",
+      "source": "pokeapi"
+    },
+    "Suction Cups": {
+      "cn": "吸盘",
+      "source": "pokeapi"
+    },
+    "Super Luck": {
+      "cn": "超幸运",
+      "source": "pokeapi"
+    },
+    "Swarm": {
+      "cn": "虫之预感",
+      "source": "pokeapi"
+    },
+    "Swift Swim": {
+      "cn": "悠游自如",
+      "source": "pokeapi"
+    },
+    "Synchronize": {
+      "cn": "同步",
+      "source": "pokeapi"
+    },
+    "Tangled Feet": {
+      "cn": "蹒跚",
+      "source": "pokeapi"
+    },
+    "Technician": {
+      "cn": "技术高手",
+      "source": "pokeapi"
+    },
+    "Telepathy": {
+      "cn": "心灵感应",
+      "source": "pokeapi"
+    },
+    "Teravolt": {
+      "cn": "兆级电压",
+      "source": "pokeapi"
+    },
+    "Thick Fat": {
+      "cn": "厚脂肪",
+      "source": "pokeapi"
+    },
+    "Tinted Lens": {
+      "cn": "有色眼镜",
+      "source": "pokeapi"
+    },
+    "Torrent": {
+      "cn": "激流",
+      "source": "pokeapi"
+    },
+    "Toxic Boost": {
+      "cn": "中毒激升",
+      "source": "pokeapi"
+    },
+    "Trace": {
+      "cn": "复制",
+      "source": "pokeapi"
+    },
+    "Truant": {
+      "cn": "懒惰",
+      "source": "pokeapi"
+    },
+    "Turboblaze": {
+      "cn": "涡轮火焰",
+      "source": "pokeapi"
+    },
+    "Unaware": {
+      "cn": "纯朴",
+      "source": "pokeapi"
+    },
+    "Unburden": {
+      "cn": "轻装",
+      "source": "pokeapi"
+    },
+    "Unnerve": {
+      "cn": "紧张感",
+      "source": "pokeapi"
+    },
+    "Victory Star": {
+      "cn": "胜利之星",
+      "source": "pokeapi"
+    },
+    "Vital Spirit": {
+      "cn": "干劲",
+      "source": "pokeapi"
+    },
+    "Volt Absorb": {
+      "cn": "蓄电",
+      "source": "pokeapi"
+    },
+    "Water Absorb": {
+      "cn": "储水",
+      "source": "pokeapi"
+    },
+    "Water Veil": {
+      "cn": "水幕",
+      "source": "pokeapi"
+    },
+    "Weak Armor": {
+      "cn": "碎裂铠甲",
+      "source": "pokeapi"
+    },
+    "White Smoke": {
+      "cn": "白色烟雾",
+      "source": "pokeapi"
+    },
+    "Wind Rider": {
+      "cn": "乘风",
+      "source": "pokeapi"
+    },
+    "Wonder Guard": {
+      "cn": "神奇守护",
+      "source": "pokeapi"
+    },
+    "Wonder Skin": {
+      "cn": "奇迹皮肤",
+      "source": "pokeapi"
+    },
+    "Zen Mode": {
+      "cn": "达摩模式",
+      "source": "pokeapi"
+    }
+  },
+  "types": {
+    "BUG": {
+      "cn": "虫",
+      "source": "pokeapi"
+    },
+    "DARK": {
+      "cn": "恶",
+      "source": "pokeapi"
+    },
+    "DRAGON": {
+      "cn": "龙",
+      "source": "pokeapi"
+    },
+    "ELECTRIC": {
+      "cn": "电",
+      "source": "pokeapi"
+    },
+    "FAIRY": {
+      "cn": "妖精",
+      "source": "pokeapi"
+    },
+    "FIGHTING": {
+      "cn": "格斗",
+      "source": "pokeapi"
+    },
+    "FIRE": {
+      "cn": "火",
+      "source": "pokeapi"
+    },
+    "FLYING": {
+      "cn": "飞行",
+      "source": "pokeapi"
+    },
+    "GHOST": {
+      "cn": "幽灵",
+      "source": "pokeapi"
+    },
+    "GRASS": {
+      "cn": "草",
+      "source": "pokeapi"
+    },
+    "GROUND": {
+      "cn": "地面",
+      "source": "pokeapi"
+    },
+    "ICE": {
+      "cn": "冰",
+      "source": "pokeapi"
+    },
+    "NORMAL": {
+      "cn": "一般",
+      "source": "pokeapi"
+    },
+    "POISON": {
+      "cn": "毒",
+      "source": "pokeapi"
+    },
+    "PSYCHIC": {
+      "cn": "超能力",
+      "source": "pokeapi"
+    },
+    "ROCK": {
+      "cn": "岩石",
+      "source": "pokeapi"
+    },
+    "STEEL": {
+      "cn": "钢",
+      "source": "pokeapi"
+    },
+    "WATER": {
+      "cn": "水",
+      "source": "pokeapi"
+    }
+  },
+  "hms": {
+    "Cut": {
+      "cn": "居合斩",
+      "source": "pokeapi"
+    },
+    "Defog": {
+      "cn": "清除浓雾",
+      "source": "pokeapi"
+    },
+    "Dig": {
+      "cn": "挖洞",
+      "source": "pokeapi"
+    },
+    "Dive": {
+      "cn": "潜水",
+      "source": "pokeapi"
+    },
+    "Flash": {
+      "cn": "闪光",
+      "source": "pokeapi"
+    },
+    "Fly": {
+      "cn": "飞翔",
+      "source": "pokeapi"
+    },
+    "Rock Climb": {
+      "cn": "攀岩",
+      "source": "pokeapi"
+    },
+    "Rock Smash": {
+      "cn": "碎岩",
+      "source": "pokeapi"
+    },
+    "Strength": {
+      "cn": "怪力",
+      "source": "pokeapi"
+    },
+    "Surf": {
+      "cn": "冲浪",
+      "source": "pokeapi"
+    },
+    "Waterfall": {
+      "cn": "攀瀑",
+      "source": "pokeapi"
+    },
+    "Whirlpool": {
+      "cn": "潮旋",
+      "source": "pokeapi"
+    }
+  },
+  "balls": {
+    "Cherish": {
+      "cn": "贵重球",
+      "source": "manual",
+      "note": "verified: pokeapi item/cherish-ball"
+    },
+    "Cherish 2026": {
+      "cn": "贵重球 2026",
+      "source": "manual",
+      "note": "verified: pokeapi item/cherish-ball"
+    },
+    "Dusk": {
+      "cn": "黑暗球",
+      "source": "manual",
+      "note": "verified: pokeapi item/dusk-ball"
+    },
+    "Dusk 2025": {
+      "cn": "黑暗球 2025",
+      "source": "manual",
+      "note": "verified: pokeapi item/dusk-ball"
+    },
+    "Great": {
+      "cn": "超级球",
+      "source": "manual",
+      "note": "verified: pokeapi item/great-ball"
+    },
+    "Great 2025": {
+      "cn": "超级球 2025",
+      "source": "manual",
+      "note": "verified: pokeapi item/great-ball"
+    },
+    "Ultra": {
+      "cn": "高级球",
+      "source": "manual",
+      "note": "verified: pokeapi item/ultra-ball"
+    },
+    "Ultra 2025": {
+      "cn": "高级球 2025",
+      "source": "manual",
+      "note": "verified: pokeapi item/ultra-ball"
+    }
+  },
+  "concepts": {
+    "Ability": {
+      "cn": "特性",
+      "source": "alphapedia-i18n"
+    },
+    "Alpha": {
+      "cn": "头目",
+      "source": "alphapedia-i18n"
+    },
+    "Alpha Pokemon": {
+      "cn": "头目宝可梦",
+      "source": "alphapedia-i18n"
+    },
+    "Alphas": {
+      "cn": "头目",
+      "source": "alphapedia-i18n"
+    },
+    "Ball": {
+      "cn": "精灵球",
+      "source": "alphapedia-i18n"
+    },
+    "Bug": {
+      "cn": null,
+      "source": "no-match",
+      "note": "egg group: absent from both the upstream zh catalog and pokeapi"
+    },
+    "Cannot Breed": {
+      "cn": null,
+      "source": "no-match",
+      "note": "egg group: absent from both the upstream zh catalog and pokeapi"
+    },
+    "Chaos": {
+      "cn": null,
+      "source": "no-match",
+      "note": "egg group: absent from both the upstream zh catalog and pokeapi"
+    },
+    "Ditto": {
+      "cn": null,
+      "source": "no-match",
+      "note": "egg group: absent from both the upstream zh catalog and pokeapi"
+    },
+    "Dragon": {
+      "cn": null,
+      "source": "no-match",
+      "note": "egg group: absent from both the upstream zh catalog and pokeapi"
+    },
+    "Dust": {
+      "cn": "卷尘",
+      "source": "alphapedia-i18n"
+    },
+    "Dust Pheno": {
+      "cn": "卷尘奇遇",
+      "source": "alphapedia-i18n"
+    },
+    "Egg Group": {
+      "cn": "蛋组",
+      "source": "alphapedia-i18n"
+    },
+    "Encounter": {
+      "cn": "遇怪方式",
+      "source": "alphapedia-i18n"
+    },
+    "Event": {
+      "cn": "活动",
+      "source": "alphapedia-i18n"
+    },
+    "Events": {
+      "cn": "活动",
+      "source": "alphapedia-i18n"
+    },
+    "Fairy": {
+      "cn": null,
+      "source": "no-match",
+      "note": "egg group: absent from both the upstream zh catalog and pokeapi"
+    },
+    "Female": {
+      "cn": "雌性",
+      "source": "alphapedia-i18n"
+    },
+    "Field": {
+      "cn": null,
+      "source": "no-match",
+      "note": "egg group: absent from both the upstream zh catalog and pokeapi"
+    },
+    "Flying": {
+      "cn": null,
+      "source": "no-match",
+      "note": "egg group: absent from both the upstream zh catalog and pokeapi"
+    },
+    "Genderless": {
+      "cn": "无性别",
+      "source": "alphapedia-i18n"
+    },
+    "Grass": {
+      "cn": "动草",
+      "source": "alphapedia-i18n"
+    },
+    "Grass Pheno": {
+      "cn": "动草奇遇",
+      "source": "alphapedia-i18n"
+    },
+    "HMs": {
+      "cn": "秘传技能",
+      "source": "alphapedia-i18n"
+    },
+    "History": {
+      "cn": "历史记录",
+      "source": "alphapedia-i18n"
+    },
+    "Horde": {
+      "cn": "群怪",
+      "source": "alphapedia-i18n"
+    },
+    "Hordes": {
+      "cn": "群怪",
+      "source": "alphapedia-i18n"
+    },
+    "Humanoid": {
+      "cn": null,
+      "source": "no-match",
+      "note": "egg group: absent from both the upstream zh catalog and pokeapi"
+    },
+    "Location": {
+      "cn": "地点",
+      "source": "alphapedia-i18n"
+    },
+    "Locations": {
+      "cn": "出现地点",
+      "source": "alphapedia-i18n"
+    },
+    "Male": {
+      "cn": "雄性",
+      "source": "alphapedia-i18n"
+    },
+    "Male Ratio": {
+      "cn": "雄性比例",
+      "source": "alphapedia-i18n"
+    },
+    "Mineral": {
+      "cn": null,
+      "source": "no-match",
+      "note": "egg group: absent from both the upstream zh catalog and pokeapi"
+    },
+    "Monster": {
+      "cn": null,
+      "source": "no-match",
+      "note": "egg group: absent from both the upstream zh catalog and pokeapi"
+    },
+    "Move": {
+      "cn": "招式",
+      "source": "alphapedia-i18n"
+    },
+    "Moveset": {
+      "cn": "配招",
+      "source": "alphapedia-i18n"
+    },
+    "Mysterious Balls": {
+      "cn": "神秘球",
+      "source": "alphapedia-i18n"
+    },
+    "Notes": {
+      "cn": "备注与提示",
+      "source": "alphapedia-i18n"
+    },
+    "Pheno": {
+      "cn": "奇遇",
+      "source": "alphapedia-i18n",
+      "note": "derived from 4 \"<weather> Pheno\" catalog entries"
+    },
+    "Phenos": {
+      "cn": "奇遇现象",
+      "source": "alphapedia-i18n"
+    },
+    "Plant": {
+      "cn": null,
+      "source": "no-match",
+      "note": "egg group: absent from both the upstream zh catalog and pokeapi"
+    },
+    "Pokemon": {
+      "cn": "宝可梦",
+      "source": "alphapedia-i18n"
+    },
+    "Raid": {
+      "cn": "团战",
+      "source": "alphapedia-i18n"
+    },
+    "Region": {
+      "cn": "地区",
+      "source": "alphapedia-i18n"
+    },
+    "Season": {
+      "cn": "季节",
+      "source": "alphapedia-i18n"
+    },
+    "Shadow": {
+      "cn": "影子",
+      "source": "alphapedia-i18n"
+    },
+    "Shadow Pheno": {
+      "cn": "影子奇遇",
+      "source": "alphapedia-i18n"
+    },
+    "Shiny Tier": {
+      "cn": "闪光等级",
+      "source": "alphapedia-i18n"
+    },
+    "Spawn": {
+      "cn": "刷新点",
+      "source": "alphapedia-i18n"
+    },
+    "Spawns": {
+      "cn": "刷新点",
+      "source": "alphapedia-i18n"
+    },
+    "Specific Location": {
+      "cn": "具体地点",
+      "source": "alphapedia-i18n"
+    },
+    "Swarm": {
+      "cn": "大量出现(明雷)",
+      "source": "alphapedia-i18n"
+    },
+    "Swarms": {
+      "cn": "大量出现(明雷)",
+      "source": "alphapedia-i18n"
+    },
+    "Tier": {
+      "cn": "等级",
+      "source": "alphapedia-i18n"
+    },
+    "Time Slot": {
+      "cn": "时段",
+      "source": "alphapedia-i18n"
+    },
+    "Type": {
+      "cn": "属性",
+      "source": "alphapedia-i18n"
+    },
+    "Valuable": {
+      "cn": "高价值物品",
+      "source": "alphapedia-i18n"
+    },
+    "Water": {
+      "cn": "水面",
+      "source": "alphapedia-i18n"
+    },
+    "Water A": {
+      "cn": null,
+      "source": "no-match",
+      "note": "egg group: absent from both the upstream zh catalog and pokeapi"
+    },
+    "Water B": {
+      "cn": null,
+      "source": "no-match",
+      "note": "egg group: absent from both the upstream zh catalog and pokeapi"
+    },
+    "Water C": {
+      "cn": null,
+      "source": "no-match",
+      "note": "egg group: absent from both the upstream zh catalog and pokeapi"
+    },
+    "Water Pheno": {
+      "cn": "水面奇遇",
+      "source": "alphapedia-i18n"
+    }
+  }
+}

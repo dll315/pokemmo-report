@@ -1,0 +1,2598 @@
+{
+  "Abomasnow": {
+    "cn": "暴雪王",
+    "natdex": 460
+  },
+  "Abra": {
+    "cn": "凯西",
+    "natdex": 63
+  },
+  "Absol": {
+    "cn": "阿勃梭鲁",
+    "natdex": 359
+  },
+  "Accelgor": {
+    "cn": "敏捷虫",
+    "natdex": 617
+  },
+  "Aerodactyl": {
+    "cn": "化石翼龙",
+    "natdex": 142
+  },
+  "Aggron": {
+    "cn": "波士可多拉",
+    "natdex": 306
+  },
+  "Aipom": {
+    "cn": "长尾怪手",
+    "natdex": 190
+  },
+  "Alakazam": {
+    "cn": "胡地",
+    "natdex": 65
+  },
+  "Alomomola": {
+    "cn": "保姆曼波",
+    "natdex": 594
+  },
+  "Altaria": {
+    "cn": "七夕青鸟",
+    "natdex": 334
+  },
+  "Ambipom": {
+    "cn": "双尾怪手",
+    "natdex": 424
+  },
+  "Amoonguss": {
+    "cn": "败露球菇",
+    "natdex": 591
+  },
+  "Ampharos": {
+    "cn": "电龙",
+    "natdex": 181
+  },
+  "Anorith": {
+    "cn": "太古羽虫",
+    "natdex": 347
+  },
+  "Arbok": {
+    "cn": "阿柏怪",
+    "natdex": 24
+  },
+  "Arcanine": {
+    "cn": "风速狗",
+    "natdex": 59
+  },
+  "Arceus": {
+    "cn": "阿尔宙斯",
+    "natdex": 493
+  },
+  "Archen": {
+    "cn": "始祖小鸟",
+    "natdex": 566
+  },
+  "Archeops": {
+    "cn": "始祖大鸟",
+    "natdex": 567
+  },
+  "Ariados": {
+    "cn": "阿利多斯",
+    "natdex": 168
+  },
+  "Armaldo": {
+    "cn": "太古盔甲",
+    "natdex": 348
+  },
+  "Aron": {
+    "cn": "可可多拉",
+    "natdex": 304
+  },
+  "Articuno": {
+    "cn": "急冻鸟",
+    "natdex": 144
+  },
+  "Audino": {
+    "cn": "差不多娃娃",
+    "natdex": 531
+  },
+  "Axew": {
+    "cn": "牙牙",
+    "natdex": 610
+  },
+  "Azelf": {
+    "cn": "亚克诺姆",
+    "natdex": 482
+  },
+  "Azumarill": {
+    "cn": "玛力露丽",
+    "natdex": 184
+  },
+  "Azurill": {
+    "cn": "露力丽",
+    "natdex": 298
+  },
+  "Bagon": {
+    "cn": "宝贝龙",
+    "natdex": 371
+  },
+  "Baltoy": {
+    "cn": "天秤偶",
+    "natdex": 343
+  },
+  "Banette": {
+    "cn": "诅咒娃娃",
+    "natdex": 354
+  },
+  "Barboach": {
+    "cn": "泥泥鳅",
+    "natdex": 339
+  },
+  "Basculin": {
+    "cn": "野蛮鲈鱼",
+    "natdex": 550
+  },
+  "Bastiodon": {
+    "cn": "护城龙",
+    "natdex": 411
+  },
+  "Bayleef": {
+    "cn": "月桂叶",
+    "natdex": 153
+  },
+  "Beartic": {
+    "cn": "冻原熊",
+    "natdex": 614
+  },
+  "Beautifly": {
+    "cn": "狩猎凤蝶",
+    "natdex": 267
+  },
+  "Beedrill": {
+    "cn": "大针蜂",
+    "natdex": 15
+  },
+  "Beheeyem": {
+    "cn": "大宇怪",
+    "natdex": 606
+  },
+  "Beldum": {
+    "cn": "铁哑铃",
+    "natdex": 374
+  },
+  "Bellossom": {
+    "cn": "美丽花",
+    "natdex": 182
+  },
+  "Bellsprout": {
+    "cn": "喇叭芽",
+    "natdex": 69
+  },
+  "Bibarel": {
+    "cn": "大尾狸",
+    "natdex": 400
+  },
+  "Bidoof": {
+    "cn": "大牙狸",
+    "natdex": 399
+  },
+  "Bisharp": {
+    "cn": "劈斩司令",
+    "natdex": 625
+  },
+  "Blastoise": {
+    "cn": "水箭龟",
+    "natdex": 9
+  },
+  "Blaziken": {
+    "cn": "火焰鸡",
+    "natdex": 257
+  },
+  "Blissey": {
+    "cn": "幸福蛋",
+    "natdex": 242
+  },
+  "Blitzle": {
+    "cn": "斑斑马",
+    "natdex": 522
+  },
+  "Boldore": {
+    "cn": "地幔岩",
+    "natdex": 525
+  },
+  "Bonsly": {
+    "cn": "盆才怪",
+    "natdex": 438
+  },
+  "Bouffalant": {
+    "cn": "爆炸头水牛",
+    "natdex": 626
+  },
+  "Braviary": {
+    "cn": "勇士雄鹰",
+    "natdex": 628
+  },
+  "Breloom": {
+    "cn": "斗笠菇",
+    "natdex": 286
+  },
+  "Bronzong": {
+    "cn": "青铜钟",
+    "natdex": 437
+  },
+  "Bronzor": {
+    "cn": "铜镜怪",
+    "natdex": 436
+  },
+  "Budew": {
+    "cn": "含羞苞",
+    "natdex": 406
+  },
+  "Buizel": {
+    "cn": "泳圈鼬",
+    "natdex": 418
+  },
+  "Bulbasaur": {
+    "cn": "妙蛙种子",
+    "natdex": 1
+  },
+  "Buneary": {
+    "cn": "卷卷耳",
+    "natdex": 427
+  },
+  "Burmy": {
+    "cn": "结草儿",
+    "natdex": 412
+  },
+  "Butterfree": {
+    "cn": "巴大蝶",
+    "natdex": 12
+  },
+  "Cacnea": {
+    "cn": "刺球仙人掌",
+    "natdex": 331
+  },
+  "Cacturne": {
+    "cn": "梦歌仙人掌",
+    "natdex": 332
+  },
+  "Camerupt": {
+    "cn": "喷火驼",
+    "natdex": 323
+  },
+  "Carnivine": {
+    "cn": "尖牙笼",
+    "natdex": 455
+  },
+  "Carracosta": {
+    "cn": "肋骨海龟",
+    "natdex": 565
+  },
+  "Carvanha": {
+    "cn": "利牙鱼",
+    "natdex": 318
+  },
+  "Cascoon": {
+    "cn": "盾甲茧",
+    "natdex": 268
+  },
+  "Castform": {
+    "cn": "飘浮泡泡",
+    "natdex": 351
+  },
+  "Caterpie": {
+    "cn": "绿毛虫",
+    "natdex": 10
+  },
+  "Celebi": {
+    "cn": "时拉比",
+    "natdex": 251
+  },
+  "Chandelure": {
+    "cn": "水晶灯火灵",
+    "natdex": 609
+  },
+  "Chansey": {
+    "cn": "吉利蛋",
+    "natdex": 113
+  },
+  "Charizard": {
+    "cn": "喷火龙",
+    "natdex": 6
+  },
+  "Charmander": {
+    "cn": "小火龙",
+    "natdex": 4
+  },
+  "Charmeleon": {
+    "cn": "火恐龙",
+    "natdex": 5
+  },
+  "Chatot": {
+    "cn": "聒噪鸟",
+    "natdex": 441
+  },
+  "Cherrim": {
+    "cn": "樱花儿",
+    "natdex": 421
+  },
+  "Cherubi": {
+    "cn": "樱花宝",
+    "natdex": 420
+  },
+  "Chikorita": {
+    "cn": "菊草叶",
+    "natdex": 152
+  },
+  "Chimchar": {
+    "cn": "小火焰猴",
+    "natdex": 390
+  },
+  "Chimecho": {
+    "cn": "风铃铃",
+    "natdex": 358
+  },
+  "Chinchou": {
+    "cn": "灯笼鱼",
+    "natdex": 170
+  },
+  "Chingling": {
+    "cn": "铃铛响",
+    "natdex": 433
+  },
+  "Cinccino": {
+    "cn": "奇诺栗鼠",
+    "natdex": 573
+  },
+  "Clamperl": {
+    "cn": "珍珠贝",
+    "natdex": 366
+  },
+  "Claydol": {
+    "cn": "念力土偶",
+    "natdex": 344
+  },
+  "Clefable": {
+    "cn": "皮可西",
+    "natdex": 36
+  },
+  "Clefairy": {
+    "cn": "皮皮",
+    "natdex": 35
+  },
+  "Cleffa": {
+    "cn": "皮宝宝",
+    "natdex": 173
+  },
+  "Cloyster": {
+    "cn": "刺甲贝",
+    "natdex": 91
+  },
+  "Cobalion": {
+    "cn": "勾帕路翁",
+    "natdex": 638
+  },
+  "Cofagrigus": {
+    "cn": "迭失棺",
+    "natdex": 563
+  },
+  "Combee": {
+    "cn": "三蜜蜂",
+    "natdex": 415
+  },
+  "Combusken": {
+    "cn": "力壮鸡",
+    "natdex": 256
+  },
+  "Conkeldurr": {
+    "cn": "修建老匠",
+    "natdex": 534
+  },
+  "Corphish": {
+    "cn": "龙虾小兵",
+    "natdex": 341
+  },
+  "Corsola": {
+    "cn": "太阳珊瑚",
+    "natdex": 222
+  },
+  "Cottonee": {
+    "cn": "木棉球",
+    "natdex": 546
+  },
+  "Cradily": {
+    "cn": "摇篮百合",
+    "natdex": 346
+  },
+  "Cranidos": {
+    "cn": "头盖龙",
+    "natdex": 408
+  },
+  "Crawdaunt": {
+    "cn": "铁螯龙虾",
+    "natdex": 342
+  },
+  "Cresselia": {
+    "cn": "克雷色利亚",
+    "natdex": 488
+  },
+  "Croagunk": {
+    "cn": "不良蛙",
+    "natdex": 453
+  },
+  "Crobat": {
+    "cn": "叉字蝠",
+    "natdex": 169
+  },
+  "Croconaw": {
+    "cn": "蓝鳄",
+    "natdex": 159
+  },
+  "Crustle": {
+    "cn": "岩殿居蟹",
+    "natdex": 558
+  },
+  "Cryogonal": {
+    "cn": "几何雪花",
+    "natdex": 615
+  },
+  "Cubchoo": {
+    "cn": "喷嚏熊",
+    "natdex": 613
+  },
+  "Cubone": {
+    "cn": "卡拉卡拉",
+    "natdex": 104
+  },
+  "Cyndaquil": {
+    "cn": "火球鼠",
+    "natdex": 155
+  },
+  "Darkrai": {
+    "cn": "达克莱伊",
+    "natdex": 491
+  },
+  "Darmanitan": {
+    "cn": "达摩狒狒",
+    "natdex": 555
+  },
+  "Darumaka": {
+    "cn": "火红不倒翁",
+    "natdex": 554
+  },
+  "Deerling": {
+    "cn": "四季鹿",
+    "natdex": 585
+  },
+  "Deino": {
+    "cn": "单首龙",
+    "natdex": 633
+  },
+  "Delcatty": {
+    "cn": "优雅猫",
+    "natdex": 301
+  },
+  "Delibird": {
+    "cn": "信使鸟",
+    "natdex": 225
+  },
+  "Deoxys": {
+    "cn": "代欧奇希斯",
+    "natdex": 386
+  },
+  "Dewgong": {
+    "cn": "白海狮",
+    "natdex": 87
+  },
+  "Dewott": {
+    "cn": "双刃丸",
+    "natdex": 502
+  },
+  "Dialga": {
+    "cn": "帝牙卢卡",
+    "natdex": 483
+  },
+  "Diglett": {
+    "cn": "地鼠",
+    "natdex": 50
+  },
+  "Ditto": {
+    "cn": "百变怪",
+    "natdex": 132
+  },
+  "Dodrio": {
+    "cn": "嘟嘟利",
+    "natdex": 85
+  },
+  "Doduo": {
+    "cn": "嘟嘟",
+    "natdex": 84
+  },
+  "Donphan": {
+    "cn": "顿甲",
+    "natdex": 232
+  },
+  "Dragonair": {
+    "cn": "哈克龙",
+    "natdex": 148
+  },
+  "Dragonite": {
+    "cn": "快龙",
+    "natdex": 149
+  },
+  "Drapion": {
+    "cn": "龙王蝎",
+    "natdex": 452
+  },
+  "Dratini": {
+    "cn": "迷你龙",
+    "natdex": 147
+  },
+  "Drifblim": {
+    "cn": "随风球",
+    "natdex": 426
+  },
+  "Drifloon": {
+    "cn": "飘飘球",
+    "natdex": 425
+  },
+  "Drilbur": {
+    "cn": "螺钉地鼠",
+    "natdex": 529
+  },
+  "Drowzee": {
+    "cn": "催眠貘",
+    "natdex": 96
+  },
+  "Druddigon": {
+    "cn": "赤面龙",
+    "natdex": 621
+  },
+  "Ducklett": {
+    "cn": "鸭宝宝",
+    "natdex": 580
+  },
+  "Dugtrio": {
+    "cn": "三地鼠",
+    "natdex": 51
+  },
+  "Dunsparce": {
+    "cn": "土龙弟弟",
+    "natdex": 206
+  },
+  "Duosion": {
+    "cn": "双卵细胞球",
+    "natdex": 578
+  },
+  "Durant": {
+    "cn": "铁蚁",
+    "natdex": 632
+  },
+  "Dusclops": {
+    "cn": "彷徨夜灵",
+    "natdex": 356
+  },
+  "Dusknoir": {
+    "cn": "黑夜魔灵",
+    "natdex": 477
+  },
+  "Duskull": {
+    "cn": "夜巡灵",
+    "natdex": 355
+  },
+  "Dustox": {
+    "cn": "毒粉蛾",
+    "natdex": 269
+  },
+  "Dwebble": {
+    "cn": "石居蟹",
+    "natdex": 557
+  },
+  "Eelektrik": {
+    "cn": "麻麻鳗",
+    "natdex": 603
+  },
+  "Eelektross": {
+    "cn": "麻麻鳗鱼王",
+    "natdex": 604
+  },
+  "Eevee": {
+    "cn": "伊布",
+    "natdex": 133
+  },
+  "Ekans": {
+    "cn": "阿柏蛇",
+    "natdex": 23
+  },
+  "Electabuzz": {
+    "cn": "电击兽",
+    "natdex": 125
+  },
+  "Electivire": {
+    "cn": "电击魔兽",
+    "natdex": 466
+  },
+  "Electrike": {
+    "cn": "落雷兽",
+    "natdex": 309
+  },
+  "Electrode": {
+    "cn": "顽皮雷弹",
+    "natdex": 101
+  },
+  "Elekid": {
+    "cn": "电击怪",
+    "natdex": 239
+  },
+  "Elgyem": {
+    "cn": "小灰怪",
+    "natdex": 605
+  },
+  "Emboar": {
+    "cn": "炎武王",
+    "natdex": 500
+  },
+  "Emolga": {
+    "cn": "电飞鼠",
+    "natdex": 587
+  },
+  "Empoleon": {
+    "cn": "帝王拿波",
+    "natdex": 395
+  },
+  "Entei": {
+    "cn": "炎帝",
+    "natdex": 244
+  },
+  "Escavalier": {
+    "cn": "骑士蜗牛",
+    "natdex": 589
+  },
+  "Espeon": {
+    "cn": "太阳伊布",
+    "natdex": 196
+  },
+  "Excadrill": {
+    "cn": "龙头地鼠",
+    "natdex": 530
+  },
+  "Exeggcute": {
+    "cn": "蛋蛋",
+    "natdex": 102
+  },
+  "Exeggutor": {
+    "cn": "椰蛋树",
+    "natdex": 103
+  },
+  "Exploud": {
+    "cn": "爆音怪",
+    "natdex": 295
+  },
+  "Farfetch'd": {
+    "cn": "大葱鸭",
+    "natdex": 83
+  },
+  "Fearow": {
+    "cn": "大嘴雀",
+    "natdex": 22
+  },
+  "Feebas": {
+    "cn": "丑丑鱼",
+    "natdex": 349
+  },
+  "Feraligatr": {
+    "cn": "大力鳄",
+    "natdex": 160
+  },
+  "Ferroseed": {
+    "cn": "种子铁球",
+    "natdex": 597
+  },
+  "Ferrothorn": {
+    "cn": "坚果哑铃",
+    "natdex": 598
+  },
+  "Finneon": {
+    "cn": "荧光鱼",
+    "natdex": 456
+  },
+  "Flaaffy": {
+    "cn": "茸茸羊",
+    "natdex": 180
+  },
+  "Flareon": {
+    "cn": "火伊布",
+    "natdex": 136
+  },
+  "Floatzel": {
+    "cn": "浮潜鼬",
+    "natdex": 419
+  },
+  "Flygon": {
+    "cn": "沙漠蜻蜓",
+    "natdex": 330
+  },
+  "Foongus": {
+    "cn": "哎呀球菇",
+    "natdex": 590
+  },
+  "Forretress": {
+    "cn": "佛烈托斯",
+    "natdex": 205
+  },
+  "Fraxure": {
+    "cn": "斧牙龙",
+    "natdex": 611
+  },
+  "Frillish": {
+    "cn": "轻飘飘",
+    "natdex": 592
+  },
+  "Froslass": {
+    "cn": "雪妖女",
+    "natdex": 478
+  },
+  "Furret": {
+    "cn": "大尾立",
+    "natdex": 162
+  },
+  "Gabite": {
+    "cn": "尖牙陆鲨",
+    "natdex": 444
+  },
+  "Gallade": {
+    "cn": "艾路雷朵",
+    "natdex": 475
+  },
+  "Galvantula": {
+    "cn": "电蜘蛛",
+    "natdex": 596
+  },
+  "Garbodor": {
+    "cn": "灰尘山",
+    "natdex": 569
+  },
+  "Garchomp": {
+    "cn": "烈咬陆鲨",
+    "natdex": 445
+  },
+  "Gardevoir": {
+    "cn": "沙奈朵",
+    "natdex": 282
+  },
+  "Gastly": {
+    "cn": "鬼斯",
+    "natdex": 92
+  },
+  "Gastrodon": {
+    "cn": "海兔兽",
+    "natdex": 423
+  },
+  "Genesect": {
+    "cn": "盖诺赛克特",
+    "natdex": 649
+  },
+  "Gengar": {
+    "cn": "耿鬼",
+    "natdex": 94
+  },
+  "Geodude": {
+    "cn": "小拳石",
+    "natdex": 74
+  },
+  "Gible": {
+    "cn": "圆陆鲨",
+    "natdex": 443
+  },
+  "Gigalith": {
+    "cn": "庞岩怪",
+    "natdex": 526
+  },
+  "Girafarig": {
+    "cn": "麒麟奇",
+    "natdex": 203
+  },
+  "Giratina": {
+    "cn": "骑拉帝纳",
+    "natdex": 487
+  },
+  "Glaceon": {
+    "cn": "冰伊布",
+    "natdex": 471
+  },
+  "Glalie": {
+    "cn": "冰鬼护",
+    "natdex": 362
+  },
+  "Glameow": {
+    "cn": "魅力喵",
+    "natdex": 431
+  },
+  "Gligar": {
+    "cn": "天蝎",
+    "natdex": 207
+  },
+  "Gliscor": {
+    "cn": "天蝎王",
+    "natdex": 472
+  },
+  "Gloom": {
+    "cn": "臭臭花",
+    "natdex": 44
+  },
+  "Golbat": {
+    "cn": "大嘴蝠",
+    "natdex": 42
+  },
+  "Goldeen": {
+    "cn": "角金鱼",
+    "natdex": 118
+  },
+  "Golduck": {
+    "cn": "哥达鸭",
+    "natdex": 55
+  },
+  "Golem": {
+    "cn": "隆隆岩",
+    "natdex": 76
+  },
+  "Golett": {
+    "cn": "泥偶小人",
+    "natdex": 622
+  },
+  "Golurk": {
+    "cn": "泥偶巨人",
+    "natdex": 623
+  },
+  "Gorebyss": {
+    "cn": "樱花鱼",
+    "natdex": 368
+  },
+  "Gothita": {
+    "cn": "哥德宝宝",
+    "natdex": 574
+  },
+  "Gothitelle": {
+    "cn": "哥德小姐",
+    "natdex": 576
+  },
+  "Gothorita": {
+    "cn": "哥德小童",
+    "natdex": 575
+  },
+  "Granbull": {
+    "cn": "布鲁皇",
+    "natdex": 210
+  },
+  "Graveler": {
+    "cn": "隆隆石",
+    "natdex": 75
+  },
+  "Grimer": {
+    "cn": "臭泥",
+    "natdex": 88
+  },
+  "Grotle": {
+    "cn": "树林龟",
+    "natdex": 388
+  },
+  "Groudon": {
+    "cn": "固拉多",
+    "natdex": 383
+  },
+  "Grovyle": {
+    "cn": "森林蜥蜴",
+    "natdex": 253
+  },
+  "Growlithe": {
+    "cn": "卡蒂狗",
+    "natdex": 58
+  },
+  "Grumpig": {
+    "cn": "噗噗猪",
+    "natdex": 326
+  },
+  "Gulpin": {
+    "cn": "溶食兽",
+    "natdex": 316
+  },
+  "Gurdurr": {
+    "cn": "铁骨土人",
+    "natdex": 533
+  },
+  "Gyarados": {
+    "cn": "暴鲤龙",
+    "natdex": 130
+  },
+  "Happiny": {
+    "cn": "小福蛋",
+    "natdex": 440
+  },
+  "Hariyama": {
+    "cn": "铁掌力士",
+    "natdex": 297
+  },
+  "Haunter": {
+    "cn": "鬼斯通",
+    "natdex": 93
+  },
+  "Haxorus": {
+    "cn": "双斧战龙",
+    "natdex": 612
+  },
+  "Heatmor": {
+    "cn": "熔蚁兽",
+    "natdex": 631
+  },
+  "Heatran": {
+    "cn": "席多蓝恩",
+    "natdex": 485
+  },
+  "Heracross": {
+    "cn": "赫拉克罗斯",
+    "natdex": 214
+  },
+  "Herdier": {
+    "cn": "哈约克",
+    "natdex": 507
+  },
+  "Hippopotas": {
+    "cn": "沙河马",
+    "natdex": 449
+  },
+  "Hippowdon": {
+    "cn": "河马兽",
+    "natdex": 450
+  },
+  "Hitmonchan": {
+    "cn": "快拳郎",
+    "natdex": 107
+  },
+  "Hitmonlee": {
+    "cn": "飞腿郎",
+    "natdex": 106
+  },
+  "Hitmontop": {
+    "cn": "战舞郎",
+    "natdex": 237
+  },
+  "Ho-Oh": {
+    "cn": "凤王",
+    "natdex": 250
+  },
+  "Honchkrow": {
+    "cn": "乌鸦头头",
+    "natdex": 430
+  },
+  "Hoothoot": {
+    "cn": "咕咕",
+    "natdex": 163
+  },
+  "Hoppip": {
+    "cn": "毽子草",
+    "natdex": 187
+  },
+  "Horsea": {
+    "cn": "墨海马",
+    "natdex": 116
+  },
+  "Houndoom": {
+    "cn": "黑鲁加",
+    "natdex": 229
+  },
+  "Houndour": {
+    "cn": "戴鲁比",
+    "natdex": 228
+  },
+  "Huntail": {
+    "cn": "猎斑鱼",
+    "natdex": 367
+  },
+  "Hydreigon": {
+    "cn": "三首恶龙",
+    "natdex": 635
+  },
+  "Hypno": {
+    "cn": "引梦貘人",
+    "natdex": 97
+  },
+  "Igglybuff": {
+    "cn": "宝宝丁",
+    "natdex": 174
+  },
+  "Illumise": {
+    "cn": "甜甜萤",
+    "natdex": 314
+  },
+  "Infernape": {
+    "cn": "烈焰猴",
+    "natdex": 392
+  },
+  "Ivysaur": {
+    "cn": "妙蛙草",
+    "natdex": 2
+  },
+  "Jellicent": {
+    "cn": "胖嘟嘟",
+    "natdex": 593
+  },
+  "Jigglypuff": {
+    "cn": "胖丁",
+    "natdex": 39
+  },
+  "Jirachi": {
+    "cn": "基拉祈",
+    "natdex": 385
+  },
+  "Jolteon": {
+    "cn": "雷伊布",
+    "natdex": 135
+  },
+  "Joltik": {
+    "cn": "电电虫",
+    "natdex": 595
+  },
+  "Jumpluff": {
+    "cn": "毽子棉",
+    "natdex": 189
+  },
+  "Jynx": {
+    "cn": "迷唇姐",
+    "natdex": 124
+  },
+  "Kabuto": {
+    "cn": "化石盔",
+    "natdex": 140
+  },
+  "Kabutops": {
+    "cn": "镰刀盔",
+    "natdex": 141
+  },
+  "Kadabra": {
+    "cn": "勇基拉",
+    "natdex": 64
+  },
+  "Kakuna": {
+    "cn": "铁壳蛹",
+    "natdex": 14
+  },
+  "Kangaskhan": {
+    "cn": "袋兽",
+    "natdex": 115
+  },
+  "Karrablast": {
+    "cn": "盖盖虫",
+    "natdex": 588
+  },
+  "Kecleon": {
+    "cn": "变隐龙",
+    "natdex": 352
+  },
+  "Keldeo": {
+    "cn": "凯路迪欧",
+    "natdex": 647
+  },
+  "Kingdra": {
+    "cn": "刺龙王",
+    "natdex": 230
+  },
+  "Kingler": {
+    "cn": "巨钳蟹",
+    "natdex": 99
+  },
+  "Kirlia": {
+    "cn": "奇鲁莉安",
+    "natdex": 281
+  },
+  "Klang": {
+    "cn": "齿轮组",
+    "natdex": 600
+  },
+  "Klink": {
+    "cn": "齿轮儿",
+    "natdex": 599
+  },
+  "Klinklang": {
+    "cn": "齿轮怪",
+    "natdex": 601
+  },
+  "Koffing": {
+    "cn": "瓦斯弹",
+    "natdex": 109
+  },
+  "Krabby": {
+    "cn": "大钳蟹",
+    "natdex": 98
+  },
+  "Kricketot": {
+    "cn": "圆法师",
+    "natdex": 401
+  },
+  "Kricketune": {
+    "cn": "音箱蟀",
+    "natdex": 402
+  },
+  "Krokorok": {
+    "cn": "混混鳄",
+    "natdex": 552
+  },
+  "Krookodile": {
+    "cn": "流氓鳄",
+    "natdex": 553
+  },
+  "Kyogre": {
+    "cn": "盖欧卡",
+    "natdex": 382
+  },
+  "Kyurem": {
+    "cn": "酋雷姆",
+    "natdex": 646
+  },
+  "Lairon": {
+    "cn": "可多拉",
+    "natdex": 305
+  },
+  "Lampent": {
+    "cn": "灯火幽灵",
+    "natdex": 608
+  },
+  "Landorus": {
+    "cn": "土地云",
+    "natdex": 645
+  },
+  "Lanturn": {
+    "cn": "电灯怪",
+    "natdex": 171
+  },
+  "Lapras": {
+    "cn": "拉普拉斯",
+    "natdex": 131
+  },
+  "Larvesta": {
+    "cn": "燃烧虫",
+    "natdex": 636
+  },
+  "Larvitar": {
+    "cn": "幼基拉斯",
+    "natdex": 246
+  },
+  "Latias": {
+    "cn": "拉帝亚斯",
+    "natdex": 380
+  },
+  "Latios": {
+    "cn": "拉帝欧斯",
+    "natdex": 381
+  },
+  "Leafeon": {
+    "cn": "叶伊布",
+    "natdex": 470
+  },
+  "Leavanny": {
+    "cn": "保姆虫",
+    "natdex": 542
+  },
+  "Ledian": {
+    "cn": "安瓢虫",
+    "natdex": 166
+  },
+  "Ledyba": {
+    "cn": "芭瓢虫",
+    "natdex": 165
+  },
+  "Lickilicky": {
+    "cn": "大舌舔",
+    "natdex": 463
+  },
+  "Lickitung": {
+    "cn": "大舌头",
+    "natdex": 108
+  },
+  "Liepard": {
+    "cn": "酷豹",
+    "natdex": 510
+  },
+  "Lileep": {
+    "cn": "触手百合",
+    "natdex": 345
+  },
+  "Lilligant": {
+    "cn": "裙儿小姐",
+    "natdex": 549
+  },
+  "Lillipup": {
+    "cn": "小约克",
+    "natdex": 506
+  },
+  "Linoone": {
+    "cn": "直冲熊",
+    "natdex": 264
+  },
+  "Litwick": {
+    "cn": "烛光灵",
+    "natdex": 607
+  },
+  "Lombre": {
+    "cn": "莲帽小童",
+    "natdex": 271
+  },
+  "Lopunny": {
+    "cn": "长耳兔",
+    "natdex": 428
+  },
+  "Lotad": {
+    "cn": "莲叶童子",
+    "natdex": 270
+  },
+  "Loudred": {
+    "cn": "吼爆弹",
+    "natdex": 294
+  },
+  "Lucario": {
+    "cn": "路卡利欧",
+    "natdex": 448
+  },
+  "Ludicolo": {
+    "cn": "乐天河童",
+    "natdex": 272
+  },
+  "Lugia": {
+    "cn": "洛奇亚",
+    "natdex": 249
+  },
+  "Lumineon": {
+    "cn": "霓虹鱼",
+    "natdex": 457
+  },
+  "Lunatone": {
+    "cn": "月石",
+    "natdex": 337
+  },
+  "Luvdisc": {
+    "cn": "爱心鱼",
+    "natdex": 370
+  },
+  "Luxio": {
+    "cn": "勒克猫",
+    "natdex": 404
+  },
+  "Luxray": {
+    "cn": "伦琴猫",
+    "natdex": 405
+  },
+  "Machamp": {
+    "cn": "怪力",
+    "natdex": 68
+  },
+  "Machoke": {
+    "cn": "豪力",
+    "natdex": 67
+  },
+  "Machop": {
+    "cn": "腕力",
+    "natdex": 66
+  },
+  "Magby": {
+    "cn": "鸭嘴宝宝",
+    "natdex": 240
+  },
+  "Magcargo": {
+    "cn": "熔岩蜗牛",
+    "natdex": 219
+  },
+  "Magikarp": {
+    "cn": "鲤鱼王",
+    "natdex": 129
+  },
+  "Magmar": {
+    "cn": "鸭嘴火兽",
+    "natdex": 126
+  },
+  "Magmortar": {
+    "cn": "鸭嘴炎兽",
+    "natdex": 467
+  },
+  "Magnemite": {
+    "cn": "小磁怪",
+    "natdex": 81
+  },
+  "Magneton": {
+    "cn": "三合一磁怪",
+    "natdex": 82
+  },
+  "Magnezone": {
+    "cn": "自爆磁怪",
+    "natdex": 462
+  },
+  "Makuhita": {
+    "cn": "幕下力士",
+    "natdex": 296
+  },
+  "Mamoswine": {
+    "cn": "象牙猪",
+    "natdex": 473
+  },
+  "Manaphy": {
+    "cn": "玛纳霏",
+    "natdex": 490
+  },
+  "Mandibuzz": {
+    "cn": "秃鹰娜",
+    "natdex": 630
+  },
+  "Manectric": {
+    "cn": "雷电兽",
+    "natdex": 310
+  },
+  "Mankey": {
+    "cn": "猴怪",
+    "natdex": 56
+  },
+  "Mantine": {
+    "cn": "巨翅飞鱼",
+    "natdex": 226
+  },
+  "Mantyke": {
+    "cn": "小球飞鱼",
+    "natdex": 458
+  },
+  "Maractus": {
+    "cn": "沙铃仙人掌",
+    "natdex": 556
+  },
+  "Mareep": {
+    "cn": "咩利羊",
+    "natdex": 179
+  },
+  "Marill": {
+    "cn": "玛力露",
+    "natdex": 183
+  },
+  "Marowak": {
+    "cn": "嘎啦嘎啦",
+    "natdex": 105
+  },
+  "Marshtomp": {
+    "cn": "沼跃鱼",
+    "natdex": 259
+  },
+  "Masquerain": {
+    "cn": "雨翅蛾",
+    "natdex": 284
+  },
+  "Mawile": {
+    "cn": "大嘴娃",
+    "natdex": 303
+  },
+  "Medicham": {
+    "cn": "恰雷姆",
+    "natdex": 308
+  },
+  "Meditite": {
+    "cn": "玛沙那",
+    "natdex": 307
+  },
+  "Meganium": {
+    "cn": "大竺葵",
+    "natdex": 154
+  },
+  "Meloetta": {
+    "cn": "美洛耶塔",
+    "natdex": 648
+  },
+  "Meowth": {
+    "cn": "喵喵",
+    "natdex": 52
+  },
+  "Mesprit": {
+    "cn": "艾姆利多",
+    "natdex": 481
+  },
+  "Metagross": {
+    "cn": "巨金怪",
+    "natdex": 376
+  },
+  "Metang": {
+    "cn": "金属怪",
+    "natdex": 375
+  },
+  "Metapod": {
+    "cn": "铁甲蛹",
+    "natdex": 11
+  },
+  "Mew": {
+    "cn": "梦幻",
+    "natdex": 151
+  },
+  "Mewtwo": {
+    "cn": "超梦",
+    "natdex": 150
+  },
+  "Mienfoo": {
+    "cn": "功夫鼬",
+    "natdex": 619
+  },
+  "Mienshao": {
+    "cn": "师父鼬",
+    "natdex": 620
+  },
+  "Mightyena": {
+    "cn": "大狼犬",
+    "natdex": 262
+  },
+  "Milotic": {
+    "cn": "美纳斯",
+    "natdex": 350
+  },
+  "Miltank": {
+    "cn": "大奶罐",
+    "natdex": 241
+  },
+  "Mime Jr.": {
+    "cn": "魔尼尼",
+    "natdex": 439
+  },
+  "Minccino": {
+    "cn": "泡沫栗鼠",
+    "natdex": 572
+  },
+  "Minun": {
+    "cn": "負电拍拍",
+    "natdex": 312
+  },
+  "Misdreavus": {
+    "cn": "梦妖",
+    "natdex": 200
+  },
+  "Mismagius": {
+    "cn": "梦妖魔",
+    "natdex": 429
+  },
+  "Moltres": {
+    "cn": "火焰鸟",
+    "natdex": 146
+  },
+  "Monferno": {
+    "cn": "猛火猴",
+    "natdex": 391
+  },
+  "Mothim": {
+    "cn": "绅士蛾",
+    "natdex": 414
+  },
+  "Mr. Mime": {
+    "cn": "魔墙人偶",
+    "natdex": 122
+  },
+  "Mudkip": {
+    "cn": "水跃鱼",
+    "natdex": 258
+  },
+  "Muk": {
+    "cn": "臭臭泥",
+    "natdex": 89
+  },
+  "Munchlax": {
+    "cn": "小卡比兽",
+    "natdex": 446
+  },
+  "Munna": {
+    "cn": "食梦梦",
+    "natdex": 517
+  },
+  "Murkrow": {
+    "cn": "黑暗鸦",
+    "natdex": 198
+  },
+  "Musharna": {
+    "cn": "梦梦蚀",
+    "natdex": 518
+  },
+  "Natu": {
+    "cn": "天然雀",
+    "natdex": 177
+  },
+  "Nidoking": {
+    "cn": "尼多王",
+    "natdex": 34
+  },
+  "Nidoqueen": {
+    "cn": "尼多后",
+    "natdex": 31
+  },
+  "Nidoran♀": {
+    "cn": "尼多兰",
+    "natdex": 29
+  },
+  "Nidoran♂": {
+    "cn": "尼多朗",
+    "natdex": 32
+  },
+  "Nidorina": {
+    "cn": "尼多娜",
+    "natdex": 30
+  },
+  "Nidorino": {
+    "cn": "尼多力诺",
+    "natdex": 33
+  },
+  "Nincada": {
+    "cn": "土居忍士",
+    "natdex": 290
+  },
+  "Ninetales": {
+    "cn": "九尾",
+    "natdex": 38
+  },
+  "Ninjask": {
+    "cn": "铁面忍者",
+    "natdex": 291
+  },
+  "Noctowl": {
+    "cn": "猫头夜鹰",
+    "natdex": 164
+  },
+  "Nosepass": {
+    "cn": "朝北鼻",
+    "natdex": 299
+  },
+  "Numel": {
+    "cn": "呆火驼",
+    "natdex": 322
+  },
+  "Nuzleaf": {
+    "cn": "长鼻叶",
+    "natdex": 274
+  },
+  "Octillery": {
+    "cn": "章鱼桶",
+    "natdex": 224
+  },
+  "Oddish": {
+    "cn": "走路草",
+    "natdex": 43
+  },
+  "Omanyte": {
+    "cn": "菊石兽",
+    "natdex": 138
+  },
+  "Omastar": {
+    "cn": "多刺菊石兽",
+    "natdex": 139
+  },
+  "Onix": {
+    "cn": "大岩蛇",
+    "natdex": 95
+  },
+  "Oshawott": {
+    "cn": "水水獭",
+    "natdex": 501
+  },
+  "Pachirisu": {
+    "cn": "帕奇利兹",
+    "natdex": 417
+  },
+  "Palkia": {
+    "cn": "帕路奇亚",
+    "natdex": 484
+  },
+  "Palpitoad": {
+    "cn": "蓝蟾蜍",
+    "natdex": 536
+  },
+  "Panpour": {
+    "cn": "冷水猴",
+    "natdex": 515
+  },
+  "Pansage": {
+    "cn": "花椰猴",
+    "natdex": 511
+  },
+  "Pansear": {
+    "cn": "爆香猴",
+    "natdex": 513
+  },
+  "Paras": {
+    "cn": "派拉斯",
+    "natdex": 46
+  },
+  "Parasect": {
+    "cn": "派拉斯特",
+    "natdex": 47
+  },
+  "Patrat": {
+    "cn": "探探鼠",
+    "natdex": 504
+  },
+  "Pawniard": {
+    "cn": "驹刀小兵",
+    "natdex": 624
+  },
+  "Pelipper": {
+    "cn": "大嘴鸥",
+    "natdex": 279
+  },
+  "Persian": {
+    "cn": "猫老大",
+    "natdex": 53
+  },
+  "Petilil": {
+    "cn": "百合根娃娃",
+    "natdex": 548
+  },
+  "Phanpy": {
+    "cn": "小小象",
+    "natdex": 231
+  },
+  "Phione": {
+    "cn": "霏欧纳",
+    "natdex": 489
+  },
+  "Pichu": {
+    "cn": "皮丘",
+    "natdex": 172
+  },
+  "Pidgeot": {
+    "cn": "大比鸟",
+    "natdex": 18
+  },
+  "Pidgeotto": {
+    "cn": "比比鸟",
+    "natdex": 17
+  },
+  "Pidgey": {
+    "cn": "波波",
+    "natdex": 16
+  },
+  "Pidove": {
+    "cn": "豆豆鸽",
+    "natdex": 519
+  },
+  "Pignite": {
+    "cn": "炒炒猪",
+    "natdex": 499
+  },
+  "Pikachu": {
+    "cn": "皮卡丘",
+    "natdex": 25
+  },
+  "Piloswine": {
+    "cn": "长毛猪",
+    "natdex": 221
+  },
+  "Pineco": {
+    "cn": "榛果球",
+    "natdex": 204
+  },
+  "Pinsir": {
+    "cn": "凯罗斯",
+    "natdex": 127
+  },
+  "Piplup": {
+    "cn": "波加曼",
+    "natdex": 393
+  },
+  "Plusle": {
+    "cn": "正电拍拍",
+    "natdex": 311
+  },
+  "Politoed": {
+    "cn": "蚊香蛙皇",
+    "natdex": 186
+  },
+  "Poliwag": {
+    "cn": "蚊香蝌蚪",
+    "natdex": 60
+  },
+  "Poliwhirl": {
+    "cn": "蚊香君",
+    "natdex": 61
+  },
+  "Poliwrath": {
+    "cn": "蚊香泳士",
+    "natdex": 62
+  },
+  "Ponyta": {
+    "cn": "小火马",
+    "natdex": 77
+  },
+  "Poochyena": {
+    "cn": "土狼犬",
+    "natdex": 261
+  },
+  "Porygon": {
+    "cn": "多边兽",
+    "natdex": 137
+  },
+  "Porygon-Z": {
+    "cn": "多边兽乙型",
+    "natdex": 474
+  },
+  "Porygon2": {
+    "cn": "多边兽２型",
+    "natdex": 233
+  },
+  "Primeape": {
+    "cn": "火暴猴",
+    "natdex": 57
+  },
+  "Prinplup": {
+    "cn": "波皇子",
+    "natdex": 394
+  },
+  "Probopass": {
+    "cn": "大朝北鼻",
+    "natdex": 476
+  },
+  "Psyduck": {
+    "cn": "可达鸭",
+    "natdex": 54
+  },
+  "Pupitar": {
+    "cn": "沙基拉斯",
+    "natdex": 247
+  },
+  "Purrloin": {
+    "cn": "扒手猫",
+    "natdex": 509
+  },
+  "Purugly": {
+    "cn": "东施喵",
+    "natdex": 432
+  },
+  "Quagsire": {
+    "cn": "沼王",
+    "natdex": 195
+  },
+  "Quilava": {
+    "cn": "火岩鼠",
+    "natdex": 156
+  },
+  "Qwilfish": {
+    "cn": "千针鱼",
+    "natdex": 211
+  },
+  "Raichu": {
+    "cn": "雷丘",
+    "natdex": 26
+  },
+  "Raikou": {
+    "cn": "雷公",
+    "natdex": 243
+  },
+  "Ralts": {
+    "cn": "拉鲁拉丝",
+    "natdex": 280
+  },
+  "Rampardos": {
+    "cn": "战槌龙",
+    "natdex": 409
+  },
+  "Rapidash": {
+    "cn": "烈焰马",
+    "natdex": 78
+  },
+  "Raticate": {
+    "cn": "拉达",
+    "natdex": 20
+  },
+  "Rattata": {
+    "cn": "小拉达",
+    "natdex": 19
+  },
+  "Rayquaza": {
+    "cn": "烈空坐",
+    "natdex": 384
+  },
+  "Regice": {
+    "cn": "雷吉艾斯",
+    "natdex": 378
+  },
+  "Regigigas": {
+    "cn": "雷吉奇卡斯",
+    "natdex": 486
+  },
+  "Regirock": {
+    "cn": "雷吉洛克",
+    "natdex": 377
+  },
+  "Registeel": {
+    "cn": "雷吉斯奇鲁",
+    "natdex": 379
+  },
+  "Relicanth": {
+    "cn": "古空棘鱼",
+    "natdex": 369
+  },
+  "Remoraid": {
+    "cn": "铁炮鱼",
+    "natdex": 223
+  },
+  "Reshiram": {
+    "cn": "莱希拉姆",
+    "natdex": 643
+  },
+  "Reuniclus": {
+    "cn": "人造细胞卵",
+    "natdex": 579
+  },
+  "Rhydon": {
+    "cn": "钻角犀兽",
+    "natdex": 112
+  },
+  "Rhyhorn": {
+    "cn": "独角犀牛",
+    "natdex": 111
+  },
+  "Rhyperior": {
+    "cn": "超甲狂犀",
+    "natdex": 464
+  },
+  "Riolu": {
+    "cn": "利欧路",
+    "natdex": 447
+  },
+  "Roggenrola": {
+    "cn": "石丸子",
+    "natdex": 524
+  },
+  "Roselia": {
+    "cn": "毒蔷薇",
+    "natdex": 315
+  },
+  "Roserade": {
+    "cn": "罗丝雷朵",
+    "natdex": 407
+  },
+  "Rotom": {
+    "cn": "洛托姆",
+    "natdex": 479
+  },
+  "Rufflet": {
+    "cn": "毛头小鹰",
+    "natdex": 627
+  },
+  "Sableye": {
+    "cn": "勾魂眼",
+    "natdex": 302
+  },
+  "Salamence": {
+    "cn": "暴飞龙",
+    "natdex": 373
+  },
+  "Samurott": {
+    "cn": "大剑鬼",
+    "natdex": 503
+  },
+  "Sandile": {
+    "cn": "黑眼鳄",
+    "natdex": 551
+  },
+  "Sandshrew": {
+    "cn": "穿山鼠",
+    "natdex": 27
+  },
+  "Sandslash": {
+    "cn": "穿山王",
+    "natdex": 28
+  },
+  "Sawk": {
+    "cn": "打击鬼",
+    "natdex": 539
+  },
+  "Sawsbuck": {
+    "cn": "萌芽鹿",
+    "natdex": 586
+  },
+  "Sceptile": {
+    "cn": "蜥蜴王",
+    "natdex": 254
+  },
+  "Scizor": {
+    "cn": "巨钳螳螂",
+    "natdex": 212
+  },
+  "Scolipede": {
+    "cn": "蜈蚣王",
+    "natdex": 545
+  },
+  "Scrafty": {
+    "cn": "头巾混混",
+    "natdex": 560
+  },
+  "Scraggy": {
+    "cn": "滑滑小子",
+    "natdex": 559
+  },
+  "Scyther": {
+    "cn": "飞天螳螂",
+    "natdex": 123
+  },
+  "Seadra": {
+    "cn": "海刺龙",
+    "natdex": 117
+  },
+  "Seaking": {
+    "cn": "金鱼王",
+    "natdex": 119
+  },
+  "Sealeo": {
+    "cn": "海魔狮",
+    "natdex": 364
+  },
+  "Seedot": {
+    "cn": "橡实果",
+    "natdex": 273
+  },
+  "Seel": {
+    "cn": "小海狮",
+    "natdex": 86
+  },
+  "Seismitoad": {
+    "cn": "蟾蜍王",
+    "natdex": 537
+  },
+  "Sentret": {
+    "cn": "尾立",
+    "natdex": 161
+  },
+  "Serperior": {
+    "cn": "君主蛇",
+    "natdex": 497
+  },
+  "Servine": {
+    "cn": "青藤蛇",
+    "natdex": 496
+  },
+  "Seviper": {
+    "cn": "饭匙蛇",
+    "natdex": 336
+  },
+  "Sewaddle": {
+    "cn": "虫宝包",
+    "natdex": 540
+  },
+  "Sharpedo": {
+    "cn": "巨牙鲨",
+    "natdex": 319
+  },
+  "Shaymin": {
+    "cn": "谢米",
+    "natdex": 492
+  },
+  "Shedinja": {
+    "cn": "脱壳忍者",
+    "natdex": 292
+  },
+  "Shelgon": {
+    "cn": "甲壳龙",
+    "natdex": 372
+  },
+  "Shellder": {
+    "cn": "大舌贝",
+    "natdex": 90
+  },
+  "Shellos": {
+    "cn": "无壳海兔",
+    "natdex": 422
+  },
+  "Shelmet": {
+    "cn": "小嘴蜗",
+    "natdex": 616
+  },
+  "Shieldon": {
+    "cn": "盾甲龙",
+    "natdex": 410
+  },
+  "Shiftry": {
+    "cn": "狡猾天狗",
+    "natdex": 275
+  },
+  "Shinx": {
+    "cn": "小猫怪",
+    "natdex": 403
+  },
+  "Shroomish": {
+    "cn": "蘑蘑菇",
+    "natdex": 285
+  },
+  "Shuckle": {
+    "cn": "壶壶",
+    "natdex": 213
+  },
+  "Shuppet": {
+    "cn": "怨影娃娃",
+    "natdex": 353
+  },
+  "Sigilyph": {
+    "cn": "象征鸟",
+    "natdex": 561
+  },
+  "Silcoon": {
+    "cn": "甲壳茧",
+    "natdex": 266
+  },
+  "Simipour": {
+    "cn": "冷水猿",
+    "natdex": 516
+  },
+  "Simisage": {
+    "cn": "花椰猿",
+    "natdex": 512
+  },
+  "Simisear": {
+    "cn": "爆香猿",
+    "natdex": 514
+  },
+  "Skarmory": {
+    "cn": "盔甲鸟",
+    "natdex": 227
+  },
+  "Skiploom": {
+    "cn": "毽子花",
+    "natdex": 188
+  },
+  "Skitty": {
+    "cn": "向尾喵",
+    "natdex": 300
+  },
+  "Skorupi": {
+    "cn": "钳尾蝎",
+    "natdex": 451
+  },
+  "Skuntank": {
+    "cn": "坦克臭鼬",
+    "natdex": 435
+  },
+  "Slaking": {
+    "cn": "请假王",
+    "natdex": 289
+  },
+  "Slakoth": {
+    "cn": "懒人獭",
+    "natdex": 287
+  },
+  "Slowbro": {
+    "cn": "呆壳兽",
+    "natdex": 80
+  },
+  "Slowking": {
+    "cn": "呆呆王",
+    "natdex": 199
+  },
+  "Slowpoke": {
+    "cn": "呆呆兽",
+    "natdex": 79
+  },
+  "Slugma": {
+    "cn": "熔岩虫",
+    "natdex": 218
+  },
+  "Smeargle": {
+    "cn": "图图犬",
+    "natdex": 235
+  },
+  "Smoochum": {
+    "cn": "迷唇娃",
+    "natdex": 238
+  },
+  "Sneasel": {
+    "cn": "狃拉",
+    "natdex": 215
+  },
+  "Snivy": {
+    "cn": "藤藤蛇",
+    "natdex": 495
+  },
+  "Snorlax": {
+    "cn": "卡比兽",
+    "natdex": 143
+  },
+  "Snorunt": {
+    "cn": "雪童子",
+    "natdex": 361
+  },
+  "Snover": {
+    "cn": "雪笠怪",
+    "natdex": 459
+  },
+  "Snubbull": {
+    "cn": "布鲁",
+    "natdex": 209
+  },
+  "Solosis": {
+    "cn": "单卵细胞球",
+    "natdex": 577
+  },
+  "Solrock": {
+    "cn": "太阳岩",
+    "natdex": 338
+  },
+  "Spearow": {
+    "cn": "烈雀",
+    "natdex": 21
+  },
+  "Spheal": {
+    "cn": "海豹球",
+    "natdex": 363
+  },
+  "Spinarak": {
+    "cn": "圆丝蛛",
+    "natdex": 167
+  },
+  "Spinda": {
+    "cn": "晃晃斑",
+    "natdex": 327
+  },
+  "Spiritomb": {
+    "cn": "花岩怪",
+    "natdex": 442
+  },
+  "Spoink": {
+    "cn": "跳跳猪",
+    "natdex": 325
+  },
+  "Squirtle": {
+    "cn": "杰尼龟",
+    "natdex": 7
+  },
+  "Stantler": {
+    "cn": "惊角鹿",
+    "natdex": 234
+  },
+  "Staraptor": {
+    "cn": "姆克鹰",
+    "natdex": 398
+  },
+  "Staravia": {
+    "cn": "姆克鸟",
+    "natdex": 397
+  },
+  "Starly": {
+    "cn": "姆克儿",
+    "natdex": 396
+  },
+  "Starmie": {
+    "cn": "宝石海星",
+    "natdex": 121
+  },
+  "Staryu": {
+    "cn": "海星星",
+    "natdex": 120
+  },
+  "Steelix": {
+    "cn": "大钢蛇",
+    "natdex": 208
+  },
+  "Stoutland": {
+    "cn": "长毛狗",
+    "natdex": 508
+  },
+  "Stunfisk": {
+    "cn": "泥巴鱼",
+    "natdex": 618
+  },
+  "Stunky": {
+    "cn": "臭鼬噗",
+    "natdex": 434
+  },
+  "Sudowoodo": {
+    "cn": "树才怪",
+    "natdex": 185
+  },
+  "Suicune": {
+    "cn": "水君",
+    "natdex": 245
+  },
+  "Sunflora": {
+    "cn": "向日花怪",
+    "natdex": 192
+  },
+  "Sunkern": {
+    "cn": "向日种子",
+    "natdex": 191
+  },
+  "Surskit": {
+    "cn": "溜溜糖球",
+    "natdex": 283
+  },
+  "Swablu": {
+    "cn": "青绵鸟",
+    "natdex": 333
+  },
+  "Swadloon": {
+    "cn": "宝包茧",
+    "natdex": 541
+  },
+  "Swalot": {
+    "cn": "吞食兽",
+    "natdex": 317
+  },
+  "Swampert": {
+    "cn": "巨沼怪",
+    "natdex": 260
+  },
+  "Swanna": {
+    "cn": "舞天鹅",
+    "natdex": 581
+  },
+  "Swellow": {
+    "cn": "大王燕",
+    "natdex": 277
+  },
+  "Swinub": {
+    "cn": "小山猪",
+    "natdex": 220
+  },
+  "Swoobat": {
+    "cn": "心蝙蝠",
+    "natdex": 528
+  },
+  "Taillow": {
+    "cn": "傲骨燕",
+    "natdex": 276
+  },
+  "Tangela": {
+    "cn": "蔓藤怪",
+    "natdex": 114
+  },
+  "Tangrowth": {
+    "cn": "巨蔓藤",
+    "natdex": 465
+  },
+  "Tauros": {
+    "cn": "肯泰罗",
+    "natdex": 128
+  },
+  "Teddiursa": {
+    "cn": "熊宝宝",
+    "natdex": 216
+  },
+  "Tentacool": {
+    "cn": "玛瑙水母",
+    "natdex": 72
+  },
+  "Tentacruel": {
+    "cn": "毒刺水母",
+    "natdex": 73
+  },
+  "Tepig": {
+    "cn": "暖暖猪",
+    "natdex": 498
+  },
+  "Terrakion": {
+    "cn": "代拉基翁",
+    "natdex": 639
+  },
+  "Throh": {
+    "cn": "投摔鬼",
+    "natdex": 538
+  },
+  "Thundurus": {
+    "cn": "雷电云",
+    "natdex": 642
+  },
+  "Timburr": {
+    "cn": "搬运小匠",
+    "natdex": 532
+  },
+  "Tirtouga": {
+    "cn": "原盖海龟",
+    "natdex": 564
+  },
+  "Togekiss": {
+    "cn": "波克基斯",
+    "natdex": 468
+  },
+  "Togepi": {
+    "cn": "波克比",
+    "natdex": 175
+  },
+  "Togetic": {
+    "cn": "波克基古",
+    "natdex": 176
+  },
+  "Torchic": {
+    "cn": "火稚鸡",
+    "natdex": 255
+  },
+  "Torkoal": {
+    "cn": "煤炭龟",
+    "natdex": 324
+  },
+  "Tornadus": {
+    "cn": "龙卷云",
+    "natdex": 641
+  },
+  "Torterra": {
+    "cn": "土台龟",
+    "natdex": 389
+  },
+  "Totodile": {
+    "cn": "小锯鳄",
+    "natdex": 158
+  },
+  "Toxicroak": {
+    "cn": "毒骷蛙",
+    "natdex": 454
+  },
+  "Tranquill": {
+    "cn": "咕咕鸽",
+    "natdex": 520
+  },
+  "Trapinch": {
+    "cn": "大颚蚁",
+    "natdex": 328
+  },
+  "Treecko": {
+    "cn": "木守宫",
+    "natdex": 252
+  },
+  "Tropius": {
+    "cn": "热带龙",
+    "natdex": 357
+  },
+  "Trubbish": {
+    "cn": "破破袋",
+    "natdex": 568
+  },
+  "Turtwig": {
+    "cn": "草苗龟",
+    "natdex": 387
+  },
+  "Tympole": {
+    "cn": "圆蝌蚪",
+    "natdex": 535
+  },
+  "Tynamo": {
+    "cn": "麻麻小鱼",
+    "natdex": 602
+  },
+  "Typhlosion": {
+    "cn": "火暴兽",
+    "natdex": 157
+  },
+  "Tyranitar": {
+    "cn": "班基拉斯",
+    "natdex": 248
+  },
+  "Tyrogue": {
+    "cn": "无畏小子",
+    "natdex": 236
+  },
+  "Umbreon": {
+    "cn": "月亮伊布",
+    "natdex": 197
+  },
+  "Unfezant": {
+    "cn": "高傲雉鸡",
+    "natdex": 521
+  },
+  "Unown": {
+    "cn": "未知图腾",
+    "natdex": 201
+  },
+  "Ursaring": {
+    "cn": "圈圈熊",
+    "natdex": 217
+  },
+  "Uxie": {
+    "cn": "由克希",
+    "natdex": 480
+  },
+  "Vanillish": {
+    "cn": "多多冰",
+    "natdex": 583
+  },
+  "Vanillite": {
+    "cn": "迷你冰",
+    "natdex": 582
+  },
+  "Vanilluxe": {
+    "cn": "双倍多多冰",
+    "natdex": 584
+  },
+  "Vaporeon": {
+    "cn": "水伊布",
+    "natdex": 134
+  },
+  "Venipede": {
+    "cn": "百足蜈蚣",
+    "natdex": 543
+  },
+  "Venomoth": {
+    "cn": "摩鲁蛾",
+    "natdex": 49
+  },
+  "Venonat": {
+    "cn": "毛球",
+    "natdex": 48
+  },
+  "Venusaur": {
+    "cn": "妙蛙花",
+    "natdex": 3
+  },
+  "Vespiquen": {
+    "cn": "蜂女王",
+    "natdex": 416
+  },
+  "Vibrava": {
+    "cn": "超音波幼虫",
+    "natdex": 329
+  },
+  "Victini": {
+    "cn": "比克提尼",
+    "natdex": 494
+  },
+  "Victreebel": {
+    "cn": "大食花",
+    "natdex": 71
+  },
+  "Vigoroth": {
+    "cn": "过动猿",
+    "natdex": 288
+  },
+  "Vileplume": {
+    "cn": "霸王花",
+    "natdex": 45
+  },
+  "Virizion": {
+    "cn": "毕力吉翁",
+    "natdex": 640
+  },
+  "Volbeat": {
+    "cn": "电萤虫",
+    "natdex": 313
+  },
+  "Volcarona": {
+    "cn": "火神蛾",
+    "natdex": 637
+  },
+  "Voltorb": {
+    "cn": "霹雳电球",
+    "natdex": 100
+  },
+  "Vullaby": {
+    "cn": "秃鹰丫头",
+    "natdex": 629
+  },
+  "Vulpix": {
+    "cn": "六尾",
+    "natdex": 37
+  },
+  "Wailmer": {
+    "cn": "吼吼鲸",
+    "natdex": 320
+  },
+  "Wailord": {
+    "cn": "吼鲸王",
+    "natdex": 321
+  },
+  "Walrein": {
+    "cn": "帝牙海狮",
+    "natdex": 365
+  },
+  "Wartortle": {
+    "cn": "卡咪龟",
+    "natdex": 8
+  },
+  "Watchog": {
+    "cn": "步哨鼠",
+    "natdex": 505
+  },
+  "Weavile": {
+    "cn": "玛狃拉",
+    "natdex": 461
+  },
+  "Weedle": {
+    "cn": "独角虫",
+    "natdex": 13
+  },
+  "Weepinbell": {
+    "cn": "口呆花",
+    "natdex": 70
+  },
+  "Weezing": {
+    "cn": "双弹瓦斯",
+    "natdex": 110
+  },
+  "Whimsicott": {
+    "cn": "风妖精",
+    "natdex": 547
+  },
+  "Whirlipede": {
+    "cn": "车轮球",
+    "natdex": 544
+  },
+  "Whiscash": {
+    "cn": "鲶鱼王",
+    "natdex": 340
+  },
+  "Whismur": {
+    "cn": "咕妞妞",
+    "natdex": 293
+  },
+  "Wigglytuff": {
+    "cn": "胖可丁",
+    "natdex": 40
+  },
+  "Wingull": {
+    "cn": "长翅鸥",
+    "natdex": 278
+  },
+  "Wobbuffet": {
+    "cn": "果然翁",
+    "natdex": 202
+  },
+  "Woobat": {
+    "cn": "滚滚蝙蝠",
+    "natdex": 527
+  },
+  "Wooper": {
+    "cn": "乌波",
+    "natdex": 194
+  },
+  "Wormadam": {
+    "cn": "结草贵妇",
+    "natdex": 413
+  },
+  "Wurmple": {
+    "cn": "刺尾虫",
+    "natdex": 265
+  },
+  "Wynaut": {
+    "cn": "小果然",
+    "natdex": 360
+  },
+  "Xatu": {
+    "cn": "天然鸟",
+    "natdex": 178
+  },
+  "Yamask": {
+    "cn": "哭哭面具",
+    "natdex": 562
+  },
+  "Yanma": {
+    "cn": "蜻蜻蜓",
+    "natdex": 193
+  },
+  "Yanmega": {
+    "cn": "远古巨蜓",
+    "natdex": 469
+  },
+  "Zangoose": {
+    "cn": "猫鼬斩",
+    "natdex": 335
+  },
+  "Zapdos": {
+    "cn": "闪电鸟",
+    "natdex": 145
+  },
+  "Zebstrika": {
+    "cn": "雷电斑马",
+    "natdex": 523
+  },
+  "Zekrom": {
+    "cn": "捷克罗姆",
+    "natdex": 644
+  },
+  "Zigzagoon": {
+    "cn": "蛇纹熊",
+    "natdex": 263
+  },
+  "Zoroark": {
+    "cn": "索罗亚克",
+    "natdex": 571
+  },
+  "Zorua": {
+    "cn": "索罗亚",
+    "natdex": 570
+  },
+  "Zubat": {
+    "cn": "超音蝠",
+    "natdex": 41
+  },
+  "Zweilous": {
+    "cn": "双首暴龙",
+    "natdex": 634
+  }
+}

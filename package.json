@@ -1,0 +1,26 @@
+{
+  "name": "pokemmo-report",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PokeMMO 报点看板：镜像 Alphapedia 的 Alpha/群蜂/特异天气点位，中文展示 + 玩家上报 + 企业微信推送",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js 3580 --host=127.0.0.1",
+    "selftest": "node tools/selftest.js --url=http://127.0.0.1:3580",
+    "test": "node tools/unit-test.js",
+    "seed": "node tools/reseed.js",
+    "sprites": "node tools/mirror-sprites.js --only-universe",
+    "cn": "node tools/build-cn-data.js",
+    "verify:cn": "node tools/verify-cn-data.js",
+    "terms": "node tools/build-cn-terms.js",
+    "verify:terms": "node tools/verify-cn-terms.js",
+    "phrases": "node tools/build-cn-phrases.js",
+    "audit:eggs": "node tools/audit-egg-groups.js",
+    "audit:sources": "node tools/audit-cn-sources.js",
+    "mock": "node tools/mock-webhook.js"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}
