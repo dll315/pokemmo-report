@@ -41,7 +41,7 @@ WECOM_WEBHOOK="http://127.0.0.1:3599/send?key=MOCK" node server.js 3580
 ## 自检
 
 ```bash
-npm test                                   # 纯逻辑单测 19 项，不联网
+npm test                                   # 纯逻辑单测 20 项，不联网
 ADMIN_USER=admin ADMIN_PASSWORD=密码 npm run selftest   # 对着跑着的服务打 53 项接口用例
 node tools/verify-cn-data.js               # 校验宝可梦名/地点名覆盖率
 npm run verify:terms                       # 校验术语表覆盖率
@@ -66,18 +66,26 @@ npm run audit:sources                      # 译名溯源复核：整句表回�
 # 1) 登上服务器
 ssh root@159.198.67.190
 
-# 2) 取代码（私有库；用 HTTPS 就换成 https://github.com/dll315/pokemmo-report.git）
-git clone git@github.com:dll315/pokemmo-report.git /opt/pokemmo-report
+# 2) 取代码（仓库已公开，HTTPS 免密 clone 即可）
+git clone https://github.com/dll315/pokemmo-report.git /opt/pokemmo-report
 cd /opt/pokemmo-report
 
-# 守卫：看不到 Dockerfile 就是代码没下来（私有仓库要先给服务器配 SSH key，
+# 守卫：看不到 Dockerfile 就是代码没下来（clone 失败时目录是空的，
 # 或在自己电脑上 git archive + scp 传包，见 DEPLOY.md 第 0 节），别再往下 build
-test -f Dockerfile && echo "代码到位 ✓" || echo "没拿到代码，停在这里" 
+test -f Dockerfile && echo "代码到位 ✓" || echo "没拿到代码，停在这里"
 
 # 3) 数据目录 + 镜像
 mkdir -p /opt/pokemmo/data
 docker build -t pokemmo-report:1.0 .
+```
 
+> ⚠️ **境内服务器大概率在这一步被卡住**：`FROM node:20-alpine` 要拉 Docker Hub，
+> 而它在国内是连不上的（`Get "https://registry-1.docker.io/v2/": context deadline exceeded`）。
+> 两条解法，按顺序试（细节在 DEPLOY.md 第 0b 节）：
+> ① 给 Docker 配腾讯云内网加速源 `mirror.ccs.tencentyun.com`；
+> ② **绕过 Docker**，用下面的 B 段纯 Node + systemd——本站零 npm 依赖，跑起来效果完全一样。
+
+```bash
 # 4) 起容器
 docker run -d --name pokemmo-report --restart unless-stopped \
   -p 3580:3580 \
@@ -88,7 +96,7 @@ docker run -d --name pokemmo-report --restart unless-stopped \
   -v /opt/pokemmo/data:/app/data \
   --memory 256m pokemmo-report:1.0
 
-# 5) 放行本机防火墙（Ubuntu 用 ufw allow 3580/tcp）
+# 5) 本机防火墙放行；如果打印 FirewallD is not running 就说明系统层没开防火墙，跳过即可
 firewall-cmd --permanent --add-port=3580/tcp && firewall-cmd --reload
 
 docker logs -f pokemmo-report        # 首启回填 48 小时报点，约 15~25 秒
@@ -110,9 +118,15 @@ docker logs -f pokemmo-report        # 首启回填 48 小时报点，约 15~25 
 
 ### B. 不装 Docker：纯 Node + systemd
 
+Docker Hub 拉不动、或者不想多一层镜像时走这条。本站零依赖，**没有 `npm install` 这一步**。
+
 ```bash
-cd /opt/pokemmo-report && cp .env.example .env && vi .env
-node server.js 3580 --host=0.0.0.0     # 生产用 systemd 托管，见 DEPLOY.md 第 6 节
+# 注意 .env 只有 docker compose / --env-file 会读，裸 node 不认（零依赖=没装 dotenv）
+cd /opt/pokemmo-report
+HOST=0.0.0.0 ADMIN_USER=admin ADMIN_PASSWORD='换成你自己的密码' node server.js 3580
+
+# 先这样手动跑通（首启回填十几秒），确认 http://服务器IP:3580/ 有点位，
+# 再按 DEPLOY.md 第 6 节写成 systemd 服务常驻（含 Node 版本不够时从 npmmirror 取二进制的方法）
 ```
 
 ### C. GitHub Pages 托管（静态快照，无上报/审核）

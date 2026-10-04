@@ -37,8 +37,37 @@ ls /opt/pokemmo-report/Dockerfile        # 看到路径打印出来才算成功
 要走 git 的话二选一：`ssh-keygen -t ed25519` 后把 `/root/.ssh/id_ed25519.pub` 加到
 GitHub → Settings → SSH Keys，再 `git clone git@github.com:dll315/pokemmo-report.git`；
 或者用 HTTPS + 只读令牌 `git clone https://<TOKEN>@github.com/dll315/pokemmo-report.git`
-（令牌会进 shell 历史，用完记得去 GitHub 撤销）。
+（令牌会进 shell 历史，用完记得去 GitHub 撤销）。仓库已是 **public**，直接
+`git clone https://github.com/dll315/pokemmo-report.git /opt/pokemmo-report` 就行；
+clone 完一定要 `ls /opt/pokemmo-report/Dockerfile` 确认目录真的有东西，
+否则后面 build 只会报 `unable to prepare context: path ... not found`。
 
+### 0b. 服务器连不上 Docker Hub（国内机器最常见的一堵墙）
+
+现象是 `Get "https://registry-1.docker.io/v2/": context deadline exceeded`，
+或者 build 卡在 `FROM node:20-alpine` 拉不下来。**这跟本仓库的代码没关系**，
+是 Docker Hub 在境内被墙了。先分清哪个源能用：
+
+```bash
+for u in https://mirror.ccs.tencentyun.com/v2/ https://registry-1.docker.io/v2/ https://registry.npmmirror.com/; do
+  printf "%-44s " "$u"; curl -sS -o /dev/null -m 8 -w "HTTP %{http_code}\n" "$u" || echo "不通"; done
+```
+
+腾讯云机器直接用厂商的内网加速源（不用登录、不用改 DNS，只在自己 VPC 内生效）：
+
+```bash
+mkdir -p /etc/docker && cat > /etc/docker/daemon.json <<'EOF'
+{ "registry-mirrors": ["https://mirror.ccs.tencentyun.com"] }
+EOF
+systemctl restart docker
+docker pull node:20-alpine      # 拉到镜像层才算真的通了，别只看 restart 没报错
+```
+
+> 网上那些第三方公共加速源也能用，但等于把"基础镜像从谁的服务器拿"交给别人，
+> 供应链上不如云厂商自己的源可信；实在要用，拉完 `docker images --digests` 核对摘要。
+
+**上面三条都不通就别跟 Docker 耗**——本站零 npm 依赖（没有 node_modules），
+第 6 节"纯 Node + systemd"跑的是同一份代码，功能完全一致，还少一层网络依赖。
 
 ### 1. 准备
 
@@ -142,6 +171,11 @@ firewall-cmd --add-port=3580/tcp --permanent && firewall-cmd --reload     # Cent
 ufw allow 3580/tcp                                                        # Ubuntu
 ```
 
+> 如果打印 `FirewallD is not running`：系统层本来就没开防火墙，这两条不用管，
+> 端口只在**云控制台的防火墙/安全组**这一道。腾讯云轻量服务器在
+> 「控制台 → 防火墙」加 TCP 3580，CVM 在「安全组 → 入方向」加。
+> 外网 `curl -sI http://服务器IP:3580/` 不通而 `curl -sI http://127.0.0.1:3580/` 通，就是这里没放行。
+
 为什么用 3580 这种非标端口：国内云厂商对 **80/443** 会检查 ICP 备案，未备案的域名解析到国内机器提供网页服务有被阻断风险。直连非标端口最省事。
 真要绑域名（例如 `poke.你的域名.com`），需要先完成备案，再走下面第 5 步的反代。
 
@@ -175,31 +209,70 @@ server {
 
 走反代后，玩家上报的限频按 IP 计算会失真，记得给容器加环境变量 `TRUST_PROXY=1`（只信任 X-Forwarded-For 的第一段）。
 
-### 6. 不用 Docker 的备选：纯 Node + systemd
+### 6. 不装 Docker：纯 Node + systemd（国内服务器更省事的一条）
+
+本站**没有任何 npm 依赖**（`src/net.js` 用 Node 自带的 `https` 模块），
+所以只要有 node 可执行文件就能跑：不用 `npm install`，不用 Docker Hub，不用镜像源。
+服务本身要 Node 16+（`tools/` 里的自检脚本用了全局 `fetch`，那个要 18+）。
 
 ```bash
-yum install -y nodejs || apt install -y nodejs        # 需要 Node 16+
-useradd -r -s /sbin/nologin poke
-cp config.example.json data/config.json && vim data/config.json  # 填 adminUser / adminPassword 与 webhook
-mkdir -p /etc/systemd/system && cat > /etc/systemd/system/poke.service <<'EOF'
+# 1) 代码到位（第 0 节：本机打包 scp 上来）
+mkdir -p /opt/pokemmo-report && tar xzf /root/pokemmo-report.tar.gz -C /opt/pokemmo-report
+ls /opt/pokemmo-report/server.js /opt/pokemmo-report/data/cn-species.json   # 看得见才继续
+
+# 2) 要一个 ≥16 的 node。发行版自带的太老就从 npmmirror 取官方二进制，不动系统包
+node -v 2>/dev/null || dnf install -y nodejs
+[ "$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null || echo 0)" -lt 16 ] && {
+  A=$(uname -m); [ "$A" = "aarch64" ] && A=arm64 || A=x64
+  curl -L -o /root/node20.tar.gz "https://registry.npmmirror.com/-/binary/node/v20.18.1/node-v20.18.1-linux-$A.tar.gz"
+  mkdir -p /usr/local/node20 && tar xzf /root/node20.tar.gz -C /usr/local/node20 --strip-components=1
+}
+NODE_BIN=$([ -x /usr/local/node20/bin/node ] && echo /usr/local/node20/bin/node || command -v node)
+echo "用的解释器：$NODE_BIN"; $NODE_BIN -v
+
+# 3) 跑成一个服务账号（只有 data/ 需要写权限）
+id poke >/dev/null 2>&1 || useradd -r -s /sbin/nologin poke
+mkdir -p /opt/pokemmo-report/data && chown -R poke:poke /opt/pokemmo-report/data
+
+# 4) systemd 单元（ADMIN_PASSWORD 那行必须改；密码里别带空格和 #）
+cat > /etc/systemd/system/poke.service <<EOF
 [Unit]
 Description=PokeMMO 报点站
-After=network.target
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 WorkingDirectory=/opt/pokemmo-report
 Environment=HOST=0.0.0.0
 Environment=ADMIN_USER=admin
 Environment=ADMIN_PASSWORD=换成你自己的密码
-Environment=WECOM_WEBHOOK=你的机器人地址
-ExecStart=/usr/bin/node server.js 3580
+Environment=WECOM_WEBHOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=你的机器人key
+Environment=TZ=Asia/Shanghai
+ExecStart=${NODE_BIN} server.js 3580
 Restart=always
-User=poke
+RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
 EOF
-systemctl daemon-reload && systemctl enable --now poke && journalctl -u poke -f
+systemctl daemon-reload && systemctl enable --now poke
+```
+
+`WECOM_WEBHOOK` 那行不需要就先删掉，之后在管理台网页里填（写进 unit 的话环境变量优先，网页改了不生效）。
+
+验证与日常操作：
+
+```bash
+journalctl -u poke -n 40 --no-pager                                  # 首启会回填 48 小时报点，十几秒
+curl -s http://127.0.0.1:3580/api/board | head -c 200                 # 本机通就说明服务活着
+systemctl restart poke                                                # 改完 unit 先 systemctl daemon-reload
+```
+
+更新版本：重新打包 scp 上来解包覆盖（`db.json`/`config.json` 不在打包里，不会被动），
+再 `systemctl restart poke`。备份还是那一份 `data/db.json`：
+
+```bash
+cp /opt/pokemmo-report/data/db.json /opt/pokemmo-report/data/db.$(date +%F).json
 ```
 
 ---
@@ -285,3 +358,6 @@ Secrets 里配 `WECOM_WEBHOOK`，Variables 里可选 `PUSH_KINDS` / `PUSH_ONLY` 
 | 上报提交后看不到 | 默认要管理员在 `/admin` 放行；想直发就关掉「上报需人工审核」。 |
 | 想重灌历史 | 停服务后 `node tools/reseed.js 168 --force`（容器里 `docker compose exec report node tools/reseed.js 168 --force`，注意先 `-e` 停调度）。 |
 | Actions 跑批报 `HTTP 403`、库存 0 | 上游 Cloudflare 拦数据中心 IP，不是代码问题。改走 DEPLOY.md 的 B2（你的机器跑批 + Pages 分支托管），用 `node tools/probe-upstream.js` 确认。 |
+| build 报 `unable to prepare context: path "/opt/pokemmo-report" not found` | 那个目录根本不存在／是空的——clone 没成功就往下的命令全跑了一遍。`ls /opt/pokemmo-report/Dockerfile` 确认代码到位，取不到代码看第 0 节。 |
+| `Get "https://registry-1.docker.io/v2/": context deadline exceeded` | Docker Hub 在境内连不上，跟本站代码无关。第 0b 节配加速源，或者干脆走第 6 节纯 Node（零依赖，不需要任何镜像）。 |
+| `FirewallD is not running` | 系统层防火墙本来就没开，`firewall-cmd` 那两条不用管；端口只剩云控制台「防火墙/安全组」一道，见第 3 节。 |
