@@ -47,6 +47,14 @@ async function main() {
   const r = await sync.syncOnce(store, cfg, { log });
   log(`新增 ${r.newEvents.length} 条，库存 ${store.index.size} 条，错误 ${r.errors.length ? r.errors.join("; ") : "无"}`);
 
+  /* 一条都没抓到且报错 = 上游拒绝这个 IP（Actions 跑在数据中心，Cloudflare 常直接 403）。
+     这种情况必须让这一步红掉：静默成功会部署出一个空看板，比失败更坏。 */
+  if (r.errors.length && store.index.size === 0) {
+    console.error("\n同步彻底失败：上游一个数据都没给。多半是 Cloudflare 拦了数据中心 IP（Actions runner）。");
+    console.error("先用 node tools/probe-upstream.js 看状态码；确认被拦就改走自建服务器路径（DEPLOY.md 的 A 段）。");
+    process.exit(1);
+  }
+
   if (r.newEvents.length) push.enqueue(store, r.newEvents);
   const f = await push.flushQueue(store, cfg, { log });
   log(`推送：发出 ${f.sent}，失败 ${f.failed}${f.skipped ? `（${f.skipped}）` : ""}`);

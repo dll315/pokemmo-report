@@ -2,13 +2,16 @@
 
 两条路径，按你手上有什么机器选：
 
-| | A. 自建服务器（推荐） | B. GitHub Pages + Actions |
+| | A. 自建服务器（推荐） | B. Pages 托管 + 你的机器跑批 |
 |---|---|---|
-| 看板实时性 | 默认 2 分钟同步一次 | 受 Actions cron 限制，最小 5 分钟，高峰期会延迟 10–20 分钟 |
+| 看板实时性 | 默认 2 分钟同步一次 | 由你的 cron 决定（建议 5 分钟） |
 | 玩家上报 / 审核 | ✅ | ❌（静态快照没有后端，入口自动隐藏） |
-| 企业微信推送 | ✅ 服务端定时发 | ✅ 由 Actions 跑批时发 |
-| 需要 | 一台国内服务器 + 开一个端口 | 只用 GitHub |
-| 数据落地 | 宿主机 `./data/db.json` | 仓库里的 `state/db.json` |
+| 企业微信推送 | ✅ 服务端定时发 | ✅ 由跑批的那台机器发 |
+| 需要 | 一台服务器 + 开一个端口 | 一个能跑 node 的地方（服务器/本机/NAS）+ GitHub |
+| 数据落地 | 宿主机 `./data/db.json` | 仓库 `pages` 分支快照 + `data/db.json` |
+
+> ⚠️ **B 不能用 GitHub Actions 抓数据**：实测上游 Cloudflare 对 Actions 出口 IP 返回 403（见 B 段）。
+> 抓取必须放在能访问上游的机器上，Pages 只负责托管静态文件。
 
 ---
 
@@ -175,49 +178,64 @@ systemctl daemon-reload && systemctl enable --now poke && journalctl -u poke -f
 
 ---
 
-## B. GitHub Pages + Actions（无服务器降级）
+## B. GitHub Pages（能托管，但要注意上游拦 Actions）
 
-### 能，但定位是"降级用"，不是省事实
+**实测结论先说**：Pages 的托管、部署、访问都正常；但 `alpha.pokemmotools.org` 的 Cloudflare
+会拒绝 GitHub Actions 的出口 IP——第一次跑批时 `/history` 与全部 `/api/*` 一律 **HTTP 403**，
+一条数据都抓不到。因此"Actions 定时抓上游"这条路当前不可行，除非上游哪天放行。
+（`node tools/probe-upstream.js` 就是用来确认这件事的，日志里有 `cf-ray` 与状态码。）
 
-Pages 路径 = GitHub Actions 每 10 分钟抓一次上游 → 生成静态 `dist/` 部署到 Pages → 顺带把新点位发到企业微信群。**不用买服务器、不用备案**，代价是三条：
+两条路可选：
 
-| | 自建 Docker | Pages + Actions |
+| | B1 Actions 全自动 | **B2 你的机器抓 + Pages 托管（可行，推荐）** |
 |---|---|---|
-| 新点位延迟 | 默认 2 分钟 | cron 最小 5 分钟，且 Actions 排队常拖到 10~20 分钟 |
-| 玩家上报 / 审核 | ✅ | ❌ 静态页没有后端，入口会自动隐藏 |
-| 看板倒计时 | 服务端时间 | 浏览器本地时间，两次跑批之间数字是陈的 |
-| 图鉴图 | 可选本地镜像 | 不打包，显示中文名首字徽标 |
+| 谁抓数据 | GitHub Actions | 你的服务器或本机（住宅/云主机 IP 能过） |
+| 谁部署 | Actions deploy-pages | push 到 `pages` 分支，Pages 分支托管 |
+| 谁推送企业微信 | Actions | 同样由跑批的那台机器发 |
+| 上游 403 影响 | 全瞎 | 无影响 |
 
-### 部署步骤
+### B2 部署步骤
 
-1. **推代码**：仓库建议 Public。私有仓库能不能用 Pages 取决于账户套餐，以第 2 步能否保存为准（不确定就先建 Public，之后随时可切 Private）。
-2. **开 Pages，源选 Actions**：`Settings` → 左侧 `Pages` → `Build and deployment` → `Source` 选 **GitHub Actions**（不要选 Deploy from a branch）。这一步不做，后面的 `deploy-pages` 会直接失败。
-3. **配密钥与变量**：`Settings` → `Secrets and variables` → `Actions`
-   - `Secrets` 里加 **Repository secret** `WECOM_WEBHOOK` = 机器人地址（留空则只更新网页、不推送）
-   - `Variables` 里按需加：`PUSH_KINDS`（默认 `alpha,swarm`）、`PUSH_ONLY`（只推这几只，逗号分隔，留空=全部）、`PUSH_EXCEPT`、`PUSH_REGIONS`（如 `Hoenn,Kanto`）、`PUSH_MIN_TIER`（低于该价值的点位不推）、`PUSH_MAX`（每轮最多发几条，默认 8）、`PUSH_ENABLED=0`（临时停推）、`BACKFILL_HOURS`（首轮回溯小时数，默认 48）
-4. **手动跑第一次**：`Actions` → 左侧「同步快照并推送」→ `Run workflow`。这一次它会：登录上游取令牌 → 拉历史 → 写 `state/db.json` → **把这个游标文件提交回仓库** → 生成 `dist/` → 部署 Pages。
-   - `state/db.json` 必须能提交回去，所以本工作流用了 `permissions: contents: write`；若你给仓库加了分支保护，要把 Actions 加进允许推送的名单，否则这一步会失败（站点仍能部署，只是每次都当首轮重灌、不会重复推送，因为队列状态没保存）。
-5. **验证**：跑完在 workflow 页面看 `抓取上游并生成 dist` 这一步的日志，应有 `[sync] alpha: 取回 … 新增 …` 与 `dist 生成完成：活动点位 N`；然后打开 Pages 地址（`https://<用户名>.github.io/<仓库名>/`）。
-6. **之后**：每 10 分钟自动跑；改代码 push 也会触发一次（只有改到 `src/ tools/ public/ workflow` 才触发，避免和回写 `state/db.json` 互相打转）。
-
-### 本地先把这条路径验通（建议推上去之前做）
+1. **仓库设置**：`Settings → Pages → Source: Deploy from a branch`，分支选 **`pages`**、目录 **`/ (root)`**。
+   （命令行版：`gh api -X POST repos/<你>/pokemmo-report/pages -f 'source[branch]=pages' -f 'source[path]=/'`）
+2. **首次发布**（在能访问上游的机器上，仓库根目录）：
 
 ```bash
-node tools/actions-sync.js                     # 读 state/db.json，抓上游，生成 dist/
-WECOM_WEBHOOK=你的地址 node tools/actions-sync.js   # 顺便真的推一条，验证队列与卡片
-node tools/build-static.js --data=data         # 只想用现有数据看效果时
-python -m http.server -d dist 8123             # 浏览器开 http://127.0.0.1:8123
+node tools/publish-pages.js        # 抓 data/ 里的数据 → 生成 dist/ → 推到 pages 分支
 ```
 
-看到页面顶部提示"静态快照"、报点标签消失、看板有数据，就说明 Pages 这条路是通的。
+   它会打印 `已推送 origin/pages`。等 30~60 秒，地址是 `https://<用户名>.github.io/<仓库名>/`。
+3. **定时跑**（cron，每 5 分钟一次；抓取和推送一起做）：
 
-### Pages 路径的已知坑
+```bash
+crontab -l 2>/dev/null | grep -v publish-pages.js > /tmp/ct; cat >> /tmp/ct <<'EOF'
+*/5 * * * * cd /opt/pokemmo-report && WECOM_WEBHOOK='https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxx' node tools/actions-sync.js && node tools/publish-pages.js --skip-build >> /var/log/poke-pages.log 2>&1
+EOF
+crontab /tmp/ct && rm -f /tmp/ct
+```
 
-- **不要在同一个仓库同时跑 compose 和这个 workflow**，两边都会往群里推，会重复。二选一，或把 `PUSH_ENABLED` 设 `0` 只留网页。
-- Actions 的 UTC 不影响推送逻辑（代码按 UTC+8 硬算北京时间），但 cron 表达式本身按 **UTC** 解释。
-- 免费 Actions 分钟数有限（公有仓库不限量；私有每月 2000 分钟）。按 10 分钟一次跑满一个月约 4400 分钟用量，私有仓库要注意。
-- Pages 在国内的可达性一般，访问慢或偶发连不上属正常，别当 SLA 用。
+   注意上面这条用的是 `state/db.json`（`actions-sync.js` 默认写 `state/`），而 `publish-pages.js` 默认读 `data/`。
+   二选一定居：**要么**只用 `data/`（那就把 `--data=data` 传给 actions-sync：`STATE_DIR=data node tools/actions-sync.js`），
+   **要么**只用 `state/`（那就 `node tools/publish-pages.js --skip-build` 前先 `node tools/build-static.js --data=state`）。
+   推荐前者，和自建服务器路径共用同一份库。
+4. **验证**：浏览器开 Pages 地址，看板应有点位；`curl -s <地址>/data.json | head -c 200` 能看到
+   `generatedAt` 在刷新；每次跑完 `git fetch && git log --oneline origin/pages -1` 应有新提交。
+5. **不要和 A 段同时开推送**（两处都会往同一个群发，会重复）。只在服务器跑服务、Pages 当纯展示镜像时，
+   把 `WECOM_WEBHOOK` 只给服务器那条，cron 那条留空即可只更新网页。
 
+### B1 如果哪天上游放行 Actions
+
+仓库 `Settings → Secrets and variables → Actions → Variables` 加 `PAGES_VIA_ACTIONS=1`，
+工作流 `同步快照并推送` 就会恢复：抓上游 → 回写 `state/db.json` → 部署 Pages → 推企业微信。
+Secrets 里配 `WECOM_WEBHOOK`，Variables 里可选 `PUSH_KINDS` / `PUSH_ONLY` / `PUSH_EXCEPT` / `PUSH_REGIONS` /
+`PUSH_MIN_TIER` / `PUSH_MAX` / `PUSH_ENABLED=0` / `BACKFILL_HOURS`。关掉变量即回到 B2。
+
+### Pages 路径的固有代价
+
+- 静态快照**没有**上报与审核，页面上报入口会自动隐藏；点位上报必须走自建服务器那条。
+- 倒计时按浏览器本地时间算，两次跑批之间数字是陈的（间隔 5 分钟就只能保证 5 分钟内新鲜）。
+- Pages 在国内可达性一般，访问偶发慢或连不上属正常。
+- 私有仓库的 Pages 站点内容仍是**公开可访问**的（你的套餐可以开私有仓库 + Pages，但网页本身不私密）。
 
 ---
 
@@ -240,3 +258,4 @@ python -m http.server -d dist 8123             # 浏览器开 http://127.0.0.1:8
 | 推送 errcode 93000 | webhook key 不对（机器人被移出群或复制错）。 |
 | 上报提交后看不到 | 默认要管理员在 `/admin` 放行；想直发就关掉「上报需人工审核」。 |
 | 想重灌历史 | 停服务后 `node tools/reseed.js 168 --force`（容器里 `docker compose exec report node tools/reseed.js 168 --force`，注意先 `-e` 停调度）。 |
+| Actions 跑批报 `HTTP 403`、库存 0 | 上游 Cloudflare 拦数据中心 IP，不是代码问题。改走 DEPLOY.md 的 B2（你的机器跑批 + Pages 分支托管），用 `node tools/probe-upstream.js` 确认。 |
