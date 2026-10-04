@@ -65,7 +65,7 @@ docker compose up -d --build
 docker compose logs -f      # 首次启动会回填 48 小时报点，看到"同步 每 2 分钟一次"就算好了
 ```
 
-访问 **`http://159.198.67.190:3580/`**，管理台 **`http://159.198.67.190:3580/admin`**（账号 `admin` / 密码 `123456`，就是你 .env 里那两个值）。
+访问 **`http://159.198.67.190:3580/`**，管理台 **`http://159.198.67.190:3580/admin`**，账号密码就是 .env 里那两个值。
 
 ### 2b. 不用 compose，直接 `docker run`
 
@@ -84,7 +84,7 @@ docker run -d \
   --restart unless-stopped \
   -p 3580:3580 \
   -e ADMIN_USER=admin \
-  -e ADMIN_PASSWORD=123456 \
+  -e ADMIN_PASSWORD='换成你自己的密码' \
   -e WECOM_WEBHOOK='https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxx' \
   -e TZ=Asia/Shanghai \
   -v /opt/pokemmo/data:/app/data \
@@ -97,7 +97,7 @@ docker run -d \
 | 参数 | 作用 | 不给会怎样 |
 |---|---|---|
 | `-p 3580:3580` | 宿主机端口映射 | 外面访问不到。换端口就改冒号左边，如 `-p 8080:3580` |
-| `-e ADMIN_USER` / `-e ADMIN_PASSWORD` | 管理台登录账号与密码 | 不设就用默认 `admin` / `123456`；密码留空的语义是**禁止登录**（管理接口全部 401） |
+| `-e ADMIN_USER` / `-e ADMIN_PASSWORD` | 管理台登录账号与密码 | 不设则用程序默认 `admin` / `123456`（公网部署务必覆盖它）；在 .env 里把 ADMIN_PASSWORD 留空 = 禁止登录管理台 |
 | `-e WECOM_WEBHOOK` | 企业微信机器人地址 | 只更新看板，不推送；也可以在管理台网页里填 |
 | `-e TZ` | 容器时区 | 不影响业务时间（代码按 UTC+8 硬算北京时间），只影响日志可读性 |
 | `-v /opt/pokemmo/data:/app/data` | 数据落地 | 容器一删，玩家上报和同步游标全没 |
@@ -109,7 +109,7 @@ docker run -d \
 ```bash
 docker logs -f pokemmo-report                # 看同步与推送日志（第一次要等 15~25 秒回填）
 docker inspect -f '{{.State.Health.Status}}' pokemmo-report   # healthcheck: healthy / unhealthy
-docker exec -e ADMIN_USER=admin -e ADMIN_PASSWORD=123456 pokemmo-report node tools/selftest.js   # 自检 53 项
+docker exec -e ADMIN_USER=admin -e ADMIN_PASSWORD=你的密码 pokemmo-report node tools/selftest.js   # 自检 53 项
 docker stop pokemmo-report && docker rm pokemmo-report        # 停止并删除（数据在宿主机，不会丢）
 ```
 
@@ -190,7 +190,7 @@ After=network.target
 WorkingDirectory=/opt/pokemmo-report
 Environment=HOST=0.0.0.0
 Environment=ADMIN_USER=admin
-Environment=ADMIN_PASSWORD=123456
+Environment=ADMIN_PASSWORD=换成你自己的密码
 Environment=WECOM_WEBHOOK=你的机器人地址
 ExecStart=/usr/bin/node server.js 3580
 Restart=always

@@ -20,15 +20,15 @@
 
 ```bash
 # 需要 Node 16+
-cp config.example.json data/config.json   # 管理账号 admin、密码 123456，webhook 也填这里
+cp config.example.json data/config.json   # 管理账号、密码、webhook 都填这里
 node server.js 3580 --host=127.0.0.1    # 首次启动会自动回填上游报点
-# 浏览器打开 http://127.0.0.1:3580/ ；管理台 http://127.0.0.1:3580/admin（admin / 123456）
+# 浏览器打开 http://127.0.0.1:3580/ ；管理台 http://127.0.0.1:3580/admin
 ```
 
 没有真实报点时可以先造几条演示数据看界面：
 
 ```bash
-ADMIN_USER=admin ADMIN_PASSWORD=123456 node tools/demo-events.js --url=http://127.0.0.1:3580
+ADMIN_USER=admin ADMIN_PASSWORD=你的密码 node tools/demo-events.js --url=http://127.0.0.1:3580
 ```
 
 验证推送排版时，建议先用本地假端点，别直接往自己群里发：
@@ -82,7 +82,7 @@ docker build -t pokemmo-report:1.0 .
 docker run -d --name pokemmo-report --restart unless-stopped \
   -p 3580:3580 \
   -e ADMIN_USER=admin \
-  -e ADMIN_PASSWORD=123456 \
+  -e ADMIN_PASSWORD='换成你自己的密码' \
   -e WECOM_WEBHOOK="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=你的机器人key" \
   -e TZ=Asia/Shanghai \
   -v /opt/pokemmo/data:/app/data \
@@ -99,11 +99,11 @@ docker logs -f pokemmo-report        # 首启回填 48 小时报点，约 15~25 
 | | |
 |---|---|
 | 看板 | `http://159.198.67.190:3580/` |
-| 管理台 | `http://159.198.67.190:3580/admin` → 账号 `admin`，密码 `123456` |
+| 管理台 | `http://159.198.67.190:3580/admin` → 账号密码就是你上面 `-e` 里设的那两个 |
 
 还要在**云厂商控制台的安全组**放行 TCP 3580，只开本机防火墙不够。
 
-- 密码就是 `123456`（按你的要求）；启动日志会提醒一句"弱口令"，不影响使用。想改：登录后在「站点设置 → 修改密码」，改完要重新登录；或者直接改下面 `.env` 里的 `ADMIN_PASSWORD` 再重建容器。
+- 程序默认账号 `admin`、默认密码 `123456`（启动日志与管理台都会标"弱口令"）。**公网部署必须改掉**：登录后「站点设置 → 修改密码」，或部署时用 `-e ADMIN_PASSWORD=` 覆盖。仓库是公开的话，别把真实密码写进任何提交或文档。
 - 不带 `WECOM_WEBHOOK` 就只更新网页不推送；填了就以它为准，网页里改 webhook 不会生效。
 - `-v` 一定要给：玩家上报、审核记录、同步游标都在 `/opt/pokemmo/data/db.json`，备份也就拷这一个文件。
 - 有 compose 更省事：`cp .env.example .env`（填三个值）→ `docker compose up -d --build`。
