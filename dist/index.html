@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>PokeMMO 报点 · 头目 / 大量出现 / 奇遇 实时看板</title>
+    <meta name="description" content="PokeMMO 国内报点看板：头目（Alpha）、大量出现（Swarm）、奇遇（Pheno）实时点位与刷新时段，支持企业微信群推送。" />
+    <meta name="theme-color" content="#b3324a" />
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css?v=1" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="ball" aria-hidden="true"></span>
+        <div>
+          <h1>PokeMMO 报点</h1>
+          <p class="sub">头目 · 大量出现 · 奇遇</p>
+        </div>
+      </div>
+      <nav class="tabs" role="tablist">
+        <button class="tab active" data-tab="board" role="tab">看板</button>
+        <button class="tab" data-tab="report" role="tab">报点</button>
+        <button class="tab" data-tab="ref" role="tab">图鉴参考</button>
+        
+      </nav>
+    </header>
+
+    <div class="statusbar">
+      <span id="clock">北京时间 --:--:--</span>
+      <span id="slotChip" class="chip">时段加载中…</span>
+      <span id="syncChip" class="chip">同步 --:--</span>
+      <span class="spacer"></span>
+      <button id="themeBtn" class="ghostbtn" type="button">🌓</button>
+    </div>
+
+    <main>
+      <!-- 看板 -->
+      <section id="tab-board" class="panel">
+        <div class="notice" id="emptyNotice" hidden>
+          当前没有活动点位。头目时段内玩家报点后会自动出现，页面每 30 秒自动刷新。
+        </div>
+
+        <div class="board">
+          <div class="board-col" data-kind="alpha">
+            <h2><span class="dot alpha"></span><span id="label-alpha">头目（Alpha）</span> <em id="count-alpha">0</em></h2>
+            <p class="hint" id="hint-alpha">报出后一段时间内有效</p>
+            <ul class="list" id="list-alpha"></ul>
+          </div>
+          <div class="board-col" data-kind="swarm">
+            <h2><span class="dot swarm"></span><span id="label-swarm">大量出现（Swarm）</span> <em id="count-swarm">0</em></h2>
+            <p class="hint" id="hint-swarm">报出后一段时间内有效</p>
+            <ul class="list" id="list-swarm"></ul>
+          </div>
+          <div class="board-col" data-kind="pheno">
+            <h2><span class="dot pheno"></span><span id="label-pheno">奇遇（Pheno）</span> <em id="count-pheno">0</em></h2>
+            <p class="hint" id="hint-pheno">仅本站玩家上报</p>
+            <ul class="list" id="list-pheno"></ul>
+          </div>
+        </div>
+
+        <div class="filters">
+          <select id="fRegion" aria-label="地区筛选"></select>
+          <input id="fQuery" type="search" placeholder="搜索宝可梦或地点…" aria-label="搜索" />
+          <button class="ghostbtn" id="refreshBtn" type="button">刷新</button>
+        </div>
+
+        <details class="slotsbox">
+          <summary>今日头目（Alpha）刷新时段</summary>
+          <table class="slots" id="slotTable"></table>
+          <p class="hint">时段取自上游规则：UTC 0/6/12/18 点起，每段 4 小时 45 分，段间空档 1 小时 15 分。</p>
+        </details>
+      </section>
+
+      <!-- 报点 -->
+      <section id="tab-report" class="panel" hidden>
+        <h2>我来报个点</h2>
+        <p class="lead">
+          报点先进待审核队列，管理员放行后才上看板并推送。填得准，通过就快。
+        </p>
+        <form id="reportForm" class="form">
+          <label>类型
+            <select name="kind" id="rKind">
+              <option value="alpha">头目（Alpha）</option>
+              <option value="swarm">大量出现（Swarm）</option>
+              <option value="pheno">奇遇（Pheno）</option>
+            </select>
+          </label>
+          <label>天气类型 <span class="opt">（仅奇遇）</span>
+            <select name="phenoType" id="rPheno" disabled></select>
+          </label>
+          <label>地区
+            <select name="region" id="rRegion"></select>
+          </label>
+          <label>地点
+            <input name="location" id="rLocation" list="locList" placeholder="如 119号道路" autocomplete="off" required />
+            <datalist id="locList"></datalist>
+          </label>
+          <label>宝可梦
+            <input name="pokemon" id="rPokemon" list="pokeList" placeholder="如 Breloom" autocomplete="off" required />
+            <datalist id="pokeList"></datalist>
+          </label>
+          <label>游戏内名 / 称呼 <span class="opt">（选填，用于认领）</span>
+            <input name="reporter" id="rReporter" maxlength="24" placeholder="如 你的 IN 名" />
+          </label>
+          <label>备注 <span class="opt">（选填，200 字内）</span>
+            <textarea name="note" id="rNote" maxlength="200" rows="2" placeholder="如 需要怪力推石、入口在西南"></textarea>
+          </label>
+          <button class="primary" type="submit">提交报点</button>
+          <span id="reportMsg" class="msg" role="status"></span>
+        </form>
+        <div class="recent">
+          <h3>最近提交</h3>
+          <ul id="myReports"></ul>
+        </div>
+      </section>
+
+      <!-- 图鉴参考 -->
+      <section id="tab-ref" class="panel" hidden>
+        <h2>地点与点位参考</h2>
+        <p class="lead">静态资料镜像自 Alphapedia：某地能刷什么、需要什么秘传（HM）、值不值得去。</p>
+        <div class="filters">
+          <select id="refRegion" aria-label="地区"></select>
+          <select id="refLocation" aria-label="地点"></select>
+        </div>
+        <div id="refBody" class="refbody"></div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <p>
+        数据来源：<a href="https://alpha.pokemmotools.org/" rel="noopener nofollow" target="_blank">Alphapedia</a>（玩家众包）+ 本站玩家上报。
+        点位由人工提交，可能过期或误报，出发前请自行确认。
+      </p>
+      <p class="tiny">本项目与 PokeMMO、Alphapedia 及 The Pokémon Company 无隶属关系，仅做数据镜像与中文展示。</p>
+    </footer>
+
+    <script>window.__STATIC__ = true;</script>
+    <script src="app.js?v=1"></script>
+  </body>
+</html>
