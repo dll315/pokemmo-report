@@ -67,7 +67,12 @@ npm run audit:sources                      # 译名溯源复核：整句表回�
 ssh root@159.198.67.190
 
 # 2) 取代码（私有库；用 HTTPS 就换成 https://github.com/dll315/pokemmo-report.git）
-git clone git@github.com:dll315/pokemmo-report.git /opt/pokemmo-report && cd /opt/pokemmo-report
+git clone git@github.com:dll315/pokemmo-report.git /opt/pokemmo-report
+cd /opt/pokemmo-report
+
+# 守卫：看不到 Dockerfile 就是代码没下来（私有仓库要先给服务器配 SSH key，
+# 或在自己电脑上 git archive + scp 传包，见 DEPLOY.md 第 0 节），别再往下 build
+test -f Dockerfile && echo "代码到位 ✓" || echo "没拿到代码，停在这里" 
 
 # 3) 数据目录 + 镜像
 mkdir -p /opt/pokemmo/data

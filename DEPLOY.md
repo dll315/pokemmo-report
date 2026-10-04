@@ -44,8 +44,11 @@ GitHub → Settings → SSH Keys，再 `git clone git@github.com:dll315/pokemmo-
 
 ```bash
 # 服务器上，装好 Docker 之后
-git clone <你的仓库地址> pokemmo-report
-cd pokemmo-report
+git clone git@github.com:dll315/pokemmo-report.git /opt/pokemmo-report
+cd /opt/pokemmo-report
+
+# 守卫：clone 失败（私有仓库没配 key）时这里就停，不要往下 build
+test -f Dockerfile && echo "代码到位 ✓" || { echo "没拿到代码，看第 0 节"; false; }
 
 cp .env.example .env
 vi .env        # 三个值：ADMIN_USER / ADMIN_PASSWORD / WECOM_WEBHOOK
