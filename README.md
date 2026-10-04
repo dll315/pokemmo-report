@@ -20,7 +20,7 @@
 
 ```bash
 # 需要 Node 16+
-cp config.example.json config.json      # 填 adminToken、wecom.webhook
+cp config.example.json data/config.json   # 填 adminToken、wecom.webhook
 node server.js 3580 --host=127.0.0.1    # 首次启动会自动回填上游报点
 # 打开 http://127.0.0.1:3580/  管理台 http://127.0.0.1:3580/admin
 ```
@@ -58,8 +58,52 @@ npm run audit:sources                      # 译名溯源复核：整句表回�
 
 ## 部署
 
-详见 **DEPLOY.md**，包含：Docker 单容器（推荐）、纯 Node + systemd、Nginx 反代、
-GitHub Pages + Actions 静态降级路径，以及端口/备案/备份的说明。
+三条路，参数含义、更新、备份、放行端口、故障排查都在 **DEPLOY.md**。
+
+### A. 服务器上直接 `docker run`（推荐）
+
+```bash
+git clone git@github.com:dll315/pokemmo-report.git && cd pokemmo-report
+docker build -t pokemmo-report:1.0 .
+mkdir -p /opt/pokemmo/data
+
+docker run -d --name pokemmo-report --restart unless-stopped \
+  -p 3580:3580 \
+  -e ADMIN_TOKEN="$(openssl rand -hex 16)" \
+  -e WECOM_WEBHOOK="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=你的key" \
+  -e TZ=Asia/Shanghai \
+  -v /opt/pokemmo/data:/app/data \
+  --memory 256m pokemmo-report:1.0
+
+docker logs -f pokemmo-report     # 首启回填 48 小时报点，约 15~25 秒
+```
+
+- 不带 `ADMIN_TOKEN` 的话管理接口全部 403（安全默认）；不带 `WECOM_WEBHOOK` 就只更新看板不推送。
+- `-v` 必须给，否则删容器就丢玩家上报与同步游标；备份就只有 `db.json` 一个文件。
+- 云主机要在**安全组**放行 TCP 3580。用 35xx 这类非标端口是为了避开国内 80/443 的备案检查。
+- 有 `docker compose` 的话更省事：`cp .env.example .env` 填好后 `docker compose up -d --build`。
+
+### B. 不装 Docker：纯 Node + systemd
+
+```bash
+cp .env.example .env      # 或用 Environment= 写进 unit 文件
+node server.js 3580       # 生产用 systemd 托管，见 DEPLOY.md 第 6 节
+```
+
+### C. GitHub Pages 托管（静态快照，无上报/审核）
+
+⚠️ **上游 Cloudflare 会拒绝 GitHub Actions 的出口 IP（全站 403），所以不能让 Actions 定时抓数据**——
+实测过一次"全绿但库存 0、部署出空站"。可行做法是把抓取放在能连上上游的机器上（服务器/本机 cron），
+Pages 只做分支托管：
+
+```bash
+node tools/publish-pages.js        # 生成 dist 并推到 pages 分支
+# 服务器上 cron 每 5 分钟：抓数据+推送，再发布快照
+*/5 * * * * cd /opt/pokemmo-report && STATE_DIR=data node tools/actions-sync.js && node tools/publish-pages.js >> /var/log/poke-pages.log 2>&1
+```
+
+Pages 设置成 `Deploy from a branch` → 分支 `pages`、目录 `/ (root)`。
+若哪天上游放行 Actions 的 IP，给仓库加 Variable `PAGES_VIA_ACTIONS=1` 即可切回全自动。
 
 ## 数据说明与已知边界
 

@@ -1,5 +1,6 @@
 "use strict";
-/* 运行配置：config.json（已 gitignore）+ 环境变量覆盖。
+/* 运行配置：data/config.json（已 gitignore）+ 环境变量覆盖。
+   放 data/ 是因为容器部署挂载的就是这个目录；写在镜像里的话 docker run 重建会把网页上配好的 webhook 丢掉。
    环境变量优先，且优先级高的来源在网页上改动不会生效，启动时会打印提醒。 */
 
 const fs = require("fs");
@@ -26,7 +27,7 @@ const DEFAULTS = {
 };
 
 const ROOT = path.resolve(__dirname, "..");
-const FILE = process.env.CONFIG_FILE || path.join(ROOT, "config.json");
+const FILE = process.env.CONFIG_FILE || path.join(ROOT, "data", "config.json");
 
 function deepMerge(base, patch) {
   const out = Array.isArray(base) ? [...base] : { ...base };
@@ -58,6 +59,7 @@ function writeConfig(patch) {
       return {};
     }
   })();
+  fs.mkdirSync(path.dirname(FILE), { recursive: true });
   fs.writeFileSync(FILE, JSON.stringify(deepMerge(disk, patch), null, 2) + "\n", "utf8");
   return readConfig();
 }

@@ -2,7 +2,7 @@
 "use strict";
 /* PokeMMO 报点站：静态站点 + 数据接口 + 上游同步 + 企业微信推送调度，单进程零依赖。
    node server.js [端口] [--host=0.0.0.0] [--no-scheduler]
-   环境变量：ADMIN_TOKEN（管理接口口令，必填才能用 /api/admin/*）、WECOM_WEBHOOK（优先于 config.json）、TZ 不影响业务时间 */
+   环境变量：ADMIN_TOKEN（管理接口口令，必填才能用 /api/admin/*）、WECOM_WEBHOOK（优先于 data/config.json）、TZ 不影响业务时间 */
 
 const http = require("http");
 const fs = require("fs");
@@ -87,7 +87,7 @@ async function handleApi(req, res, url) {
   const cfg = readConfig();
   const isAdmin = url.pathname.startsWith("/api/admin/");
   if (isAdmin) {
-    if (!cfg.adminToken) return send(res, 403, { error: "未设置管理口令：请配置 ADMIN_TOKEN 环境变量或 config.json 的 adminToken" });
+    if (!cfg.adminToken) return send(res, 403, { error: "未设置管理口令：请配置 ADMIN_TOKEN 环境变量或 data/config.json 的 adminToken" });
     /* 只读接口允许 ?token= 方便浏览器/curl 直接取；写操作必须用请求头，避免口令落进访问日志 */
     const given = req.headers["x-admin-token"] || (req.method === "GET" ? url.searchParams.get("token") || "" : "");
     if (given !== cfg.adminToken) return send(res, 401, { error: "管理口令不正确" });
@@ -257,7 +257,7 @@ server.listen(PORT, HOST, async () => {
   console.log(`  管理台   http://${HOST}:${PORT}/admin`);
   console.log(`  数据库   ${path.join(DATA_DIR, "db.json")}（${store.index.size} 条事件）`);
   if (process.env.WECOM_WEBHOOK) console.log("  推送     webhook 由环境变量注入，网页里改不会生效（环境变量优先）");
-  if (!cfg.adminToken) console.log("  ⚠ 未设置管理口令，/api/admin/* 全部禁用。设 ADMIN_TOKEN 环境变量或网页 config.json 的 adminToken");
+  if (!cfg.adminToken) console.log("  ⚠ 未设置管理口令，/api/admin/* 全部禁用。设 ADMIN_TOKEN 环境变量或网页 data/config.json 的 adminToken");
   if (HOST !== "127.0.0.1" && HOST !== "localhost" && !cfg.adminToken) console.log("  ⚠ 公网监听且无管理口令，请尽快设置");
   if (!TRUST_PROXY && (HOST === "0.0.0.0" || HOST !== "127.0.0.1"))
     console.log("  ⚠ 未设 TRUST_PROXY=1：前面有 Nginx 反代时所有玩家会共用同一个上报限流桶（6 条/10 分钟），配上反代就设这个环境变量");

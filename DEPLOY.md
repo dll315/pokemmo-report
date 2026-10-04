@@ -24,13 +24,12 @@
 git clone <你的仓库地址> pokemmo-report
 cd pokemmo-report
 
-# 管理口令自己生成一个长随机串，别用默认值
-openssl rand -hex 16
-cat > .env <<'EOF'
-ADMIN_TOKEN=把上面生成的串填进来
-WECOM_WEBHOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=你的机器人key
-EOF
+cp .env.example .env
+# 至少要填 ADMIN_TOKEN；口令可以这样生成： openssl rand -hex 16
+vi .env
 ```
+
+`.env` 已在 `.gitignore` 里，不会被提交。`TRUST_PROXY` 只在前面挂了 Nginx 反代时才设 1。
 
 `WECOM_WEBHOOK` 可以先留空，之后在管理台网页里填也行；**一旦用环境变量注入，环境变量优先，网页里改 webhook 不会生效**（启动日志会提醒）。
 
@@ -155,7 +154,7 @@ server {
 ```bash
 yum install -y nodejs || apt install -y nodejs        # 需要 Node 16+
 useradd -r -s /sbin/nologin poke
-cp config.example.json config.json && vim config.json  # 填 adminToken 与 webhook
+cp config.example.json data/config.json && vim data/config.json  # 填 adminToken 与 webhook
 mkdir -p /etc/systemd/system && cat > /etc/systemd/system/poke.service <<'EOF'
 [Unit]
 Description=PokeMMO 报点站

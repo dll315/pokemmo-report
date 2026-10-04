@@ -6,7 +6,7 @@ data/db.json
 data/db.json.tmp
 data/db.json.bak-*
 data/upstream/.fetched-at
-config.json
+data/config.json
 *.log
 DEPLOY.md
 README.md
