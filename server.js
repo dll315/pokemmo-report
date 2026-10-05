@@ -386,6 +386,21 @@ async function tick() {
   }
 }
 
+/* 端口被占是最常见的启动失败，Node 默认吐一堆 EADDRINUSE 对象，看不出该干什么 */
+server.on("error", (e) => {
+  if (e.code === "EADDRINUSE") {
+    console.error(`\n× ${HOST}:${PORT} 已经被别的进程占着，服务没起来。`);
+    console.error("  看是谁：  ss -lntp | grep ':3580'");
+    console.error("  多半是之前手动跑的 node server.js 还在：找到那个 PID，kill 掉它，再 systemctl restart poke");
+    console.error("  要换端口：改 poke.service 里 ExecStart 的端口和 Environment=，并同步放行云防火墙");
+  } else if (e.code === "EACCES") {
+    console.error(`\n× 没有权限监听 ${HOST}:${PORT}（端口 <1024 需要 root 或 cap_net_bind_service）。`);
+  } else {
+    console.error("\n× 监听失败：", e.message || e);
+  }
+  process.exit(1);
+});
+
 server.listen(PORT, HOST, async () => {
   const cfg = readConfig();
   console.log("PokeMMO 报点站");
