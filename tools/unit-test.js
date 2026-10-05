@@ -289,9 +289,49 @@ t("机器人地址的校验与脱敏", () => {
   eq(m.wecom.webhook, "", "脱敏后不能把完整地址回前端");
   ok(m.wecom.webhookHint.endsWith("f3a4b") && !m.wecom.webhookHint.includes("0f9c1a2b"), "只给尾号");
   eq(m.wecom.webhookOffHost, false, "官方域名不算异常");
-  const m2 = cfgmod.masked({ adminPassword: "", wecom: { webhook: "http://127.0.0.1:3599/send?key=MOCK" } });
+  const m2 = cfgmod.masked({ adminPassword: "", wecom: { webhook: "http://127.0.0.1:3599/send?key=MOCK", targets: [{ id: "t1", name: "本机", webhook: "http://127.0.0.1:3599/send?key=MOCK", enabled: true }] } });
   eq(m2.wecom.webhookOffHost, true, "本机 mock 端点要标出来提醒");
-  eq(m2.wecom.webhookSource, process.env.WECOM_WEBHOOK ? "env" : "file", "来源要标对");
+  eq(m2.wecom.webhookSource, "file", "来源按那条启用的连接判定：配置文件里的算 file");
+  const m3 = cfgmod.masked({ adminPassword: "", wecom: { webhook: "https://e/x?key=1", targets: [{ id: "env", name: "环境变量注入", webhook: "https://e/x?key=1", enabled: true, locked: true }] } });
+  eq(m3.wecom.webhookSource, "env", "锁定的那条来自环境变量");
+  eq(m3.wecom.targets[0].webhook, "", "连接列表里也不能带完整地址");
+});
+
+t("连接列表：旧单地址迁移、数组能缩短、环境变量是多加一条而不是覆盖", () => {
+  const cfgmod = require("../src/config");
+  const savedEnv = process.env.WECOM_WEBHOOK;
+  delete process.env.WECOM_WEBHOOK;
+  try {
+    const one = cfgmod.normalizeTargets({ webhook: "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=aaaa1111" });
+    eq(one.length, 1, "旧单地址要变成一条连接");
+    eq([one[0].id, one[0].enabled], ["legacy", true], "迁移出来的那条默认启用");
+    eq(cfgmod.normalizeTargets({ webhook: "https://a/x?key=1", targets: [] }).length, 0, "targets 是空数组 = 真的没有，不能被旧字段复活");
+    eq(cfgmod.normalizeTargets({ targets: [{ webhook: "https://a/x?key=1" }, { webhook: "https://a/x?key=1" }] }).length, 1, "同一条地址不重复登记");
+    eq(cfgmod.normalizeTargets({ targets: [{ webhook: "" }] }).length, 0, "空地址不登记");
+
+    process.env.WECOM_WEBHOOK = "https://env/x?key=eeeeeeee";
+    const withEnv = cfgmod.normalizeTargets({ webhook: "https://a/x?key=1" });
+    eq(withEnv.length, 2, "环境变量是多加的一条，不是覆盖掉文件里那条");
+    eq(withEnv.filter((t) => t.locked).length, 1, "只有 env 那条标锁定");
+    eq(withEnv.find((t) => t.locked).enabled, true, "锁定不等于停用");
+    eq(cfgmod.normalizeTargets({ webhook: "https://env/x?key=eeeeeeee" }).length, 1, "文件里已是同一条地址时不重复登记");
+    eq(cfgmod.normalizeTargets({ webhook: "https://env/x?key=eeeeeeee" })[0].locked, true, "同一条地址只补锁定标记");
+    delete process.env.WECOM_WEBHOOK;
+
+    const f = process.env.CONFIG_FILE;
+    fs.rmSync(f, { force: true });
+    cfgmod.writeConfig({ wecom: { targets: [{ id: "t1", name: "A", webhook: "https://a/x?key=1" }, { id: "t2", name: "B", webhook: "https://b/x?key=2" }] } });
+    eq(cfgmod.readConfig().wecom.targets.length, 2, "先写两条");
+    cfgmod.writeConfig({ wecom: { targets: [{ id: "t1", name: "A", webhook: "https://a/x?key=1" }] } });
+    eq(cfgmod.readConfig().wecom.targets.length, 1, "数组必须能缩短（逐项合并会把第二条留在后面）");
+    eq(cfgmod.readConfig().wecom.webhook, "https://a/x?key=1", "老代码读的 webhook 派生自第一条启用的连接");
+    cfgmod.writeConfig({ wecom: { targets: [{ id: "t1", name: "A", webhook: "https://a/x?key=1", enabled: false }] } });
+    eq(cfgmod.readConfig().wecom.webhook, "", "全停用后派生地址为空，decide() 会当作没配");
+    fs.rmSync(f, { force: true });
+  } finally {
+    if (savedEnv) process.env.WECOM_WEBHOOK = savedEnv;
+    else delete process.env.WECOM_WEBHOOK;
+  }
 });
 
 console.log(`\n单测通过 ${pass}，失败 ${fails.length}${fails.length ? "：" + fails.join(" / ") : ""}`);

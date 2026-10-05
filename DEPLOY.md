@@ -85,7 +85,7 @@ vi .env        # 只有两个值：ADMIN_USER=admin / ADMIN_PASSWORD=123456
 
 `.env` 已在 `.gitignore` 里，不会被提交。`TRUST_PROXY` 只在前面挂了 Nginx 反代时才设 1。
 
-**企业微信机器人不要写进 `.env`**：环境变量优先级高于网页，设了之后管理台里改机器人地址就不生效了。留空、起站后去「推送设置」里填。
+**企业微信机器人不要写进 `.env`**：设了它，管理台的连接列表里会多出一条**锁定**记录（改不动、删不掉）。留空，起站后在「企业微信机器人」里添加，想加几个群就加几条。
 
 ### 2. 起服务
 
@@ -107,7 +107,7 @@ docker build -t pokemmo-report:1.0 .
 # 2) 建数据目录（宿主机上存 db.json，容器重建不丢玩家上报和历史）
 mkdir -p /opt/pokemmo/data
 
-# 3) 起容器（账号 admin、密码 123456；机器人地址起站后在管理台「推送设置」里填）
+# 3) 起容器（账号 admin、密码 123456；机器人地址起站后在管理台「企业微信机器人」里添加）
 docker run -d \
   --name pokemmo-report \
   --restart unless-stopped \
@@ -131,14 +131,14 @@ docker run -d \
 | `--restart unless-stopped` | 开机/崩溃自启 | 服务器重启后服务不会自己起来 |
 | `--memory 256m` | 上限保护 | 一般用不到（常驻内存约 60MB），留着防意外 |
 
-**这里没有 `WECOM_WEBHOOK` 是有意的**：环境变量会盖过管理台里填的地址（改了不生效），所以机器人只在网页设置里配。
+**这里没有 `WECOM_WEBHOOK` 是有意的**：设了它就会在管理台的连接列表里多出一条**锁定**记录（改不动、删不掉），机器人地址统一在网页里管更省事。
 
 日常操作：
 
 ```bash
 docker logs -f pokemmo-report                # 看同步与推送日志（第一次要等 15~25 秒回填）
 docker inspect -f '{{.State.Health.Status}}' pokemmo-report   # healthcheck: healthy / unhealthy
-docker exec -e ADMIN_USER=admin -e ADMIN_PASSWORD=123456 pokemmo-report node tools/selftest.js   # 自检 66 项
+docker exec -e ADMIN_USER=admin -e ADMIN_PASSWORD=123456 pokemmo-report node tools/selftest.js   # 自检 74 项
 docker stop pokemmo-report && docker rm pokemmo-report        # 停止并删除（数据在宿主机，不会丢）
 ```
 
@@ -263,7 +263,7 @@ EOF
 systemctl daemon-reload && systemctl enable --now poke
 ```
 
-**unit 里不放 `WECOM_WEBHOOK`**：环境变量优先于网页，写了之后你在管理台「推送设置」里改机器人地址就不生效了。服务起来后直接在 `http://159.198.67.190:3580/admin` 填，保存即生效（写进 `data/config.json`，重启不丢）。
+**unit 里不放 `WECOM_WEBHOOK`**：设了它，管理台的连接列表里就会多出一条**锁定的**记录（改不动也删不掉，要取消得先删掉这行再 `systemctl restart poke`）。服务起来后直接在 `http://159.198.67.190:3580/admin` 添加机器人地址，保存即生效（写进 `data/config.json`，重启不丢）。
 
 验证与日常操作：
 
@@ -318,7 +318,7 @@ EOF
 crontab /tmp/ct && rm -f /tmp/ct
 ```
 
-   这条 cron **不写机器人地址**：`actions-sync.js` 先读 `data/config.json`（就是管理台「推送设置」写的那份），
+   这条 cron **不写机器人地址**：`actions-sync.js` 先读 `data/config.json`（就是管理台「企业微信机器人」写的那份），
    环境变量只在显式给了的时候覆盖。所以机器人统一在管理台配，cron 和服务用的是同一条地址、同一份订阅规则。
    `STATE_DIR=data` 是让跑批和自建服务共用同一份库（不给的话跑批会写到 `state/`，Pages 那条读的是 `data/`，两边对不上）。
    临时想只更新网页不推送：把 cron 那行加上 `PUSH_ENABLED=0`（比去改配置里的总开关更安全）。
@@ -354,8 +354,10 @@ Secrets 里配 `WECOM_WEBHOOK`，Variables 里可选 `PUSH_KINDS` / `PUSH_ONLY` 
 - markdown 消息上限 **4096 字节**，代码里已做截断。
 - 支持的颜色只有 `info / comment / warning`，别的会退成默认色。
 - 发送失败不推进队列，重试 5 次后丢弃并记日志；点位过期也会静默丢弃（不再打扰）。
-- 机器人地址**只在管理台「企业微信机器人」这一块管**：显示的是域名+路径+key 尾 6 位（完整 key 不回浏览器），可以「保存这条地址」替换、「清空」停用推送；不合法的地址（少 `key=`、带空格换行、不是 http(s)）会被当场拒绝且不落盘。地址旁边会标出来源：`data/config.json`（可改）还是环境变量（网页改了不生效，按钮会禁用）。
-- 换群就是换 webhook 地址；建议先建个测试群跑几天。
+- 机器人地址**只在管理台「企业微信机器人」这一块管**，而且可以是**多条**：一条点位会送达到每条启用的连接，每条能单独改名 / 启用停用 / 删除 / 点「测试」验证。列表里只显示域名+路径+key 尾 6 位（完整 key 不回浏览器），并记录每条最后一次发送的成功与失败原因；不合法的地址（少 `key=`、带空格换行、不是 http(s)）会被当场拒绝且不落盘。
+- 想只推某个群：把其它连接停用或删掉即可。企业微信的 20 条/分钟限速是**按每个机器人**算的，多群之间不互相占用；但每轮每个机器人都最多发 `maxPerTick` 条。
+- 环境变量 `WECOM_WEBHOOK` 如果设了，它会作为**一条锁定连接**出现在列表最前面（改不动也删不掉，要取消就在容器/systemd 里删掉那行再重启），不影响你另外添加的连接。
+- 换群就是加一条新连接、测通后删掉旧的；建议先建个测试群跑几天。
 
 ## 故障排查
 

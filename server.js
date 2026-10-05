@@ -8,7 +8,7 @@
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
-const { readConfig, writeConfig, masked, webhookProblem } = require("./src/config");
+const { readConfig, writeConfig, masked, webhookProblem, targetId: newTargetId } = require("./src/config");
 const { Store } = require("./src/store");
 const sync = require("./src/sync");
 const push = require("./src/push-wecom");
@@ -116,7 +116,7 @@ async function handleApi(req, res, url) {
       /* 机器人最后成功发送的时间：判断"链接是不是还活着"最直接的证据 */
       let lastPushAt = 0;
       for (const ev of store.index.values()) if (ev.pushedAt && ev.pushedAt > lastPushAt) lastPushAt = ev.pushedAt;
-      return send(res, 200, { config: masked(cfg), push: { lastPushAt }, meta: store.db.meta, board: boardData(), reports: local.list(store, { status: "pending", limit: 100 }), queue: store.db.queue || [] });
+      return send(res, 200, { config: masked(cfg), push: { lastPushAt, stats: store.db.meta.pushStats || {} }, meta: store.db.meta, board: boardData(), reports: local.list(store, { status: "pending", limit: 100 }), queue: store.db.queue || [] });
     }
     if (url.pathname === "/api/admin/export") {
       return send(res, 200, { generatedAt: new Date().toISOString(), events: store.events({ activeOnly: false, limit: 5000 }).rows, board: boardData() });
@@ -161,12 +161,25 @@ async function handleApi(req, res, url) {
     if (typeof payload.reportRequireApprove === "boolean") patch.reportRequireApprove = payload.reportRequireApprove;
 
     const wecom = {};
-    if (payload.webhook === "__clear__" || payload.webhook === "") wecom.webhook = "";
-    else if (typeof payload.webhook === "string" && payload.webhook.trim()) {
+    /* 兼容旧的单地址写法：webhook 字段现在落到"第一条能改的连接"上，清空=删掉所有非锁定的 */
+    if (payload.webhook === "__clear__" || payload.webhook === "") {
+      wecom.targets = readConfig().wecom.targets.filter((t) => t.locked);
+      wecom.webhook = "";
+    } else if (typeof payload.webhook === "string" && payload.webhook.trim()) {
       const bad = webhookProblem(payload.webhook);
       /* 不合法就不写盘：存了坏地址只会让后面每次推送都失败，还不如当场拒绝 */
       if (bad) return send(res, 400, { error: "机器人地址不合法：" + bad });
-      wecom.webhook = String(payload.webhook).trim();
+      const url = payload.webhook.trim();
+      const cur = readConfig().wecom.targets;
+      const idx = cur.findIndex((t) => !t.locked);
+      const row = idx >= 0
+        ? { ...cur[idx], webhook: url }
+        : { id: newTargetId(), name: "默认群", webhook: url, enabled: true, addedAt: Math.floor(Date.now() / 1000) };
+      const next = cur.slice();
+      if (idx >= 0) next[idx] = row;
+      else next.push(row);
+      wecom.targets = next;
+      wecom.webhook = "";
     }
     for (const k of ["enabled", "kinds", "onlyPokemon", "exceptPokemon", "regions", "minTier", "maxPerTick", "quietHours"]) {
       if (payload[k] !== undefined) wecom[k] = payload[k];
@@ -195,19 +208,62 @@ async function handleApi(req, res, url) {
   }
   if (url.pathname === "/api/admin/test-push") {
     const cfg = readConfig();
-    const hook = String(payload.webhook || "").trim() || cfg.wecom.webhook;
-    if (!hook) return send(res, 200, { errcode: -1, errmsg: "未配置 webhook", hint: "先在「推送设置」里填机器人地址并保存（或部署时用 WECOM_WEBHOOK 环境变量）" });
-    const sample = store.events({ activeOnly: true, limit: 1 }).rows[0];
-    const msg = sample ? push.buildMessage(sample) : { msgtype: "markdown", markdown: { content: "**报点站连通性测试**\n当前没有活动点位。" } };
-    let r;
-    try {
-      r = await push.send(hook, msg);
-    } catch (e) {
-      r = { errcode: -1, errmsg: e.message, hint: push.explain({ errcode: -1, errmsg: e.message }) };
+    const adhoc = String(payload.webhook || "").trim();
+    if (adhoc) {
+      const bad = webhookProblem(adhoc);
+      if (bad) return send(res, 200, { errcode: -1, errmsg: `机器人地址不合法：${bad}`, hint: "" });
+      return send(res, 200, await sendTo(cfg, { id: "__adhoc__", name: "临时", webhook: adhoc }, false));
     }
-    log(`测试推送 → ${r.errcode === 0 ? "已送达" : "失败：" + r.errmsg + (r.hint ? "｜" + r.hint : "")}`);
-    if (r.errcode === 0 && !cfg.wecom.enabled) r.hint = "这条测试发出去了，但「推送总开关」是关的，真实报点不会自动发——去推送设置里打开";
-    return send(res, 200, r);
+    const t = cfg.wecom.targets.find((x) => x.enabled);
+    if (!t) return send(res, 200, { errcode: -1, errmsg: "还没有启用中的连接", hint: "在「企业微信机器人」里添加一条机器人地址（或打开某条的启用开关）" });
+    return send(res, 200, await sendTo(cfg, t));
+  }
+  /* ---------- 推送连接：多条机器人地址分开管 ---------- */
+  if (url.pathname === "/api/admin/target-add") {
+    const hook = String(payload.webhook || "").trim();
+    const bad = webhookProblem(hook);
+    if (bad) return send(res, 400, { error: "机器人地址不合法：" + bad });
+    const list = readConfig().wecom.targets;
+    if (list.some((t) => t.webhook === hook)) return send(res, 400, { error: "这条地址已经在列表里了" });
+    if (list.length >= 10) return send(res, 400, { error: "最多 10 条连接，先删掉不用的" });
+    const name = String(payload.name || "").trim().slice(0, 24) || `群 ${list.length + 1}`;
+    writeConfig({ wecom: { targets: list.concat([{ id: newTargetId(), name, webhook: hook, enabled: true, addedAt: Math.floor(Date.now() / 1000) }]), webhook: "" } });
+    log(`新增推送连接「${name}」，现在 ${list.length + 1} 条`);
+    return send(res, 200, { ok: true, config: masked(readConfig()) });
+  }
+  if (url.pathname === "/api/admin/target-update") {
+    const cur = readConfig().wecom.targets;
+    const id = String(payload.id || "");
+    const t = cur.find((x) => x.id === id);
+    if (!t) return send(res, 404, { error: "没有这条连接" });
+    if (t.locked && (typeof payload.enabled === "boolean" || payload.name)) return send(res, 400, { error: "这条来自环境变量，改不了" });
+    const next = cur.map((x) => {
+      if (x.id !== id) return x;
+      const row = { ...x };
+      if (typeof payload.name === "string" && payload.name.trim()) row.name = payload.name.trim().slice(0, 24);
+      if (typeof payload.enabled === "boolean") row.enabled = payload.enabled;
+      return row;
+    });
+    writeConfig({ wecom: { targets: next, webhook: "" } });
+    return send(res, 200, { ok: true, config: masked(readConfig()) });
+  }
+  if (url.pathname === "/api/admin/target-remove") {
+    const cur = readConfig().wecom.targets;
+    const id = String(payload.id || "");
+    const t = cur.find((x) => x.id === id);
+    if (!t) return send(res, 404, { error: "没有这条连接" });
+    if (t.locked) return send(res, 400, { error: "这条由环境变量 WECOM_WEBHOOK 注入，要去容器/systemd 里删掉那一行再重启" });
+    const next = cur.filter((x) => x.id !== id);
+    delete (store.db.meta.pushStats || {})[id];
+    writeConfig({ wecom: { targets: next, webhook: "" } });
+    log(`删除推送连接「${t.name}」，剩 ${next.length} 条`);
+    return send(res, 200, { ok: true, config: masked(readConfig()) });
+  }
+  if (url.pathname === "/api/admin/target-test") {
+    const cfg = readConfig();
+    const t = cfg.wecom.targets.find((x) => x.id === String(payload.id || ""));
+    if (!t) return send(res, 404, { error: "没有这条连接" });
+    return send(res, 200, await sendTo(cfg, t));
   }
   if (url.pathname === "/api/admin/flush") {
     const r = await push.flushQueue(store, readConfig(), { log });
@@ -224,6 +280,30 @@ async function handleApi(req, res, url) {
 function locationInfo(name) {
   const key = String(name || "").trim();
   return { name: key, cn: dict.locationOf(key), detail: refdata.atLocation(key) };
+}
+
+/* 给某条连接发一条测试（有活动点位就顺手用真实卡片，没有就发占位文案）。
+   record=false 用于自检里的临时地址，不把统计写进站主的配置。 */
+async function sendTo(cfg, t, record = true) {
+  const sample = store.events({ activeOnly: true, limit: 1 }).rows[0];
+  const msg = sample
+    ? push.buildMessage(sample)
+    : { msgtype: "markdown", markdown: { content: `**报点站连通性测试 · ${t.name}**\n当前没有活动点位，这条是占位消息。` } };
+  let r;
+  try {
+    r = await push.send(t.webhook, msg);
+  } catch (e) {
+    r = { errcode: -1, errmsg: e.message, hint: push.explain({ errcode: -1, errmsg: e.message }) };
+  }
+  if (record) {
+    const nowUnix = Math.floor(Date.now() / 1000);
+    const stats = (store.db.meta.pushStats = store.db.meta.pushStats || {});
+    stats[t.id] = { at: nowUnix, ok: r.errcode === 0, err: r.errcode === 0 ? "" : `${r.errmsg}${r.hint ? "｜" + r.hint : ""}`, test: true };
+    store.scheduleFlush();
+  }
+  log(`测试推送[${t.name}] → ${r.errcode === 0 ? "已送达" : "失败：" + r.errmsg + (r.hint ? "｜" + r.hint : "")}`);
+  if (r.errcode === 0 && !cfg.wecom.enabled) r.hint = "这条测试发出去了，但「启用推送」总开关是关的，真实报点不会自动发——在同一张卡片里打开它";
+  return r;
 }
 
 /* ---------------- 静态文件 ---------------- */
@@ -296,7 +376,8 @@ server.listen(PORT, HOST, async () => {
   console.log(`  站点     http://${HOST}:${PORT}/`);
   console.log(`  管理台   http://${HOST}:${PORT}/admin`);
   console.log(`  数据库   ${path.join(DATA_DIR, "db.json")}（${store.index.size} 条事件）`);
-  if (process.env.WECOM_WEBHOOK) console.log("  推送     webhook 由环境变量注入，网页里改不会生效（环境变量优先）");
+  if (process.env.WECOM_WEBHOOK) console.log("  推送     WECOM_WEBHOOK 已作为一条锁定连接加入列表（网页里改不动它，但可以另加别的）");
+  console.log(`  连接     启用 ${(readConfig().wecom.targets || []).filter((t) => t.enabled).length} 条 / 共 ${(readConfig().wecom.targets || []).length} 条`);
   if (!cfg.adminPassword) console.log("  ⚠ 未设置管理密码，管理台无法登录。在 data/config.json 写 adminPassword 或设环境变量 ADMIN_PASSWORD");
   else if (require("./src/config").isWeakPassword(cfg.adminPassword))
     console.log(`  ⚠ 管理密码是弱口令（当前账号 ${cfg.adminUser}）。站点是公网可访问的，建议改成 8 位以上；登录已限频 8 次/10 分钟`);

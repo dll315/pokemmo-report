@@ -130,12 +130,17 @@ function enqueue(store, events, { maxAgeSeconds = 2 * 3600 } = {}) {
   return added;
 }
 
+/* 一条点位要送达到"每一条启用的连接"，所以队列项上记的是 sentTo（已送达的连接 id）。
+   全部送达才出队；只送达到一部分的留着重试，但最多 5 轮，避免一条坏连接把队列卡死。 */
 async function flushQueue(store, cfg, { log = () => {} } = {}) {
   const q = store.db.queue || [];
   if (!q.length) return { sent: 0, failed: 0 };
   const w = cfg.wecom;
-  if (!w.webhook || !w.enabled) return { sent: 0, failed: 0, skipped: "未配置或已关闭" };
+  if (!w.enabled) return { sent: 0, failed: 0, skipped: "总开关已关闭" };
+  const targets = (w.targets || []).filter((t) => t.enabled && t.webhook);
+  if (!targets.length) return { sent: 0, failed: 0, skipped: "没有启用中的连接" };
 
+  const stats = (store.db.meta.pushStats = store.db.meta.pushStats || {});
   const cap = Number(w.maxPerTick || 4);
   let sent = 0;
   let failed = 0;
@@ -153,33 +158,44 @@ async function flushQueue(store, cfg, { log = () => {} } = {}) {
       q.splice(i, 1);
       continue;
     }
-    let r;
-    try {
-      r = await send(w.webhook, buildMessage(ev, { nowUnix }));
-    } catch (e) {
-      r = { errcode: -1, errmsg: e.message, hint: explain({ errcode: -1, errmsg: e.message }) };
-    }
-    if (r.errcode === 0) {
-      q.splice(i, 1);
-      sent++;
-      ev.pushedAt = nowUnix;
-      log(`推送成功 ${ev.kind} ${ev.pokemon} @ ${ev.location}`);
-    } else {
-      item.tries++;
-      if (item.tries >= 5) {
-        q.splice(i, 1);
-        log(`推送放弃（重试 5 次）${ev.pokemon} @ ${ev.location}: ${r.errmsg}${r.hint ? "｜" + r.hint : ""}`);
-      } else {
-        /* 只在第一次失败时喊一声，不然每 2 分钟刷一条同样的日志会淹掉 */
-        if (item.tries === 1) log(`推送失败（会自动重试到第 5 次）${ev.pokemon} @ ${ev.location}: ${r.errmsg}${r.hint ? "｜" + r.hint : ""}`);
-        i++;
+    item.sentTo = (item.sentTo || []).filter((id) => targets.some((t) => t.id === id));
+    for (const t of targets) {
+      if (item.sentTo.includes(t.id)) continue;
+      let r;
+      try {
+        r = await send(t.webhook, buildMessage(ev, { nowUnix }));
+      } catch (e) {
+        r = { errcode: -1, errmsg: e.message };
       }
-      failed++;
+      const hint = r.hint || explain(r);
+      if (r.errcode === 0) {
+        item.sentTo.push(t.id);
+        sent++;
+        ev.pushedAt = nowUnix;
+        stats[t.id] = { at: nowUnix, ok: true, err: "" };
+        log(`推送成功[${t.name}] ${ev.kind} ${ev.pokemon} @ ${ev.location}`);
+      } else {
+        failed++;
+        stats[t.id] = { at: nowUnix, ok: false, err: `${r.errmsg}${hint ? "｜" + hint : ""}` };
+        /* 只在第一轮失败时喊一声，不然每 2 分钟刷一条同样的日志会淹掉 */
+        if (!item.tries) log(`推送失败[${t.name}]（会自动重试到第 5 轮）${ev.pokemon} @ ${ev.location}: ${r.errmsg}${hint ? "｜" + hint : ""}`);
+      }
+      await new Promise((res) => setTimeout(res, 350));
     }
-    await new Promise((res) => setTimeout(res, 350));
+    if (item.sentTo.length >= targets.length) {
+      q.splice(i, 1);
+      continue;
+    }
+    item.tries++;
+    if (item.tries >= 5) {
+      q.splice(i, 1);
+      log(`推送放弃（重试 5 轮）${ev.pokemon} @ ${ev.location}：${item.sentTo.length}/${targets.length} 条连接送达`);
+    } else {
+      i++;
+    }
   }
   store.scheduleFlush();
-  return { sent, failed, remaining: q.length };
+  return { sent, failed, targets: targets.length, remaining: q.length };
 }
 
 module.exports = { buildMessage, buildDigest, send, enqueue, flushQueue, remainingText, displayName, placeName, regionName, hmsText, kindTitle, explain };

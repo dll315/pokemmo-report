@@ -99,37 +99,46 @@ function relTime(unix) {
   return `${Math.floor(d / 86400)} 天前`;
 }
 
-/* 机器人链接的管理：当前是哪条（只回尾号，完整 key 不进浏览器）、从哪来、上次几点发成功、
-   能不能在这里改（环境变量注入时不能改，改了不生效，所以按钮直接禁用） */
-function renderHook(w, push) {
-  const fromEnv = w.webhookSource === "env";
-  const kids = [];
-  if (!w.webhookSet) kids.push(el("span", { class: "no", text: "还没有配置机器人地址：本站只更新看板，不会推送。" }));
-  else {
-    kids.push(el("span", { text: "当前：" }));
-    kids.push(el("b", { text: w.webhookHint }));
-    kids.push(el("span", { text: fromEnv ? "（来自环境变量 WECOM_WEBHOOK）" : "（存在 data/config.json，重建容器不丢）" }));
+/* 连接列表：每条机器人地址单独启用/改名/删除/测试。完整 key 不进浏览器，只显示尾号。 */
+function renderHooks(w, push) {
+  const list = w.targets || [];
+  const stats = (push && push.stats) || {};
+  const on = list.filter((t) => t.enabled).length;
+  const rows = [el("tr", {}, ["名称", "地址（只显示尾号）", "启用", "最后一次发送", "操作"].map((h) => el("th", { text: h })))];
+  if (!list.length) {
+    rows.push(el("tr", {}, [el("td", { colspan: "5", class: "empty", text: "还没有连接：本站只更新看板，不会推送。在下面粘贴机器人地址添加。" })]));
   }
-  if (push && push.lastPushAt) {
-    const t = new Date(push.lastPushAt * 1000).toLocaleString("zh-CN", { hour12: false, month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
-    kids.push(el("span", { text: ` · 上次成功推送 ${t}（${relTime(push.lastPushAt)}）` }));
-  } else if (w.webhookSet) kids.push(el("span", { class: "warn", text: " · 这条地址还没有成功推送过" }));
-  $("#hookState").replaceChildren(...kids);
-
-  $("#webhook").disabled = fromEnv;
-  $("#saveHookBtn").disabled = fromEnv;
-  $("#clearHookBtn").disabled = fromEnv || !w.webhookSet;
+  for (const t of list) {
+    const s = stats[t.id];
+    const when = s ? new Date(s.at * 1000).toLocaleString("zh-CN", { hour12: false, month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
+    const cell = el("td", { class: s && !s.ok ? "no" : "", text: s ? `${s.ok ? "成功" : "失败"} ${when}（${relTime(s.at)}）${s.err ? " · " + s.err : ""}` : "还没发过" });
+    rows.push(
+      el("tr", {}, [
+        el("td", {}, [el("b", { text: t.name }), t.locked ? el("span", { class: "en", text: "环境变量注入" }) : null]),
+        el("td", {}, [el("code", { text: t.webhookHint }), t.offHost ? el("span", { class: "no", text: " 非官方域名" }) : null]),
+        el("td", {}, [el("input", { type: "checkbox", ...(t.enabled ? { checked: "" } : {}), ...(t.locked ? { disabled: "" } : {}), onchange: () => toggleTarget(t) })]),
+        cell,
+        el("td", { class: "rowbtns" }, [
+          el("button", { class: "act mini", type: "button", onclick: () => testTarget(t) }, "测试"),
+          t.locked ? null : el("button", { class: "act mini", type: "button", onclick: () => renameTarget(t) }, "改名"),
+          t.locked ? null : el("button", { class: "act no mini", type: "button", onclick: () => removeTarget(t) }, "删除"),
+        ]),
+      ])
+    );
+  }
+  $("#hookTable").replaceChildren(...rows);
+  $("#hookSummary").textContent = list.length
+    ? `共 ${list.length} 条，启用 ${on} 条 · 一条点位会送达到每条启用的连接（企业微信的 20 条/分钟限速是按每个机器人算的，互不占用）`
+    : "没有连接时看板照常更新，只是不推送。";
   const notes = [];
-  if (fromEnv) notes.push("地址由环境变量注入，而环境变量优先于这里——要改用网页，先把容器/systemd 里的 WECOM_WEBHOOK 那行删掉再重启。");
-  else if (w.webhookSet) notes.push("换群就把新地址粘上来点「保存这条地址」；点「清空」则只更新看板不再推送。改完点上方「发一条测试推送」确认能送达。");
-  else notes.push("在企业微信群里「群机器人 → 添加」，把生成的完整地址粘到上面保存；改完点上方「发一条测试推送」确认送达。");
-  if (w.webhookOffHost) notes.push("注意：这条地址的域名不是 qyapi.weixin.qq.com（本机的假端点？真实消息不会进群）。");
+  if (list.some((t) => t.locked)) notes.push("标着「环境变量注入」的那条来自 WECOM_WEBHOOK，改不动也删不掉——要取消就在容器/systemd 里删掉那行再重启。");
+  notes.push("换群或加群：粘贴新地址点「添加这条连接」，不需要的连接直接删除；每条都能单独点「测试」验证送达。");
   $("#hookHint").textContent = notes.join(" ");
 }
 
 function renderConfig(cfg, push) {
   const w = cfg.wecom;
-  renderHook(w, push);
+  renderHooks(w, push);
   $("#maxPerTick").value = w.maxPerTick;
   $("#minTier").value = w.minTier;
   $("#pushEnabled").checked = !!w.enabled;
@@ -247,22 +256,46 @@ async function saveAll() {
 }
 
 /* 机器人地址：合法性由服务端判定（规则只有一份，前端不重复实现一遍防止走味） */
-async function saveHook() {
-  const v = $("#webhook").value.trim();
-  if (!v) return toast("先把机器人地址粘贴进来");
-  const r = await api("/api/admin/config", { method: "PUT", body: JSON.stringify({ webhook: v }) });
+async function addTarget() {
+  const hook = $("#webhook").value.trim();
+  if (!hook) return toast("先把机器人地址粘贴进来");
+  const r = await api("/api/admin/target-add", { method: "POST", body: JSON.stringify({ webhook: hook, name: $("#hookName").value.trim() }) });
   if (r.error) return toast(r.error);
   $("#webhook").value = "";
-  $("#saveMsg").textContent = "机器人地址已保存 " + new Date().toLocaleTimeString("zh-CN", { hour12: false });
-  toast("机器人地址已保存，可以点「发一条测试推送」验证");
+  $("#hookName").value = "";
+  toast("已添加，点这条的「测试」确认能送达");
   await refresh();
 }
 
-async function clearHook() {
-  if (!confirm("清空后本站只更新看板、不再往企业微信群推送。确定清空？")) return;
-  const r = await api("/api/admin/config", { method: "PUT", body: JSON.stringify({ webhook: "" }) });
+async function toggleTarget(t) {
+  const r = await api("/api/admin/target-update", { method: "POST", body: JSON.stringify({ id: t.id, enabled: !t.enabled }) });
   if (r.error) return toast(r.error);
-  toast("已清空机器人地址");
+  toast(`「${t.name}」已${t.enabled ? "停用" : "启用"}`);
+  await refresh();
+}
+
+async function renameTarget(t) {
+  const v = prompt("给这条连接起个名字（最多 24 字）", t.name);
+  if (!v || !v.trim() || v.trim() === t.name) return;
+  const r = await api("/api/admin/target-update", { method: "POST", body: JSON.stringify({ id: t.id, name: v.trim() }) });
+  if (r.error) return toast(r.error);
+  toast("名字已更新");
+  await refresh();
+}
+
+async function removeTarget(t) {
+  if (!confirm(`删除「${t.name}」${t.webhookHint}？以后这个群不会再收到推送。`)) return;
+  const r = await api("/api/admin/target-remove", { method: "POST", body: JSON.stringify({ id: t.id }) });
+  if (r.error) return toast(r.error);
+  toast("已删除这条连接");
+  await refresh();
+}
+
+async function testTarget(t) {
+  toast(`正在给「${t.name}」发测试…`);
+  const r = await api("/api/admin/target-test", { method: "POST", body: JSON.stringify({ id: t.id }) });
+  if (r.error) return toast(r.error);
+  toast(r.errcode === 0 ? `「${t.name}」已送达` : `「${t.name}」失败：${r.errmsg}${r.hint ? "｜" + r.hint : ""}`);
   await refresh();
 }
 
@@ -309,9 +342,9 @@ function bind() {
   $("#reloadBtn").addEventListener("click", () => act("reload-dict", {}));
   $("#refreshBtn").addEventListener("click", () => refresh().then(() => toast("已刷新")));
   $("#saveBtn").addEventListener("click", saveAll);
-  $("#saveHookBtn").addEventListener("click", saveHook);
-  $("#webhook").addEventListener("keydown", (e) => e.key === "Enter" && saveHook());
-  $("#clearHookBtn").addEventListener("click", clearHook);
+  $("#saveHookBtn").addEventListener("click", addTarget);
+  $("#webhook").addEventListener("keydown", (e) => e.key === "Enter" && addTarget());
+  $("#hookName").addEventListener("keydown", (e) => e.key === "Enter" && $("#webhook").focus());
 }
 
 /* 先看有没有有效会话（cookie 由浏览器管），有就直接进，没有就摆登录框 */

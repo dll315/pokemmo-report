@@ -33,11 +33,40 @@ const FILE = process.env.CONFIG_FILE || path.join(ROOT, "data", "config.json");
 function deepMerge(base, patch) {
   const out = Array.isArray(base) ? [...base] : { ...base };
   for (const [k, v] of Object.entries(patch || {})) {
-    if (v && typeof v === "object" && !Array.isArray(v) && typeof out[k] === "object" && out[k] && !Array.isArray(out[k])) out[k] = deepMerge(out[k], v);
+    /* 数组一律整体替换：连接列表要能删到只剩一条甚至清空，逐元素合并会把多余的旧项留在后面 */
+    if (Array.isArray(v)) out[k] = [...v];
+    else if (v && typeof v === "object" && typeof out[k] === "object" && out[k] && !Array.isArray(out[k])) out[k] = deepMerge(out[k], v);
     else if (v !== undefined) out[k] = v;
   }
   return out;
 }
+
+/* 连接列表：磁盘里没写过 targets 时，把旧的单条 webhook 认作"默认群"这一条。
+   环境变量 WECOM_WEBHOOK 是"多出来的一条且网页改不动"，不是覆盖全部。 */
+function normalizeTargets(wecom) {
+  const out = [];
+  const seen = new Set();
+  const add = (t) => {
+    const url = String(t.webhook || "").trim();
+    if (!url || seen.has(url)) return;
+    seen.add(url);
+    out.push({ id: String(t.id || "").slice(0, 16) || `t${out.length + 1}`, name: String(t.name || "").slice(0, 24) || `连接 ${out.length + 1}`, webhook: url, enabled: t.enabled !== false, addedAt: Number(t.addedAt) || 0, locked: !!t.locked });
+  };
+  if (Array.isArray(wecom.targets)) wecom.targets.forEach((t, i) => add({ id: `t${i + 1}`, ...t }));
+  else if (wecom.webhook) add({ id: "legacy", name: "默认群", webhook: wecom.webhook });
+  const envUrl = String(process.env.WECOM_WEBHOOK || "").trim();
+  if (envUrl) {
+    add({ id: "env", name: "环境变量注入", webhook: envUrl, enabled: true, locked: true });
+    /* 同一条地址磁盘上可能已经有了（add 里按地址去重），那就只标锁定；env 那条排最前面，
+       这样派生出来的 cfg.wecom.webhook 仍是环境变量的，跟老行为一致 */
+    const i = out.findIndex((t) => t.webhook === envUrl);
+    out[i].locked = true;
+    if (i > 0) out.unshift(out.splice(i, 1)[0]);
+  }
+  return out;
+}
+
+const targetId = () => "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 
 function readConfig() {
   let disk = {};
@@ -47,9 +76,11 @@ function readConfig() {
     disk = {};
   }
   const cfg = deepMerge(DEFAULTS, disk);
-  if (process.env.WECOM_WEBHOOK) cfg.wecom.webhook = process.env.WECOM_WEBHOOK;
   if (process.env.ADMIN_USER) cfg.adminUser = process.env.ADMIN_USER;
   if (process.env.ADMIN_PASSWORD) cfg.adminPassword = process.env.ADMIN_PASSWORD;
+  cfg.wecom.targets = normalizeTargets(cfg.wecom);
+  /* 老代码（限流判断、跑批脚本）读的是 cfg.wecom.webhook，这里让它始终等于第一条启用的连接 */
+  cfg.wecom.webhook = (cfg.wecom.targets.find((t) => t.enabled) || {}).webhook || "";
   return cfg;
 }
 
@@ -95,19 +126,29 @@ function webhookParts(url) {
   return out;
 }
 
+/* 够认出是哪条、不够拼出整条地址：完整 key 一旦回前端就会进浏览器内存和响应日志 */
+function webhookHint(url) {
+  const p = webhookParts(url);
+  return p.host ? `${p.host}${p.path}…${p.key.slice(-6)}` : "";
+}
+
 function masked(cfg) {
   const w = String(cfg.wecom.webhook || "");
-  const p = webhookParts(w);
+  const targets = (cfg.wecom.targets || []).map((t) => ({
+    id: t.id, name: t.name, enabled: t.enabled, locked: !!t.locked, addedAt: t.addedAt,
+    webhook: "", webhookHint: webhookHint(t.webhook), offHost: webhookParts(t.webhook).offHost,
+  }));
+  const first = (cfg.wecom.targets || []).find((t) => t.enabled);
   return {
     ...cfg,
     wecom: {
       ...cfg.wecom,
-      /* 完整 key 一旦回到前端就会进浏览器内存与响应日志，这里只回"够认出来是哪条"的部分 */
       webhook: "",
+      targets,
       webhookSet: !!w,
-      webhookHint: w ? `${p.host}${p.path}…${p.key.slice(-6)}` : "",
-      webhookOffHost: !!w && p.offHost,
-      webhookSource: process.env.WECOM_WEBHOOK ? "env" : w ? "file" : "none",
+      webhookHint: webhookHint(w),
+      webhookOffHost: !!w && webhookParts(w).offHost,
+      webhookSource: first ? (first.locked ? "env" : "file") : "none",
     },
     adminPassword: cfg.adminPassword ? "••••••" : "",
     adminPasswordSet: !!cfg.adminPassword,
@@ -115,4 +156,4 @@ function masked(cfg) {
   };
 }
 
-module.exports = { FILE, DEFAULTS, readConfig, writeConfig, masked, isWeakPassword, webhookProblem, webhookParts };
+module.exports = { FILE, DEFAULTS, readConfig, writeConfig, masked, isWeakPassword, webhookProblem, webhookParts, webhookHint, normalizeTargets, targetId };

@@ -182,10 +182,31 @@ async function rawPost(path, body) {
     const noKey = await hit("/api/admin/config", { method: "PUT", admin: true, body: JSON.stringify({ webhook: "https://qyapi.weixin.qq.com/cgi-bin/webhook/send" }) });
     check("少了 key 参数的地址也拒", noKey.status === 400 && /key/.test(noKey.json?.error || ""), `${noKey.status} ${JSON.stringify(noKey.json).slice(0, 90)}`);
 
+    /* 多条连接：加→查→测→改→删，最后必须回到原样（用的是指向不可达端口的假地址，不会真发消息） */
+    const before = (cfg.json.wecom.targets || []).length;
+    const dup = await hit("/api/admin/target-add", { method: "POST", admin: true, body: JSON.stringify({ name: "自检临时", webhook: "zzz" }) });
+    check("非法地址加不进列表", dup.status === 400 && /不合法/.test(dup.json?.error || ""), `${dup.status} ${JSON.stringify(dup.json).slice(0, 90)}`);
+    const added = await hit("/api/admin/target-add", { method: "POST", admin: true, body: JSON.stringify({ name: "自检临时", webhook: "http://127.0.0.1:1/none?key=SELFTESTKEY" }) });
+    const rows = added.json?.config?.wecom?.targets || [];
+    const tid = (rows.find((t) => t.name === "自检临时") || {}).id;
+    check("添加连接成功", added.status === 200 && rows.length === before + 1 && !!tid, `${added.status} 共 ${rows.length} 条`);
+    check("列表里不回显完整 key", !JSON.stringify(rows).includes("SELFTESTKEY"), JSON.stringify(rows).slice(0, 120));
+    const same = await hit("/api/admin/target-add", { method: "POST", admin: true, body: JSON.stringify({ name: "重复", webhook: "http://127.0.0.1:1/none?key=SELFTESTKEY" }) });
+    check("同一条地址不重复登记", same.status === 400 && /已经在列表/.test(same.json?.error || ""), `${same.status} ${JSON.stringify(same.json).slice(0, 90)}`);
+    const t1 = await hit("/api/admin/target-test", { method: "POST", admin: true, body: JSON.stringify({ id: tid }) });
+    check("单条测试返回结构化失败与中文提示", t1.json?.errcode !== 0 && /出网|DNS/.test(t1.json?.hint || ""), JSON.stringify(t1.json).slice(0, 120));
+    const upd = await hit("/api/admin/target-update", { method: "POST", admin: true, body: JSON.stringify({ id: tid, name: "自检改名", enabled: false }) });
+    const row2 = (upd.json?.config?.wecom?.targets || []).find((t) => t.id === tid);
+    check("改名与停用生效", row2?.name === "自检改名" && row2?.enabled === false, JSON.stringify(row2));
+    const removed = await hit("/api/admin/target-remove", { method: "POST", admin: true, body: JSON.stringify({ id: tid }) });
+    check("删除后列表回到原样", removed.json?.config?.wecom?.targets?.length === before, `${removed.json?.config?.wecom?.targets?.length} vs ${before}`);
+    const gone = await hit("/api/admin/target-remove", { method: "POST", admin: true, body: JSON.stringify({ id: tid }) });
+    check("删掉之后再删返回 404 而不是崩溃", gone.status === 404, `${gone.status} ${JSON.stringify(gone.json).slice(0, 80)}`);
+
     const exp = await hit("/api/admin/export", { admin: true });
     check("export 带事件数组", Array.isArray(exp.json?.events), JSON.stringify(exp.json || {}).slice(0, 60));
 
-    const tp = await hit("/api/admin/test-push", { method: "POST", admin: true, body: JSON.stringify({ webhook: "http://127.0.0.1:1/broken" }) });
+    const tp = await hit("/api/admin/test-push", { method: "POST", admin: true, body: JSON.stringify({ webhook: "http://127.0.0.1:1/broken?key=SELFTEST" }) });
     check("推送到不可达地址返回错误而不是崩溃", [200, 400].includes(tp.status) && (tp.json?.error || tp.json?.errcode !== 0), `${tp.status} ${JSON.stringify(tp.json).slice(0, 120)}`);
     check("不可达地址要给出中文排查提示", /出网|DNS/.test(tp.json?.hint || ""), JSON.stringify(tp.json?.hint || ""));
 
