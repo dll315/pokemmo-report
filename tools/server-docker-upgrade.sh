@@ -2,7 +2,11 @@
 # 在【服务器】上用 root 跑：把正在跑的 pokemmo-report 容器升级到仓库最新代码，
 # 并且**原样继承现有容器的挂载与环境变量**（机器人地址、上报记录都在挂载目录里）。
 #
-#   bash server-docker-upgrade.sh
+#   bash server-docker-upgrade.sh                 # 升级，账号密码等环境原样继承
+#   bash server-docker-upgrade.sh --reset-admin   # 升级，并把账号强制改回 admin / 123456
+#
+# 加 --reset-admin 的场景：早期起容器时 -e 了一个自己定的密码，之后每次升级都继承下来，
+# 而环境变量优先级高于 data/config.json，于是管理台里改密码"不生效"。
 #
 # 安全设计：
 #   - 先取代码、先 build，build 失败就到此为止，旧容器不受任何影响；
@@ -16,6 +20,8 @@ REPO="dll315/pokemmo-report"
 NAME="pokemmo-report"
 DIR="/opt/pokemmo-report"
 PORT="3580"
+RESET_ADMIN=""
+if [ "${1:-}" = "--reset-admin" ]; then RESET_ADMIN=1; fi
 
 echo "1/5 取最新代码（按 main 的提交号取，避开 GitHub 的分支包缓存）"
 SHA="$(curl -fsSL --max-time 25 -H 'Accept: application/vnd.github+json' "https://api.github.com/repos/$REPO/commits/main" 2>/dev/null | sed -n 's/.*"sha"[[:space:]]*:[[:space:]]*"\([0-9a-f]\{40\}\)".*/\1/p' | head -1)"
@@ -39,7 +45,15 @@ fi
 mapfile -t MNTS < <(docker inspect -f '{{range .Mounts}}{{.Source}}:{{.Destination}}{{println}}{{end}}' "$NAME")
 mapfile -t ENVS < <(docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' "$NAME" | grep -vE '^(PATH|HOME|NODE_ENV|container)=') || true
 echo "   挂载 ${#MNTS[@]} 个：${MNTS[*]:-（无）}"
-echo "   环境 ${#ENVS[@]} 个：$(printf '%s ' "${ENVS[@]:-}" | sed -E 's/(key=)[^&[:space:]]+/\1***/g')"
+echo "   环境 ${#ENVS[@]} 个：$(printf '%s ' "${ENVS[@]:-}" | sed -E 's/(key=)[^&[:space:]]+/\1***/g; s/(ADMIN_PASSWORD=).*/\1***/')"
+# 继承来的 ADMIN_* 会盖掉 data/config.json 里的设置（环境变量优先级最高），
+# 而且 docker 的 -e 是"后面覆盖前面"，所以这里必须让它显式可见，不能悄悄带过去。
+for e in "${ENVS[@]:-}"; do
+  case "$e" in
+    ADMIN_PASSWORD=*) echo "   ! 旧容器带着 ADMIN_PASSWORD（${#e} 位含前缀），登录用的是它、不是 config.json 里那个。要改回默认请加 --reset-admin" ;;
+    ADMIN_USER=*) echo "   ! 旧容器带着 $e" ;;
+  esac
+done
 HAS_DATA=""
 for m in "${MNTS[@]:-}"; do case "$m" in *:/app/data*) HAS_DATA=1 ;; esac; done
 if [ -z "$HAS_DATA" ]; then
@@ -53,9 +67,21 @@ docker tag "$NAME:latest" "$NAME:rollback" 2>/dev/null || echo "   （没有 $NA
 docker build -t "$NAME:new" "$DIR"
 
 echo "4/5 换容器（旧容器改名留着，新容器验证通过才删）"
+if [ -n "$RESET_ADMIN" ]; then
+  KEEP=()
+  for e in "${ENVS[@]:-}"; do
+    if [ -z "$e" ]; then continue; fi
+    case "$e" in
+      ADMIN_USER=*|ADMIN_PASSWORD=*) echo "   丢掉继承来的 ${e%%=*}（改用默认 admin / 123456）" ;;
+      *) KEEP+=("$e") ;;
+    esac
+  done
+  ENVS=("${KEEP[@]:-}")
+fi
 ARGS=()
 for m in "${MNTS[@]}"; do ARGS+=(-v "$m"); done
 for e in "${ENVS[@]:-}"; do if [ -n "$e" ]; then ARGS+=(-e "$e"); fi; done
+if [ -n "$RESET_ADMIN" ]; then ARGS+=(-e ADMIN_USER=admin -e ADMIN_PASSWORD=123456); fi
 OLD="$NAME-old"
 docker rm -f "$OLD" >/dev/null 2>&1 || true
 if ! docker rename "$NAME" "$OLD"; then echo "× 改不出 $OLD，停手（旧容器原样在跑）"; exit 5; fi
