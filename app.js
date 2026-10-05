@@ -7,6 +7,8 @@ const REFRESH_MS = 30000;
 /* 静态快照模式（GitHub Pages + Actions）：没有后端，读同目录的 data.json，
    筛选在浏览器里做，上报和管理入口直接隐藏。 */
 const STATIC = !!window.__STATIC__;
+/* Pages 挂在仓库子路径下，绝对路径会 404，图片前缀按模式分岔（index.html 里的 css/js 由 build-static 改成相对） */
+const SPRITE_DIR = STATIC ? "assets/sprites/" : "/assets/sprites/";
 
 const state = { board: null, options: null, tab: "board", region: "", q: "", staticCache: null };
 
@@ -48,12 +50,13 @@ function spriteNode(ev) {
   const cn = ev.pokemonCn || ev.pokemon || "?";
   const badge = () => el("span", { class: "sprite badge", text: String(cn).slice(0, 1), title: cn });
   if (!ev.natdex) return badge();
-  const img = el("img", { class: "sprite", src: `/assets/sprites/${ev.natdex}.gif`, alt: "", loading: "lazy" });
-  /* 图是可选装饰：gif 没有就试 png，都没有换成中文名首字徽标 */
+  const img = el("img", { class: "sprite", src: `${SPRITE_DIR}${ev.natdex}.png`, alt: "", loading: "lazy" });
+  /* 图是可选装饰：默认发的是 96x96 静态图（483 张共 0.36MB，动图要 17MB 不适合明文端口直发）；
+     自己 mirror 过 --with-animated 的会退而求其次拿 gif，都没有就换中文名首字徽标 */
   img.addEventListener("error", () => {
     if (!img.dataset.tried) {
       img.dataset.tried = "1";
-      img.src = `/assets/sprites/${ev.natdex}.png`;
+      img.src = `${SPRITE_DIR}${ev.natdex}.gif`;
     } else img.replaceWith(badge());
   });
   return img;
