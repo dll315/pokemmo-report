@@ -138,7 +138,7 @@ docker run -d \
 ```bash
 docker logs -f pokemmo-report                # 看同步与推送日志（第一次要等 15~25 秒回填）
 docker inspect -f '{{.State.Health.Status}}' pokemmo-report   # healthcheck: healthy / unhealthy
-docker exec -e ADMIN_USER=admin -e ADMIN_PASSWORD=你的密码 pokemmo-report node tools/selftest.js   # 自检 53 项
+docker exec -e ADMIN_USER=admin -e ADMIN_PASSWORD=你的密码 pokemmo-report node tools/selftest.js   # 自检 58 项
 docker stop pokemmo-report && docker rm pokemmo-report        # 停止并删除（数据在宿主机，不会丢）
 ```
 
@@ -354,6 +354,7 @@ Secrets 里配 `WECOM_WEBHOOK`，Variables 里可选 `PUSH_KINDS` / `PUSH_ONLY` 
 | `会话就绪` 之后 totalRows=0 | 上游令牌与会话 cookie 绑定，代码已自动重建会话重试；持续失败说明上游改了页面结构，检查 `src/upstream.js` 里 `history-api-token` 的正则。 |
 | 日志出现 `429 / HTTP 5xx` | 抓得太急。把同步间隔调到 5 分钟以上。 |
 | 中文名显示成英文 | `data/cn-species.json` / `cn-locations.json` 没进容器（`.dockerignore` 别把它们排除），或管理台点「重载词表」。 |
+| 小图标不显示、只剩首字圆徽 | `public/assets/sprites/` 没被打进去（483 张共 0.36MB，正常随仓库走）。补一次：`npm run sprites`，它按 `data/sprite-manifest.json` 里的 git blob SHA 逐张校验后才落盘。 |
 | 推送 errcode 93000 | webhook key 不对（机器人被移出群或复制错）。 |
 | 上报提交后看不到 | 默认要管理员在 `/admin` 放行；想直发就关掉「上报需人工审核」。 |
 | 想重灌历史 | 停服务后 `node tools/reseed.js 168 --force`（容器里 `docker compose exec report node tools/reseed.js 168 --force`，注意先 `-e` 停调度）。 |

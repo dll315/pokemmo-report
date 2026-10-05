@@ -29,7 +29,7 @@ async function hit(path, opts = {}) {
   const text = await r.text();
   let json = null;
   try { json = JSON.parse(text); } catch (e) { /* 保留原文 */ }
-  return { status: r.status, json, text };
+  return { status: r.status, json, text, headers: r.headers };
 }
 
 /* 登录类请求单独走，免得好密码那次把 cookie 冲掉 */
@@ -103,6 +103,16 @@ async function rawPost(path, body) {
   check("未知接口 404", notFound.status === 404);
   const badMethod = await hit("/api/board", { method: "DELETE" });
   check("非法方法 405", badMethod.status === 405, badMethod.status);
+
+  /* ---------- 图鉴图与缓存策略 ---------- */
+  const png = await hit("/assets/sprites/1.png");
+  check("图鉴图可取且是 PNG", png.status === 200 && png.text.slice(1, 4) === "PNG", png.status);
+  check("图片给一周强缓存（文件名即内容）", /max-age=\d{5,}/.test(png.headers.get("cache-control") || ""), png.headers.get("cache-control"));
+  check("页面脚本不做强缓存，改了立刻生效", /no-cache/.test((await hit("/app.js")).headers.get("cache-control") || ""));
+  const noSprite = await hit("/assets/sprites/999999.png");
+  check("缺图返回 404，不回吐 HTML", noSprite.status === 404, noSprite.status);
+  const encTrav = await hit("/assets/%2e%2e%2f%2e%2e%2fdata%2fconfig.json");
+  check("百分号编码的目录穿越也被挡", encTrav.status === 403 || encTrav.status === 404, encTrav.status);
 
   /* ---------- 上报校验 ---------- */
   const cases = [

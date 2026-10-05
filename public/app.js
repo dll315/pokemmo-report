@@ -306,6 +306,7 @@ function liForRef(x, kind) {
   }
   const sp = state.options.species.find((s) => s.en.toLowerCase() === String(x.name).toLowerCase());
   const kids = [
+    sp && sp.natdex ? spriteNode({ natdex: sp.natdex, pokemonCn: sp.cn, pokemon: x.name }) : null,
     el("b", { text: (sp && sp.cn) || x.name }),
     el("span", { class: "en", text: x.name }),
     x.HMs && x.HMs.length ? el("em", { text: "需要：" + cnList(x.HMs, x.hmsCn).join(" / ") }) : null,
