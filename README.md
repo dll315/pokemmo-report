@@ -10,6 +10,7 @@
 - **点位需求**：每条报点直接显示"去之前要什么秘传兽"、具体位置说明、上游备注（含反伤招式警告）与点位地图截图链接
 - **Alpha 刷新时段**：按 UTC 0/6/12/18 点起、每段 4 小时 45 分现算，同时给北京时间
 - **中文对照**：宝可梦名、地区名、地点名、招式名、特性名、属性名、天气类型全部中文为主、英文括注
+- **图鉴图标**：483 张第五世代 96×96 图随仓库发布（0.36MB），不热链 GitHub，缺图自动降级为中文名首字徽标
 - **玩家上报**：下拉选择宝可梦与地点（不接受自由文本编新地点），提交后进待审核队列
 - **管理台** `/admin`：审核队列、推送订阅规则、同步日志、手动触发同步、测试推送
 - **企业微信推送**：机器人 markdown 卡片，支持按类型 / 地区 / tier / 关注名单 / 屏蔽名单 / 免打扰时段过滤
@@ -156,15 +157,16 @@ Pages 设置成 `Deploy from a branch` → 分支 `pages`、目录 `/ (root)`。
 | 整句汉化 | `data/cn-phrases.json`（252 条）把上游的**备注与位置说明整句**翻成中文，每条都能回指到 Alphapedia 简体中文语言包，例如 `Acro Bike required` → 需要越野自行车、`⚠ ADS HAVE RECOIL ⚠` → 小怪带反伤自残技能、`South` → 南侧。 |
 | 蛋组名取证 | 上游用 PokeMMO 黑话（`Water A/B/C`、`Chaos`、`Cannot Breed`、`Genderless`），语言包和 PokeAPI 招式表都没有。`npm run audit:eggs` 按**宝可梦成员集合的包含率**推出每个黑话对应哪个官方蛋组，再直接取该蛋组的 PokeAPI `zh-hans` 名（19/19 包含率 ≥0.925，证据落在 `data/egg-group-mapping.json`）。这一步纠正了手写表里的错译：**`Field` 官方作「陆上」，不是「场地」**；`Chaos` → 不定形、`Cannot Breed` → 未发现、`Genderless` → 矿物。 |
 | 译名分歧 | `Giant Chasm` 官方维基作「巨人洞窟」，PokeMMO 圈也常说「巨大之洼」；`Tanoby Ruins` 作「阿斯卡纳遗迹 / 蔓藤废墟」。想改就写 `data/cn-overrides.json`：`{"locations":{"Giant Chasm":"巨大之洼"}}`，管理台点「重载词表」即可生效。 |
-| 图鉴图 | 上游热链 `raw.githubusercontent.com`，国内不通。`node tools/mirror-sprites.js --only-universe` 镜像到本地（需要代理或换 `--base` 镜像源）；没有图时界面自动降级为中文名首字徽标。 |
+| 图鉴图 | **483 张第五世代 96×96 图已随仓库发布**（`public/assets/sprites/`，共 0.36MB），前端不热链 `raw.githubusercontent.com`（境内打不开）。取图走公共 GitHub 代理但**不信任代理**：文件清单与 git blob SHA-1 来自 `api.github.com` 的 git trees 接口，每张落盘前重算 `sha1("blob "+长度+"\0"+内容)` 比对，取证写在 `data/sprite-manifest.json`，`npm test` 会逐张复核。动图（`--with-animated`）要多 17MB，明文端口直发不划算，默认不带；缺图自动降级为中文名首字徽标。 |
 | 抓取礼貌 | 增量同步默认 2 分钟一次，每页之间 sleep 700ms，静态参考表 12 小时才刷一次。上游 `robots.txt` 只有内容信号模板、没有 Disallow；转载请保留数据来源署名。 |
 
 ## 接口一览（本站）
 
 公开：`GET /api/board`、`GET /api/events`、`GET /api/ref/options`、`GET /api/ref/species?name=`、
 `GET /api/ref/location?name=`、`POST /api/report`
-管理（需 `x-admin-token` 头）：`GET /api/admin/state|config|export`、
-`PUT /api/admin/config`、`POST /api/admin/sync|approve|reject|test-push|flush|reload-dict`
+管理：先 `POST /api/admin/login`（账号 + 密码）换 HttpOnly 会话 cookie，之后
+`GET /api/admin/state|config|export`、`PUT /api/admin/config`、
+`POST /api/admin/sync|approve|reject|test-push|flush|reload-dict`；无会话一律 401，登录限频 8 次/10 分钟
 
 ## 目录结构
 

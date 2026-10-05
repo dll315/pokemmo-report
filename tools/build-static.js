@@ -24,6 +24,20 @@ function copy(rel) {
   return to;
 }
 
+/* 图鉴图跟着快照走：Pages 那份也没有后端能代理图片，本地有几十张就带几十张 */
+function copySprites() {
+  const dir = path.join(PUB, "assets", "sprites");
+  if (!fs.existsSync(dir)) return { n: 0, kb: 0 };
+  const files = fs.readdirSync(dir).filter((f) => /^\d+\.(png|gif)$/.test(f));
+  fs.mkdirSync(path.join(DIST, "assets", "sprites"), { recursive: true });
+  let bytes = 0;
+  for (const f of files) {
+    fs.copyFileSync(path.join(dir, f), path.join(DIST, "assets", "sprites", f));
+    bytes += fs.statSync(path.join(dir, f)).size;
+  }
+  return { n: files.length, kb: (bytes / 1024).toFixed(0) };
+}
+
 function main(dataDir) {
   const store = new Store(dataDir ? path.resolve(ROOT, dataDir) : DATA_DIR);
   store.load();
@@ -48,6 +62,7 @@ function main(dataDir) {
   copy("styles.css");
   copy("app.js");
   copy("assets/favicon.svg");
+  const sprites = copySprites();
 
   /* Pages 可能挂在仓库子路径下，绝对路径会 404，这里一律改成相对路径并打开静态模式 */
   let html = fs.readFileSync(path.join(PUB, "index.html"), "utf8");
@@ -59,7 +74,7 @@ function main(dataDir) {
     .replace('<script src="app.js', '<script>window.__STATIC__ = true;</script>\n    <script src="app.js');
   fs.writeFileSync(path.join(DIST, "index.html"), html, "utf8");
 
-  console.log(`dist 生成完成：活动点位 ${board.stats.active}，库存 ${board.stats.stored}，数据 ${(JSON.stringify(payload).length / 1024).toFixed(0)}KB`);
+  console.log(`dist 生成完成：活动点位 ${board.stats.active}，库存 ${board.stats.stored}，数据 ${(JSON.stringify(payload).length / 1024).toFixed(0)}KB，图鉴图 ${sprites.n} 张/${sprites.kb}KB`);
 }
 
 if (require.main === module) main(argDir);

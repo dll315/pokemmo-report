@@ -241,5 +241,31 @@ t("静态表刷新落盘的文件名必须等于读取方用的文件名", () =>
   ok(!fs.readdirSync(UPSTREAM_DIR).some((f) => /^(alpha|swarm|pheno|alphapedia|natdex)\.json$/.test(f)), "不该残留旧短名文件");
 });
 
+t("图鉴图：已本地镜像，且能按 git blob SHA 逐张复核", () => {
+  const dir = path.join(ROOT, "public", "assets", "sprites");
+  const man = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "sprite-manifest.json"), "utf8"));
+  const uni = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "species-universe.json"), "utf8"));
+  const list = JSON.parse(fs.readFileSync(path.join(UPSTREAM_DIR, "pokesearch-data.json"), "utf8"));
+  const byName = new Map(list.map((p) => [String(p.name).toLowerCase(), Number(p.id)]));
+  const ids = new Set(uni.map((n) => byName.get(String(n).toLowerCase())).filter(Boolean));
+  const missing = [...ids].filter((id) => !fs.existsSync(path.join(dir, `${id}.png`)));
+  ok(missing.length === 0, `universe ${ids.size} 个编号里缺图：${missing.slice(0, 8).join(",")}`);
+
+  const sha1 = require("crypto").createHash;
+  const bad = [];
+  const ghost = [];
+  for (const [name, rec] of Object.entries(man.files)) {
+    const f = path.join(dir, name);
+    if (!fs.existsSync(f)) { ghost.push(name); continue; }
+    const buf = fs.readFileSync(f);
+    if (buf.readUInt32BE(0) !== 0x89504e47) { bad.push(`${name} 不是 PNG`); continue; }
+    if (!rec.verified || sha1("sha1").update(`blob ${buf.length}\0`).update(buf).digest("hex") !== rec.sha) bad.push(`${name} SHA 不符`);
+  }
+  ok(bad.length === 0, `${bad.length} 张图与清单 blob SHA 对不上：${bad.slice(0, 4).join(" ")}`);
+  ok(ghost.length === 0, `清单登记了 ${ghost.length} 个磁盘上不存在的文件：${ghost.slice(0, 4).join(" ")}`);
+  const one = fs.readFileSync(path.join(dir, "1.png"));
+  eq([one.readUInt32BE(16), one.readUInt32BE(20)], [96, 96], "图必须是 96x96");
+});
+
 console.log(`\n单测通过 ${pass}，失败 ${fails.length}${fails.length ? "：" + fails.join(" / ") : ""}`);
 process.exit(fails.length ? 1 : 0);

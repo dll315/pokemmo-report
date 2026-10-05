@@ -227,7 +227,12 @@ function serveStatic(req, res, url) {
       res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
       return res.end("404 页面不存在");
     }
-    res.writeHead(200, { "Content-Type": MIME[path.extname(file)] || "application/octet-stream", "Cache-Control": "no-cache" });
+    /* 图片文件名即内容（编号.png），可以放心让玩家缓存一周；页面与脚本仍然 no-cache，改了立刻生效 */
+    const immutable = p.startsWith("/assets/");
+    res.writeHead(200, {
+      "Content-Type": MIME[path.extname(file)] || "application/octet-stream",
+      "Cache-Control": immutable ? "public, max-age=604800" : "no-cache",
+    });
     res.end(data);
   });
 }

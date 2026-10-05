@@ -17,3 +17,6 @@ dist/
 # 上游语言包与蛋组缓存是构建工具的输入，按需重新拉取，不进仓库
 data/upstream/i18n-zh.json
 tools/.egg-cache/
+
+# 手工探查脚本与临时清单，不入库
+.cache/
