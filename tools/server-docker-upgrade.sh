@@ -100,20 +100,29 @@ if ! docker run -d --name "$NAME" --restart unless-stopped -p "$PORT:$PORT" --me
   restore_old
   exit 6
 fi
-sleep 15
-CODE=$(curl -s -m 8 -o /dev/null -w '%{http_code}' "http://127.0.0.1:$PORT/api/board" || echo 000)
+# 新容器首启要回填 48 小时报点 + 拉静态参考表，实测 15~25 秒，慢的机器更久；
+# 单次探测会把"还在启动"误判成"起不来"然后回滚，所以这里轮询到 90 秒。
+CODE=000
+for i in $(seq 1 18); do
+  sleep 5
+  CODE=$(curl -s -m 8 -o /dev/null -w '%{http_code}' "http://127.0.0.1:$PORT/api/board" || echo 000)
+  if [ "$CODE" = "200" ]; then break; fi
+  printf '   等待新容器就绪 %s/90s（HTTP %s，容器状态 %s）\n' "$((i * 5))" "$CODE" "$(docker inspect -f '{{.State.Status}}' "$NAME" 2>/dev/null || echo 无容器)"
+done
 if [ "$CODE" != "200" ]; then
-  echo "× 新容器起来了但 $PORT 没答 200（HTTP $CODE），日志："
-  docker logs --tail 20 "$NAME" 2>&1 | tail -20
+  echo "× 新容器 90 秒内没答 200（HTTP $CODE）。它的日志："
+  docker logs --tail 25 "$NAME" 2>&1 | tail -25
   restore_old
   exit 7
 fi
 docker rm "$OLD" >/dev/null && echo "   新容器已验证通过，旧容器 $OLD 删除（镜像 $NAME:rollback 仍留着）"
 
 echo "5/5 自检"
-sleep 15
+sleep 3
 docker ps --filter "name=$NAME" --format '{{.Status}}'
 docker logs --tail 12 "$NAME"
 curl -s -m 8 "http://127.0.0.1:$PORT/api/config/public" | head -c 200; echo
 echo "   浏览器打开 http://$(curl -s -m 5 ifconfig.me 2>/dev/null || echo 服务器IP):$PORT/admin ，标题下应显示上面 build 里的版本号"
-echo "   回滚：docker stop $NAME && docker rm $NAME && docker run -d --name $NAME --restart unless-stopped -p $PORT:$PORT --memory 256m ${MNTS[*]/#/-v } $NAME:rollback"
+MNT_HINT=""
+for m in "${MNTS[@]}"; do MNT_HINT="$MNT_HINT -v $m"; done
+echo "   回滚：docker stop $NAME && docker rm $NAME && docker run -d --name $NAME --restart unless-stopped -p $PORT:$PORT --memory 256m$MNT_HINT $NAME:rollback"
