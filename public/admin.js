@@ -91,10 +91,45 @@ function renderPending(reports) {
   );
 }
 
-function renderConfig(cfg) {
+function relTime(unix) {
+  const d = Math.max(0, Math.floor(Date.now() / 1000) - unix);
+  if (d < 60) return `${d} 秒前`;
+  if (d < 3600) return `${Math.floor(d / 60)} 分前`;
+  if (d < 86400) return `${Math.floor(d / 3600)} 小时前`;
+  return `${Math.floor(d / 86400)} 天前`;
+}
+
+/* 机器人链接的管理：当前是哪条（只回尾号，完整 key 不进浏览器）、从哪来、上次几点发成功、
+   能不能在这里改（环境变量注入时不能改，改了不生效，所以按钮直接禁用） */
+function renderHook(w, push) {
+  const fromEnv = w.webhookSource === "env";
+  const kids = [];
+  if (!w.webhookSet) kids.push(el("span", { class: "no", text: "还没有配置机器人地址：本站只更新看板，不会推送。" }));
+  else {
+    kids.push(el("span", { text: "当前：" }));
+    kids.push(el("b", { text: w.webhookHint }));
+    kids.push(el("span", { text: fromEnv ? "（来自环境变量 WECOM_WEBHOOK）" : "（存在 data/config.json，重建容器不丢）" }));
+  }
+  if (push && push.lastPushAt) {
+    const t = new Date(push.lastPushAt * 1000).toLocaleString("zh-CN", { hour12: false, month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" });
+    kids.push(el("span", { text: ` · 上次成功推送 ${t}（${relTime(push.lastPushAt)}）` }));
+  } else if (w.webhookSet) kids.push(el("span", { class: "warn", text: " · 这条地址还没有成功推送过" }));
+  $("#hookState").replaceChildren(...kids);
+
+  $("#webhook").disabled = fromEnv;
+  $("#saveHookBtn").disabled = fromEnv;
+  $("#clearHookBtn").disabled = fromEnv || !w.webhookSet;
+  const notes = [];
+  if (fromEnv) notes.push("地址由环境变量注入，而环境变量优先于这里——要改用网页，先把容器/systemd 里的 WECOM_WEBHOOK 那行删掉再重启。");
+  else if (w.webhookSet) notes.push("换群就把新地址粘上来点「保存这条地址」；点「清空」则只更新看板不再推送。改完点上方「发一条测试推送」确认能送达。");
+  else notes.push("在企业微信群里「群机器人 → 添加」，把生成的完整地址粘到上面保存；改完点上方「发一条测试推送」确认送达。");
+  if (w.webhookOffHost) notes.push("注意：这条地址的域名不是 qyapi.weixin.qq.com（本机的假端点？真实消息不会进群）。");
+  $("#hookHint").textContent = notes.join(" ");
+}
+
+function renderConfig(cfg, push) {
   const w = cfg.wecom;
-  $("#webhook").value = "";
-  $("#hookHint").textContent = w.webhookSet ? `已保存 webhook ${w.webhookHint}（若用环境变量注入，这里改动不生效）` : "尚未配置 webhook";
+  renderHook(w, push);
   $("#maxPerTick").value = w.maxPerTick;
   $("#minTier").value = w.minTier;
   $("#pushEnabled").checked = !!w.enabled;
@@ -142,7 +177,7 @@ async function refresh() {
   const state = await api("/api/admin/state");
   renderStats(state);
   renderPending(state.reports);
-  renderConfig(state.config);
+  renderConfig(state.config, state.push);
   renderLog(state.meta);
   showUI();
   return state;
@@ -187,8 +222,7 @@ function collectConfig() {
     },
     windows: { alphaMinutes: Number($("#winAlpha").value || 75), swarmMinutes: Number($("#winSwarm").value || 25) },
   };
-  const hook = $("#webhook").value.trim();
-  if (hook === "__clear__" || hook) patch.webhook = hook;
+  /* 机器人地址不在这里提交：它有自己的「保存/清空」按钮，避免点「保存全部设置」时误覆盖 */
   const nu = $("#newUser").value.trim();
   const np = $("#newToken").value.trim();
   if (nu) patch.adminUser = nu;
@@ -209,6 +243,26 @@ async function saveAll() {
     toast("凭据已更新，请重新登录");
     return;
   }
+  await refresh();
+}
+
+/* 机器人地址：合法性由服务端判定（规则只有一份，前端不重复实现一遍防止走味） */
+async function saveHook() {
+  const v = $("#webhook").value.trim();
+  if (!v) return toast("先把机器人地址粘贴进来");
+  const r = await api("/api/admin/config", { method: "PUT", body: JSON.stringify({ webhook: v }) });
+  if (r.error) return toast(r.error);
+  $("#webhook").value = "";
+  $("#saveMsg").textContent = "机器人地址已保存 " + new Date().toLocaleTimeString("zh-CN", { hour12: false });
+  toast("机器人地址已保存，可以点「发一条测试推送」验证");
+  await refresh();
+}
+
+async function clearHook() {
+  if (!confirm("清空后本站只更新看板、不再往企业微信群推送。确定清空？")) return;
+  const r = await api("/api/admin/config", { method: "PUT", body: JSON.stringify({ webhook: "" }) });
+  if (r.error) return toast(r.error);
+  toast("已清空机器人地址");
   await refresh();
 }
 
@@ -255,6 +309,9 @@ function bind() {
   $("#reloadBtn").addEventListener("click", () => act("reload-dict", {}));
   $("#refreshBtn").addEventListener("click", () => refresh().then(() => toast("已刷新")));
   $("#saveBtn").addEventListener("click", saveAll);
+  $("#saveHookBtn").addEventListener("click", saveHook);
+  $("#webhook").addEventListener("keydown", (e) => e.key === "Enter" && saveHook());
+  $("#clearHookBtn").addEventListener("click", clearHook);
 }
 
 /* 先看有没有有效会话（cookie 由浏览器管），有就直接进，没有就摆登录框 */

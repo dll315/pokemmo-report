@@ -70,15 +70,49 @@ function writeConfig(patch) {
   return readConfig();
 }
 
+/* 机器人地址的校验：只看形状，不联网。允许 http:// 是为了本机 mock 端点能验通链路，
+   但域名不是企业微信官方时会单独标出来，界面上给一句提醒。 */
+function webhookProblem(url) {
+  const s = String(url || "").trim();
+  if (!s) return "地址是空的";
+  if (/[\s\u3000]/.test(s)) return "里面有空格或换行，请把整条地址原样重新粘贴";
+  let u;
+  try { u = new URL(s); } catch (e) { return "不是合法 URL，要 https:// 开头的完整一条"; }
+  if (u.protocol !== "https:" && u.protocol !== "http:") return "只支持 http(s):// 地址";
+  if (!/[?&]key=[^&]+/.test(u.search)) return "没看到 key= 参数，确认是从群机器人设置里复制的完整地址";
+  return null;
+}
+
+function webhookParts(url) {
+  const out = { host: "", path: "", key: "", offHost: false };
+  try {
+    const u = new URL(String(url || "").trim());
+    out.host = u.hostname;
+    out.path = u.pathname;
+    out.key = (u.search.match(/key=([^&]+)/) || [])[1] || "";
+    out.offHost = u.hostname !== "qyapi.weixin.qq.com";
+  } catch (e) { /* 空或非法，留默认值 */ }
+  return out;
+}
+
 function masked(cfg) {
-  const key = (cfg.wecom.webhook || "").split("key=")[1] || "";
+  const w = String(cfg.wecom.webhook || "");
+  const p = webhookParts(w);
   return {
     ...cfg,
-    wecom: { ...cfg.wecom, webhook: "", webhookSet: !!cfg.wecom.webhook, webhookHint: key ? `…${key.slice(-6)}` : "" },
+    wecom: {
+      ...cfg.wecom,
+      /* 完整 key 一旦回到前端就会进浏览器内存与响应日志，这里只回"够认出来是哪条"的部分 */
+      webhook: "",
+      webhookSet: !!w,
+      webhookHint: w ? `${p.host}${p.path}…${p.key.slice(-6)}` : "",
+      webhookOffHost: !!w && p.offHost,
+      webhookSource: process.env.WECOM_WEBHOOK ? "env" : w ? "file" : "none",
+    },
     adminPassword: cfg.adminPassword ? "••••••" : "",
     adminPasswordSet: !!cfg.adminPassword,
     adminPasswordWeak: isWeakPassword(cfg.adminPassword),
   };
 }
 
-module.exports = { FILE, DEFAULTS, readConfig, writeConfig, masked, isWeakPassword };
+module.exports = { FILE, DEFAULTS, readConfig, writeConfig, masked, isWeakPassword, webhookProblem, webhookParts };

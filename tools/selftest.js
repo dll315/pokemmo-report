@@ -142,9 +142,12 @@ async function rawPost(path, body) {
   if (cookie) {
     const state = await hit("/api/admin/state", { admin: true });
     check("admin/state 200", state.status === 200 && !!state.json?.config && !!state.json?.board, state.status);
-    check("admin/state 不回显 webhook 明文", !JSON.stringify(state.json?.config || {}).includes("qyapi") && !String(state.json?.config?.wecom?.webhook || "").length);
+    /* 地址里的秘密只有 key：域名与路径回前端是必要的（要让人认出是哪条），完整 key 不行 */
+    check("admin/state 不回显完整机器人地址", !/key=[0-9a-f-]{20,}/i.test(JSON.stringify(state.json?.config || {})) && !String(state.json?.config?.wecom?.webhook || "").length, JSON.stringify(state.json?.config?.wecom).slice(0, 120));
     check("admin/state 不回显管理密码", String(state.json?.config?.adminPassword || "").replace(/•/g, "") === "", state.json?.config?.adminPassword);
     check("admin/state 标出弱口令", state.json?.config?.adminPasswordWeak === true, String(state.json?.config?.adminPasswordWeak));
+    check("state 带机器人最后成功时间", typeof state.json?.push?.lastPushAt === "number", JSON.stringify(state.json?.push));
+    check("机器人地址来源有标注", ["env", "file", "none"].includes(state.json?.config?.wecom?.webhookSource), state.json?.config?.wecom?.webhookSource);
 
     const pend = (state.json?.reports?.rows || []).find((r) => r.note === "自检数据");
     if (pend) {
@@ -169,6 +172,15 @@ async function rawPost(path, body) {
     check("PUT admin/config 保存", save.json?.saved === true && save.json?.config?.sync?.intervalMinutes === 3, JSON.stringify(save.json?.config?.sync));
     const back = await hit("/api/admin/config", { method: "PUT", admin: true, body: JSON.stringify({ sync: { intervalMinutes: cfg.json.sync.intervalMinutes } }) });
     check("间隔已还原", back.json?.config?.sync?.intervalMinutes === cfg.json.sync.intervalMinutes);
+
+    /* 机器人地址：只测"坏值被拒且不落盘"，不覆盖站主真配的那条 */
+    check("配置接口不回吐完整地址", !JSON.stringify(cfg.json.wecom).includes("key="), JSON.stringify(cfg.json.wecom).slice(0, 90));
+    const badHook = await hit("/api/admin/config", { method: "PUT", admin: true, body: JSON.stringify({ webhook: "abc" }) });
+    check("非法机器人地址被拒绝（400 + 中文原因）", badHook.status === 400 && /不合法/.test(badHook.json?.error || ""), `${badHook.status} ${JSON.stringify(badHook.json).slice(0, 90)}`);
+    const afterBad = await hit("/api/admin/config", { admin: true });
+    check("被拒的写入没有落盘", afterBad.json?.wecom?.webhookSet === cfg.json.wecom.webhookSet, `${afterBad.json?.wecom?.webhookSet} vs ${cfg.json.wecom.webhookSet}`);
+    const noKey = await hit("/api/admin/config", { method: "PUT", admin: true, body: JSON.stringify({ webhook: "https://qyapi.weixin.qq.com/cgi-bin/webhook/send" }) });
+    check("少了 key 参数的地址也拒", noKey.status === 400 && /key/.test(noKey.json?.error || ""), `${noKey.status} ${JSON.stringify(noKey.json).slice(0, 90)}`);
 
     const exp = await hit("/api/admin/export", { admin: true });
     check("export 带事件数组", Array.isArray(exp.json?.events), JSON.stringify(exp.json || {}).slice(0, 60));

@@ -8,7 +8,7 @@
 const http = require("http");
 const fs = require("fs");
 const path = require("path");
-const { readConfig, writeConfig, masked } = require("./src/config");
+const { readConfig, writeConfig, masked, webhookProblem } = require("./src/config");
 const { Store } = require("./src/store");
 const sync = require("./src/sync");
 const push = require("./src/push-wecom");
@@ -113,7 +113,10 @@ async function handleApi(req, res, url) {
     if (url.pathname === "/api/config/public") return send(res, 200, { publicReport: cfg.publicReport, reportRequireApprove: cfg.reportRequireApprove, windows: cfg.windows });
     if (url.pathname === "/api/admin/session") return send(res, 200, { authed: !!session, user: session ? session.user : null, expiresAt: session ? new Date(session.exp).toISOString() : null });
     if (url.pathname === "/api/admin/state") {
-      return send(res, 200, { config: masked(cfg), meta: store.db.meta, board: boardData(), reports: local.list(store, { status: "pending", limit: 100 }), queue: store.db.queue || [] });
+      /* 机器人最后成功发送的时间：判断"链接是不是还活着"最直接的证据 */
+      let lastPushAt = 0;
+      for (const ev of store.index.values()) if (ev.pushedAt && ev.pushedAt > lastPushAt) lastPushAt = ev.pushedAt;
+      return send(res, 200, { config: masked(cfg), push: { lastPushAt }, meta: store.db.meta, board: boardData(), reports: local.list(store, { status: "pending", limit: 100 }), queue: store.db.queue || [] });
     }
     if (url.pathname === "/api/admin/export") {
       return send(res, 200, { generatedAt: new Date().toISOString(), events: store.events({ activeOnly: false, limit: 5000 }).rows, board: boardData() });
@@ -158,8 +161,13 @@ async function handleApi(req, res, url) {
     if (typeof payload.reportRequireApprove === "boolean") patch.reportRequireApprove = payload.reportRequireApprove;
 
     const wecom = {};
-    if (payload.webhook === "__clear__") wecom.webhook = "";
-    else if (payload.webhook) wecom.webhook = String(payload.webhook).trim();
+    if (payload.webhook === "__clear__" || payload.webhook === "") wecom.webhook = "";
+    else if (typeof payload.webhook === "string" && payload.webhook.trim()) {
+      const bad = webhookProblem(payload.webhook);
+      /* 不合法就不写盘：存了坏地址只会让后面每次推送都失败，还不如当场拒绝 */
+      if (bad) return send(res, 400, { error: "机器人地址不合法：" + bad });
+      wecom.webhook = String(payload.webhook).trim();
+    }
     for (const k of ["enabled", "kinds", "onlyPokemon", "exceptPokemon", "regions", "minTier", "maxPerTick", "quietHours"]) {
       if (payload[k] !== undefined) wecom[k] = payload[k];
     }

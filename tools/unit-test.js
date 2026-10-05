@@ -276,5 +276,23 @@ t("企业微信错误码要翻成可操作的中文", () => {
   ok(push.explain({ errcode: 12345 }).includes("12345"), "没见过的码要原样带出来，不许编原因");
 });
 
+t("机器人地址的校验与脱敏", () => {
+  const cfgmod = require("../src/config");
+  const good = "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=0f9c1a2b-3c4d-5e6f-7a8b-9c0d1e2f3a4b";
+  eq(cfgmod.webhookProblem(good), null, "合法地址不该报错");
+  ok(cfgmod.webhookProblem("").includes("空"), "空地址要说清");
+  ok(cfgmod.webhookProblem("abc").includes("URL"), "不是 URL");
+  ok(cfgmod.webhookProblem("ftp://qyapi.weixin.qq.com/x").includes("http"), "协议不对");
+  ok(cfgmod.webhookProblem("https://qyapi.weixin.qq.com/cgi-bin/webhook/send").includes("key"), "缺 key 要拒");
+  ok(cfgmod.webhookProblem("https://qyapi.weixin.qq.com/send?key=a b").includes("空格"), "粘贴带换行/空格要指出来");
+  const m = cfgmod.masked({ adminPassword: "123456", wecom: { webhook: good } });
+  eq(m.wecom.webhook, "", "脱敏后不能把完整地址回前端");
+  ok(m.wecom.webhookHint.endsWith("f3a4b") && !m.wecom.webhookHint.includes("0f9c1a2b"), "只给尾号");
+  eq(m.wecom.webhookOffHost, false, "官方域名不算异常");
+  const m2 = cfgmod.masked({ adminPassword: "", wecom: { webhook: "http://127.0.0.1:3599/send?key=MOCK" } });
+  eq(m2.wecom.webhookOffHost, true, "本机 mock 端点要标出来提醒");
+  eq(m2.wecom.webhookSource, process.env.WECOM_WEBHOOK ? "env" : "file", "来源要标对");
+});
+
 console.log(`\n单测通过 ${pass}，失败 ${fails.length}${fails.length ? "：" + fails.join(" / ") : ""}`);
 process.exit(fails.length ? 1 : 0);

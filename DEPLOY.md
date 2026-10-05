@@ -138,7 +138,7 @@ docker run -d \
 ```bash
 docker logs -f pokemmo-report                # 看同步与推送日志（第一次要等 15~25 秒回填）
 docker inspect -f '{{.State.Health.Status}}' pokemmo-report   # healthcheck: healthy / unhealthy
-docker exec -e ADMIN_USER=admin -e ADMIN_PASSWORD=123456 pokemmo-report node tools/selftest.js   # 自检 60 项
+docker exec -e ADMIN_USER=admin -e ADMIN_PASSWORD=123456 pokemmo-report node tools/selftest.js   # 自检 66 项
 docker stop pokemmo-report && docker rm pokemmo-report        # 停止并删除（数据在宿主机，不会丢）
 ```
 
@@ -354,6 +354,7 @@ Secrets 里配 `WECOM_WEBHOOK`，Variables 里可选 `PUSH_KINDS` / `PUSH_ONLY` 
 - markdown 消息上限 **4096 字节**，代码里已做截断。
 - 支持的颜色只有 `info / comment / warning`，别的会退成默认色。
 - 发送失败不推进队列，重试 5 次后丢弃并记日志；点位过期也会静默丢弃（不再打扰）。
+- 机器人地址**只在管理台「企业微信机器人」这一块管**：显示的是域名+路径+key 尾 6 位（完整 key 不回浏览器），可以「保存这条地址」替换、「清空」停用推送；不合法的地址（少 `key=`、带空格换行、不是 http(s)）会被当场拒绝且不落盘。地址旁边会标出来源：`data/config.json`（可改）还是环境变量（网页改了不生效，按钮会禁用）。
 - 换群就是换 webhook 地址；建议先建个测试群跑几天。
 
 ## 故障排查

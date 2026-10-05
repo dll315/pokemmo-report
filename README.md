@@ -12,7 +12,7 @@
 - **中文对照**：宝可梦名、地区名、地点名、招式名、特性名、属性名、天气类型全部中文为主、英文括注
 - **图鉴图标**：483 张第五世代 96×96 图随仓库发布（0.36MB），不热链 GitHub，缺图自动降级为中文名首字徽标
 - **玩家上报**：下拉选择宝可梦与地点（不接受自由文本编新地点），提交后进待审核队列
-- **管理台** `/admin`：审核队列、推送订阅规则、同步日志、手动触发同步、测试推送
+- **管理台** `/admin`：审核队列、**企业微信机器人地址管理（查看尾号 / 替换 / 清空 / 标注来源与最后成功推送）**、推送订阅规则、同步日志、手动触发同步、测试推送
 - **企业微信推送**：机器人 markdown 卡片，支持按类型 / 地区 / tier / 关注名单 / 屏蔽名单 / 免打扰时段过滤
 - **图鉴参考**：某地点能刷什么 Alpha / 群蜂 / 特异天气、需要什么秘传器、价值 tier
 - **两条部署路径**：自建服务器（Docker 单容器）或 GitHub Pages + Actions 静态快照
@@ -42,8 +42,8 @@ WECOM_WEBHOOK="http://127.0.0.1:3599/send?key=MOCK" node server.js 3580
 ## 自检
 
 ```bash
-npm test                                   # 纯逻辑单测 22 组，不联网
-ADMIN_USER=admin ADMIN_PASSWORD=123456 npm run selftest   # 对着跑着的服务打 60 项接口用例
+npm test                                   # 纯逻辑单测 23 组，不联网
+ADMIN_USER=admin ADMIN_PASSWORD=123456 npm run selftest   # 对着跑着的服务打 66 项接口用例
 node tools/verify-cn-data.js               # 校验宝可梦名/地点名覆盖率
 npm run verify:terms                       # 校验术语表覆盖率
 npm run phrases                            # 重新生成整句表（上游语言包有更新时）

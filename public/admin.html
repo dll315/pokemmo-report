@@ -28,6 +28,7 @@
       button.act.ok { background: var(--good); }
       button.act.no { background: var(--bad); }
       button.act.mini { padding: 5px 10px; font-size: 12.5px; font-weight: 500; }
+      button.act:disabled, button:disabled { opacity: 0.4; cursor: not-allowed; }
       table.log { width: 100%; border-collapse: collapse; font-size: 12.5px; }
       table.log th, table.log td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
       .pend { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; border-bottom: 1px solid var(--line); padding: 10px 0; }
@@ -36,7 +37,14 @@
       .toast.show { opacity: 0.95; }
       .empty { color: var(--ink-2); font-size: 13px; }
       code { font-family: ui-monospace, Consolas, monospace; font-size: 12px; background: var(--bg); padding: 1px 5px; border-radius: 5px; }
-      @media (max-width: 760px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+      .hookbox { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; }
+      .hookstate { margin: 0 0 8px; font-size: 13px; }
+      .hookstate b { font-family: ui-monospace, Consolas, monospace; }
+      .hookstate .no { color: var(--bad); }
+      .hookstate .warn { color: var(--swarm); }
+      .hookrow { display: flex; gap: 8px; flex-wrap: wrap; margin: 0; }
+      .hookrow input { flex: 1 1 320px; }
+      @media (max-width: 760px) { .grid2, .grid3 { grid-template-columns: 1fr; } .hookrow input { flex: 1 1 100%; } }
     </style>
   </head>
   <body>
@@ -86,16 +94,21 @@
       </div>
 
       <div class="card">
-        <h2>企业微信推送</h2>
+        <h2>企业微信机器人</h2>
+        <div class="hookbox">
+          <p class="hookstate" id="hookState">读取中…</p>
+          <div class="row hookrow">
+            <input id="webhook" placeholder="粘贴群机器人地址 https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=…" />
+            <button class="act ok mini" id="saveHookBtn" type="button">保存这条地址</button>
+            <button class="act no mini" id="clearHookBtn" type="button">清空</button>
+          </div>
+          <p class="hint" id="hookHint"></p>
+        </div>
         <div class="grid2">
-          <label>Webhook 地址
-            <input id="webhook" placeholder="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=…" />
-          </label>
           <label>每轮最多发几条
             <input id="maxPerTick" type="number" min="1" max="15" />
           </label>
         </div>
-        <p class="hint" id="hookHint"></p>
         <div class="row checks">
           <label><input type="checkbox" id="pushEnabled" /> 启用推送</label>
           <label><input type="checkbox" id="kindAlpha" /> 头目 Alpha</label>
