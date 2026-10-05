@@ -86,6 +86,31 @@ if id poke >/dev/null 2>&1; then chown -R poke:poke "$DIR/data"; fi
 ls "$DIR"/public/assets/sprites 2>/dev/null | wc -l | sed 's/^/  现在代码里的图鉴图：/'
 
 echo "5/6 重启"
+# 与 server-bootstrap.sh 同样的判据：命令行里有 server.js 且工作目录是本项目，才认为是可清的游离进程
+HOLDER=$(ss -lntp 2>/dev/null | grep ":$PORT " | grep -oE 'pid=[0-9]+' | head -1 | cut -d= -f2)
+MAIN=$(systemctl show -p MainPID --value poke 2>/dev/null || echo 0)
+if [ -n "$HOLDER" ] && [ "$HOLDER" != "$MAIN" ] && [ "$HOLDER" != "1" ]; then
+  CMD=$(tr '\0' ' ' < "/proc/$HOLDER/cmdline" 2>/dev/null || echo "")
+  CWD=$(readlink "/proc/$HOLDER/cwd" 2>/dev/null || echo "")
+  CG=$(cat "/proc/$HOLDER/cgroup" 2>/dev/null || echo "")
+  echo "   端口 $PORT 正被 PID $HOLDER 占用：cmd[$CMD] cwd[$CWD]"
+  case "$CG" in
+    *docker*|*containerd*|*kubepods*)
+      CID=$(printf '%s' "$CG" | grep -oE '[0-9a-f]{64}' | head -1)
+      echo "   ! 它在容器里（${CID:0:12}），我不替你停容器：docker update --restart=no ${CID:0:12} && docker stop ${CID:0:12}"
+      ;;
+    *)
+      if printf '%s' "$CMD" | grep -q 'server[.]js' && { [ "$CWD" = "$DIR" ] || printf '%s' "$CMD" | grep -q "$DIR"; }; then
+        echo "   是宿主机上手动起的本项目进程 → 结束它"
+        kill "$HOLDER" 2>/dev/null
+        sleep 3
+        if kill -0 "$HOLDER" 2>/dev/null; then kill -9 "$HOLDER" 2>/dev/null; fi
+      else
+        echo "   ! 判据不足（不是本项目的 node server.js），我不动它"
+      fi
+      ;;
+  esac
+fi
 MODE=""
 if [ -f /etc/systemd/system/poke.service ]; then MODE=systemd; fi
 if [ -z "$MODE" ] && command -v docker >/dev/null 2>&1 && docker ps -a --format '{{.Names}}' 2>/dev/null | grep -qx pokemmo-report; then MODE=docker; fi

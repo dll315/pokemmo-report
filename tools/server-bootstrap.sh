@@ -39,18 +39,35 @@ id poke >/dev/null 2>&1 || useradd -r -s /sbin/nologin poke
 mkdir -p /opt/pokemmo-report/data && chown -R poke:poke /opt/pokemmo-report/data
 printf '[Unit]\nDescription=PokeMMO 报点站\nAfter=network-online.target\n\n[Service]\nWorkingDirectory=/opt/pokemmo-report\nEnvironment=HOST=0.0.0.0\nEnvironment=ADMIN_USER=admin\nEnvironment=ADMIN_PASSWORD=123456\nEnvironment=TZ=Asia/Shanghai\nExecStart=%s server.js 3580\nRestart=always\nRestartSec=5\n\n[Install]\nWantedBy=multi-user.target\n' "$NODE_BIN" > /etc/systemd/system/poke.service
 echo "4/5 启动服务"
-# 端口被上一次手动跑的 node 占着是最常见的起不来，先把它清掉（只清本项目 server.js 的进程，别的不动）
+# 端口被上一次手动跑的 node 占着是最常见的起不来。判据不能只看命令行：
+# `node server.js --host=0.0.0.0` 里没有路径，要看它的工作目录是不是本项目；容器的情况只提示不动手。
 HOLDER=$(ss -lntp 2>/dev/null | grep ':3580 ' | grep -oE 'pid=[0-9]+' | head -1 | cut -d= -f2)
 MAIN=$(systemctl show -p MainPID --value poke 2>/dev/null || echo 0)
 if [ -n "$HOLDER" ] && [ "$HOLDER" != "$MAIN" ] && [ "$HOLDER" != "1" ]; then
   CMD=$(tr '\0' ' ' < "/proc/$HOLDER/cmdline" 2>/dev/null || echo "")
-  case "$CMD" in
-    *server.js*pokemmo-report*|*pokemmo-report*server.js*)
-      echo "   端口 3580 被游离进程 PID $HOLDER（$CMD）占着 → 结束它"
-      kill "$HOLDER" 2>/dev/null; sleep 3
-      if kill -0 "$HOLDER" 2>/dev/null; then kill -9 "$HOLDER" 2>/dev/null; fi
+  CWD=$(readlink "/proc/$HOLDER/cwd" 2>/dev/null || echo "")
+  CG=$(cat "/proc/$HOLDER/cgroup" 2>/dev/null || echo "")
+  echo "   3580 正被 PID $HOLDER 占用：cmd[$CMD] cwd[$CWD]"
+  case "$CG" in
+    *docker*|*containerd*|*kubepods*)
+      CID=$(printf '%s' "$CG" | grep -oE '[0-9a-f]{64}' | head -1)
+      echo "   ! 它在容器里（${CID:0:12}）。脚本不替你停容器，要腾端口自己执行这两条："
+      echo "       docker update --restart=no ${CID:0:12} && docker stop ${CID:0:12}"
       ;;
-    *) echo "   端口 3580 被 PID $HOLDER（${CMD:-未知}）占着，不是本项目的 node 进程，我不动它——把这一行输出发我" ;;
+    *)
+      if printf '%s' "$CMD" | grep -q 'server[.]js'; then
+        if [ "$CWD" = "$DIR" ] || printf '%s' "$CMD" | grep -q "$DIR"; then
+          echo "   是宿主机上手动起的本项目 node 进程 → 结束它（SIGTERM，写库是 tmp+rename 原子的）"
+          kill "$HOLDER" 2>/dev/null
+          sleep 3
+          if kill -0 "$HOLDER" 2>/dev/null; then kill -9 "$HOLDER" 2>/dev/null; fi
+        else
+          echo "   ! 命令行有 server.js 但工作目录不是 $DIR，我不动它——把这行输出发我"
+        fi
+      else
+        echo "   ! 不是 node server.js（可能是 docker-proxy 或别的服务），我不动它——把这行输出发我"
+      fi
+      ;;
   esac
 fi
 systemctl daemon-reload && systemctl enable poke && systemctl restart poke
