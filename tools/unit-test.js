@@ -334,5 +334,32 @@ t("连接列表：旧单地址迁移、数组能缩短、环境变量是多加�
   }
 });
 
+t("头目推送要报得详细：特性/配招/本波时段/同点其它/本波统计", () => {
+  const refdata = require("../src/refdata");
+  const req = refdata.requirementFor({ kind: "alpha", pokemon: "Crawdaunt", location: "Abandoned Ship" });
+  ok(req.abilityCn && req.abilityCn !== "Adaptability", `特性要有中文名：${req.abilityCn}`);
+  ok(req.movesetCn.length >= 3 && /（/.test(req.movesetCn[0]), `配招要中文带括注：${req.movesetCn && req.movesetCn[0]}`);
+  eq(req.hmsCn.length, req.hms.length, "hmsCn 与 hms 一一对应");
+  eq(req.hmsCn[0].cn, "冲浪", "hmsCn 必须仍是 {en,cn} 结构（前端与卡片都依赖）");
+
+  const now = Math.floor(Date.now() / 1000);
+  const CN = { Crawdaunt: "铁螯龙虾", Ambipom: "双尾怪手", Beedrill: "大针蜂" };
+  const ev = (p, loc, tier) => ({ key: `alpha|${p}|${loc}|${now}`, kind: "alpha", source: "upstream", pokemon: p, pokemonCn: CN[p], location: loc, region: "Hoenn", tier, tsUnix: now, expiresUnix: now + 3600 });
+  const rows = [ev("Crawdaunt", "Abandoned Ship", 4), ev("Ambipom", "Abandoned Ship", 2), ev("Beedrill", "Route 102", 5)];
+  const ctx = push.pushContext({ events: () => ({ rows }) }, now);
+  eq([ctx.waveTotal, ctx.waveHigh], [3, 2], "本波统计");
+  eq(ctx.samePlace(rows[0]).map((e) => e.pokemon).join(","), "Ambipom", "同点其它头目要排除自己");
+  const c = push.buildMessage(rows[0], { nowUnix: now, ctx }).markdown.content;
+  ok(/特性：/.test(c), "卡片要有特性");
+  ok(/配招：/.test(c), "卡片要有配招");
+  ok(/本波：第 \d 波 \d\d:\d\d–\d\d:\d\d/.test(c) || /现在在两波之间/.test(c), `卡片要交代时段（第几波、起止）`);
+  ok(/本波共 3 个头目，其中 tier≥4 的 2 个/.test(c), "卡片要有本波统计");
+  ok(/同点还有：.*双尾怪手/.test(c), "卡片要列出同点其它头目");
+  ok(/★ 上游标记为有价值/.test(c) === !!req.valuable, "有价值标记跟着静态表走，不自造");
+  ok(Buffer.byteLength(c, "utf8") <= 4096, "不能超企业微信 markdown 上限");
+  const sw = push.buildMessage({ key: "k", kind: "swarm", source: "upstream", pokemon: "Relicanth", location: "Tanoby Ruins", tsUnix: now, expiresUnix: now + 900 }, { nowUnix: now, ctx });
+  ok(!/本波共/.test(sw.markdown.content), "群蜂卡片不塞头目的波次统计，别把不相关信息堆上去");
+});
+
 console.log(`\n单测通过 ${pass}，失败 ${fails.length}${fails.length ? "：" + fails.join(" / ") : ""}`);
 process.exit(fails.length ? 1 : 0);

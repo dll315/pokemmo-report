@@ -6,6 +6,7 @@
 
 const { request } = require("./net");
 const { fmtBeijing, decide } = require("./rules");
+const { slots } = require("./slots");
 const dict = require("./dict");
 const refdata = require("./refdata");
 
@@ -44,21 +45,54 @@ function hmsText(req) {
   return req.hms.map((h) => dict.termPair("hms", h) || h).filter(Boolean).join(" / ");
 }
 
-function buildMessage(ev, { nowUnix = Math.floor(Date.now() / 1000) } = {}) {
-  const req = ev.req || refdata.requirementFor(ev);
+/* 推送上下文：本波时段、这一波的头目统计、同地点还有谁。
+   一个 tick 算一遍传给每张卡片 —— 玩家判断"现在值不值得赶过去"靠的就是这几个数。 */
+function pushContext(store, nowUnix = Math.floor(Date.now() / 1000)) {
+  const s = slots(nowUnix);
+  const alpha = store.events({ activeOnly: true, limit: 500 }).rows.filter((e) => e.kind === "alpha");
+  const byPlace = new Map();
+  for (const e of alpha) {
+    const k = String(e.location || "").toLowerCase();
+    if (!byPlace.has(k)) byPlace.set(k, []);
+    byPlace.get(k).push(e);
+  }
+  return {
+    slot: s.current,
+    next: s.next,
+    inGap: s.inGap,
+    waveTotal: alpha.length,
+    waveHigh: alpha.filter((e) => Number(e.tier) >= 4).length,
+    samePlace: (ev) => (byPlace.get(String(ev.location || "").toLowerCase()) || []).filter((e) => e.key !== ev.key),
+  };
+}
+
+const hhmm = (unixSec) => String(fmtBeijing(unixSec)).slice(-5);
+
+function buildMessage(ev, { nowUnix = Math.floor(Date.now() / 1000), ctx = null } = {}) {
+  const req = ev.req || refdata.requirementFor(ev) || {};
+  const isAlpha = ev.kind === "alpha";
+  const others = isAlpha && ctx ? ctx.samePlace(ev) : [];
   const lines = [
     `**${KIND_EMOJI[ev.kind] || "🔴"} ${kindTitle(ev.kind)}｜${displayName(ev)}**`,
     `地点：<font color="info">${placeName(ev)}</font>`,
     ev.region ? `地区：${regionName(ev)}` : "",
+    req.typesCn && req.typesCn.length ? `属性：${req.typesCn.join(" / ")}` : "",
+    req.abilityCn ? `特性：${req.abilityCn}` : "",
+    req.movesetCn && req.movesetCn.length ? `配招：${req.movesetCn.slice(0, 6).join("、")}` : "",
     `剩余：<font color="warning">约 ${remainingText(ev, nowUnix)}</font>（${fmtBeijing(ev.expiresUnix || ev.tsUnix)} 北京时间消失）`,
+    isAlpha && ctx && ctx.slot ? `本波：第 ${ctx.slot.index} 波 ${hhmm(ctx.slot.start)}–${hhmm(ctx.slot.end)}（北京时间）` : "",
+    isAlpha && ctx && ctx.inGap && ctx.next ? `现在在两波之间：下一波 ${hhmm(ctx.next.start)} 开始` : "",
     `报出：${fmtBeijing(ev.tsUnix)}`,
     ev.phenoType ? `天气：${dict.termPair("concepts", ev.phenoType)}` : "",
     hmsText(req) ? `需要：${hmsText(req)}` : "",
-    req && req.specific ? `位置：${req.specific}` : "",
-    ev.tier ? `价值 tier：${ev.tier}` : "",
-    ev.reporter ? `上报人：${ev.reporter}` : "",
+    req.specific ? `位置：${req.specific}` : "",
+    (req.notes || []).filter(Boolean).length ? `小怪警告：${req.notes.filter(Boolean).slice(0, 2).join(" · ")}` : "",
+    ev.tier ? `价值 tier：${ev.tier}${req.valuable ? "　<font color=\"warning\">★ 上游标记为有价值</font>" : ""}` : "",
+    isAlpha && ctx && ctx.waveTotal ? `本波共 ${ctx.waveTotal} 个头目，其中 tier≥4 的 ${ctx.waveHigh} 个` : "",
+    others.length ? `同点还有：${others.slice(0, 3).map(displayName).join("、")}${others.length > 3 ? ` 等 ${others.length} 个` : ""}` : "",
+    ev.source === "local" ? `来源：玩家上报${ev.reporter ? `（${ev.reporter}）` : ""}` : "",
     ev.note ? `备注：${String(ev.note).slice(0, 80)}` : "",
-    req && req.map ? `[点位地图](${req.map})` : "",
+    req.map ? `[点位地图](${req.map})` : "",
     ev.upstreamUrl ? `[查看上游原始报点](${ev.upstreamUrl})` : "",
     `<font color="comment">数据来自 Alphapedia 众包 · 本站镜像</font>`,
   ].filter(Boolean);
@@ -141,6 +175,7 @@ async function flushQueue(store, cfg, { log = () => {} } = {}) {
   if (!targets.length) return { sent: 0, failed: 0, skipped: "没有启用中的连接" };
 
   const stats = (store.db.meta.pushStats = store.db.meta.pushStats || {});
+  const ctx = pushContext(store);
   const cap = Number(w.maxPerTick || 4);
   let sent = 0;
   let failed = 0;
@@ -163,7 +198,7 @@ async function flushQueue(store, cfg, { log = () => {} } = {}) {
       if (item.sentTo.includes(t.id)) continue;
       let r;
       try {
-        r = await send(t.webhook, buildMessage(ev, { nowUnix }));
+        r = await send(t.webhook, buildMessage(ev, { nowUnix, ctx }));
       } catch (e) {
         r = { errcode: -1, errmsg: e.message };
       }
@@ -198,4 +233,4 @@ async function flushQueue(store, cfg, { log = () => {} } = {}) {
   return { sent, failed, targets: targets.length, remaining: q.length };
 }
 
-module.exports = { buildMessage, buildDigest, send, enqueue, flushQueue, remainingText, displayName, placeName, regionName, hmsText, kindTitle, explain };
+module.exports = { buildMessage, buildDigest, send, enqueue, flushQueue, pushContext, remainingText, displayName, placeName, regionName, hmsText, kindTitle, explain };

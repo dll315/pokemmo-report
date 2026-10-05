@@ -81,6 +81,9 @@ function reqBlock(ev) {
   const kids = [];
   const hms = (r.hmsCn || []).map((x) => (x.cn && x.cn !== x.en ? `${x.cn}（${x.en}）` : x.en)).filter(Boolean);
   if (hms.length) kids.push(el("span", { class: "req need", text: "需要：" + hms.join(" / ") }));
+  if ((r.typesCn || []).length) kids.push(el("span", { class: "req", text: "属性：" + r.typesCn.join(" / ") }));
+  if (r.abilityCn) kids.push(el("span", { class: "req", text: "特性：" + r.abilityCn }));
+  if ((r.movesetCn || []).length) kids.push(el("span", { class: "req", title: (r.moveset || []).join(" / "), text: "配招：" + r.movesetCn.slice(0, 4).join("、") + (r.movesetCn.length > 4 ? ` +${r.movesetCn.length - 4}` : "") }));
   if (r.note) kids.push(el("span", { class: "req", text: r.note }));
   if (r.specific) kids.push(el("span", { class: "req", text: "位置：" + r.specific }));
   const warn = (r.notes || []).filter(Boolean).slice(0, 2);

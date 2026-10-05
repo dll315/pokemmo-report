@@ -303,7 +303,7 @@ function locationInfo(name) {
 async function sendTo(cfg, t, record = true) {
   const sample = store.events({ activeOnly: true, limit: 1 }).rows[0];
   const msg = sample
-    ? push.buildMessage(sample)
+    ? push.buildMessage(sample, { ctx: push.pushContext(store) })   /* 测试卡片要和真实卡片一模一样，否则测了等于没测 */
     : { msgtype: "markdown", markdown: { content: `**报点站连通性测试 · ${t.name}**\n当前没有活动点位，这条是占位消息。` } };
   let r;
   try {

@@ -41,14 +41,21 @@ function addSpecies(name, kind) {
   speciesIndex.set(name, rec);
 }
 
-function addReq(key, { hms = [], map = "", specific = "", note = "", notes = [], type = "" }) {
-  const rec = reqIndex.get(key) || { hms: new Set(), map: "", specific: "", note: "", notes: new Set(), types: new Set() };
+function addReq(key, { hms = [], map = "", specific = "", note = "", notes = [], type = "", ability = "", moveset = [], valuable = false }) {
+  const rec = reqIndex.get(key) || { hms: new Set(), map: "", specific: "", note: "", notes: new Set(), types: new Set(), moveset: [], ability: "" };
   (hms || []).forEach((h) => rec.hms.add(h));
   if (!rec.map && isUrl(map)) rec.map = String(map).trim();
   if (!rec.specific && specific) rec.specific = String(specific).trim();
   if (!rec.note && note) rec.note = String(note).trim();
   (notes || []).forEach((n) => rec.notes.add(String(n).trim()));
   if (type) rec.types.add(type);
+  /* 特性与配招是"去之前该知道的事"：头目会不会秒杀、带不带反伤，玩家要看这两个判断 */
+  if (!rec.ability && ability) rec.ability = String(ability).trim();
+  if (valuable) rec.valuable = true;
+  for (const m of moveset || []) {
+    const v = String(m || "").trim();
+    if (v && !rec.moveset.includes(v)) rec.moveset.push(v);
+  }
   reqIndex.set(key, rec);
 }
 
@@ -95,6 +102,9 @@ function indexInto(table, kind) {
           specific: low(d["Specific Location"]) === low(loc) ? "" : d["Specific Location"],
           note: d["Location Notes"],
           notes: d.Notes,
+          ability: d.Ability,
+          moveset: d.Moveset,
+          valuable: !!d.HasValuable,
         });
       }
       locationIndex.set(loc, rec);
@@ -127,12 +137,18 @@ function requirementFor(ev) {
   const hms = [...rec.hms];
   return {
     hms,
-    hmsCn: hms.map((h) => ({ en: h, cn: dict.term("hms", h) || dict.term("moves", h) })),
+    hmsCn: hms.map((h) => ({ en: h, cn: dict.term("hms", h) || dict.term("moves", h) || "" })),
     map: rec.map,
     specific: plain(rec.specific),
     note: plain(rec.note),
     notes: [...rec.notes].map(plain),
     types: [...rec.types],
+    typesCn: [...rec.types].map((t) => dict.termPair("types", t) || t),
+    ability: rec.ability || "",
+    abilityCn: rec.ability ? dict.termPair("abilities", rec.ability) : "",
+    moveset: [...(rec.moveset || [])],
+    movesetCn: (rec.moveset || []).map((m) => dict.termPair("moves", m) || m),
+    valuable: !!rec.valuable,
   };
 }
 
