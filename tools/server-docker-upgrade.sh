@@ -79,9 +79,26 @@ if [ -n "$RESET_ADMIN" ]; then
   ENVS=("${KEEP[@]:-}")
 fi
 ARGS=()
-for m in "${MNTS[@]}"; do ARGS+=(-v "$m"); done
 for e in "${ENVS[@]:-}"; do if [ -n "$e" ]; then ARGS+=(-e "$e"); fi; done
 if [ -n "$RESET_ADMIN" ]; then ARGS+=(-e ADMIN_USER=admin -e ADMIN_PASSWORD=123456); fi
+
+# 先验参数再动旧容器：上次就是 inspect 出来一个空挂载、拼成 -v "" 被 docker 拒掉，
+# 白折腾一趟回滚。空挂载也不能"跳过算了"——那会让新容器看不见 data/，设置像凭空没了。
+BAD=""
+for m in "${MNTS[@]:-}"; do
+  SRC="${m%%:*}"; DST="${m#*:}"
+  if [ -z "$m" ] || [ "$DST" = "$m" ] || [ -z "$SRC" ] || [ -z "$DST" ]; then BAD="$BAD[$m]"; continue; fi
+  ARGS+=(-v "$m")
+done
+if [ -n "$BAD" ]; then
+  echo "× 从旧容器读到的挂载表有问题：$BAD"
+  echo "  正确的应该是 宿主机路径:容器路径 两段都非空。原始数据如下，发我这一行我就能判断："
+  docker inspect -f '{{json .Mounts}}' "$NAME"
+  echo "  （旧容器没被动过，站点照常在跑）"
+  exit 8
+fi
+printf '   将执行：docker run -d --name %s --restart unless-stopped -p %s:%s --memory 256m %s\n' "$NAME" "$PORT" "$PORT" \
+  "$(printf '%s ' "${ARGS[@]}" | sed -E 's/(key=)[^ &]+/\1***/g; s/(ADMIN_PASSWORD=)[^ ]+/\1***/g')"$NAME:new
 OLD="$NAME-old"
 docker rm -f "$OLD" >/dev/null 2>&1 || true
 if ! docker rename "$NAME" "$OLD"; then echo "× 改不出 $OLD，停手（旧容器原样在跑）"; exit 5; fi
