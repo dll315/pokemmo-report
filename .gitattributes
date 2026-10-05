@@ -2,3 +2,4 @@
 *.png binary
 *.gif binary
 *.jpg binary
+BUILDINFO export-subst
