@@ -206,7 +206,29 @@ bash tools/deploy-update.sh root@别的IP 3581 # 换主机或端口
 - 认不出任何已部署痕迹时会**直接退出并告诉你这是首次部署**，不会半路创建服务。
 - Docker 那条它只更新代码并打印重建镜像的两条命令，不替你 `docker rm`（删容器属于不可逆动作）。
 
+#### 如果端口被容器占着：用 Docker 的方式升级
+
+先确认是谁占着端口（这条输出很短，整段贴回来就能判断）：
+
+```bash
+ss -lntp | grep ':3580 '; docker ps -a --format '{{.Names}} | {{.Status}} | {{.Ports}}'
+```
+
+出现 `docker-proxy` + `pokemmo-report | Up ... | 0.0.0.0:3580->3580/tcp` 就是**容器在跑旧镜像**，
+这时别用 systemd 抢端口，用 `tools/server-docker-upgrade.sh`：它先取代码、先 `docker build`，
+再从**现有容器**上读出挂载和环境变量原样继承，只有确认 `/app/data` 挂在宿主机上才敢删旧容器
+（否则停手，避免机器人地址和上报记录随容器一起没了），旧镜像留成 `pokemmo-report:rollback` 可回滚。
+
+```bash
+for u in "https://raw.githubusercontent.com/dll315/pokemmo-report/main/tools/server-docker-upgrade.sh" \
+         "https://gh-proxy.com/https://raw.githubusercontent.com/dll315/pokemmo-report/main/tools/server-docker-upgrade.sh"; do
+  curl -fsSL --max-time 30 -o /root/sdu.sh "$u" && grep -q server-docker-upgrade /root/sdu.sh && echo "取到：$u" && break
+done
+bash /root/sdu.sh
+```
+
 #### 本机连不上服务器 22 端口时：让服务器自己取代码
+
 
 `deploy-update.sh` 要在能 `ssh` 通服务器的电脑上跑。如果 22 端口被云防火墙挡着（实测过：`ssh: connect to host ... port 22: Connection timed out`，而 80/443 是通的），
 就把更新脚本传到服务器上、在**云控制台的网页终端**里跑，让它自己去 GitHub 取代码：
