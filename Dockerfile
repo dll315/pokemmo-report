@@ -5,6 +5,8 @@ ENV NODE_ENV=production
 
 # 零依赖：只拷源码，不跑 npm install
 COPY package.json ./
+# 版本戳：没有这个文件，容器里跑起来的站点报不出自己是哪一版（server.js 读 /app/BUILDINFO）
+COPY BUILDINFO ./
 COPY server.js ./
 COPY src ./src
 COPY public ./public
