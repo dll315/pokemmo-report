@@ -160,7 +160,12 @@ function renderConfig(cfg, push) {
   $("#winSwarm").value = cfg.windows.swarmMinutes;
   $("#newUser").value = "";
   $("#newToken").value = "";
-  $("#newToken").placeholder = cfg.adminPasswordWeak ? "当前密码是弱口令，建议改掉" : "已设置，留空不修改";
+  /* 密码框的提示要说清"现在生效的是哪个来源"，否则改了不生效又变成一次"密码错误"排查 */
+  const pwNotes = [];
+  if (cfg.adminPasswordFromEnv) pwNotes.push("当前密码来自环境变量 ADMIN_PASSWORD，在这里改不会生效");
+  if (cfg.adminPasswordPlaceholder) pwNotes.push("当前密码" + cfg.adminPasswordPlaceholder);
+  else if (cfg.adminPasswordWeak) pwNotes.push("当前是弱口令");
+  $("#newToken").placeholder = pwNotes.length ? pwNotes.join("；") : "已设置，留空不修改";
   $("#userHint").textContent = `当前账号 ${cfg.adminUser}${cfg.adminPasswordWeak ? " · 密码是弱口令（登录已限频 8 次/10 分钟，仍建议改）" : ""}`;
 }
 

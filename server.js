@@ -410,7 +410,9 @@ server.listen(PORT, HOST, async () => {
   console.log(`  数据库   ${path.join(DATA_DIR, "db.json")}（${store.index.size} 条事件）`);
   if (process.env.WECOM_WEBHOOK) console.log("  推送     WECOM_WEBHOOK 已作为一条锁定连接加入列表（网页里改不动它，但可以另加别的）");
   console.log(`  连接     启用 ${(readConfig().wecom.targets || []).filter((t) => t.enabled).length} 条 / 共 ${(readConfig().wecom.targets || []).length} 条`);
-  if (!cfg.adminPassword) console.log("  ⚠ 未设置管理密码，管理台无法登录。在 data/config.json 写 adminPassword 或设环境变量 ADMIN_PASSWORD");
+  const ph = require("./src/config").placeholderPassword(cfg.adminPassword);
+  if (ph) console.log(`  ⚠ 管理密码${ph}："${cfg.adminPassword}"。登录要用这一串；要改就改环境变量 ADMIN_PASSWORD 或 data/config.json 后重启`);
+  else if (!cfg.adminPassword) console.log("  ⚠ 未设置管理密码，管理台无法登录。在 data/config.json 写 adminPassword 或设环境变量 ADMIN_PASSWORD");
   else if (require("./src/config").isWeakPassword(cfg.adminPassword))
     console.log(`  ⚠ 管理密码是弱口令（当前账号 ${cfg.adminUser}）。站点是公网可访问的，建议改成 8 位以上；登录已限频 8 次/10 分钟`);
   if (HOST !== "127.0.0.1" && HOST !== "localhost" && cfg.adminPassword && require("./src/config").isWeakPassword(cfg.adminPassword))

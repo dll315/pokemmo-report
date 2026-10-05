@@ -4,7 +4,7 @@
   "publicReport": true,
   "reportRequireApprove": true,
   "wecom": {
-    "webhook": "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "webhook": "",
     "enabled": true,
     "kinds": ["alpha", "swarm"],
     "onlyPokemon": [],

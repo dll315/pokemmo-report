@@ -88,6 +88,19 @@ function readConfig() {
 const WEAK = new Set(["", "123456", "123456789", "admin", "admin123", "888888", "666666", "password", "qwerty", "abc123"]);
 const isWeakPassword = (p) => WEAK.has(String(p || "").toLowerCase());
 
+/* 文档里的占位符被原样照抄成密码是真实发生过的（"换成你自己的密码" 8 个汉字），
+   这类值一律在启动时喊一声，免得人对着"密码错误"查半天。 */
+const PLACEHOLDER_HINTS = ["换成你", "你自己", "你的密码", "你的账号", "自己定", "修改这", "placeholder", "changeme", "your-", "xxxx"];
+function placeholderPassword(p) {
+  const s = String(p || "");
+  if (!s) return "";
+  const low = s.toLowerCase();
+  const hit = PLACEHOLDER_HINTS.find((k) => low.includes(k));
+  if (hit) return `看起来是文档里的占位符（含"${hit}"）`;
+  if (/[^\x00-\x7f]/.test(s)) return "含中文或全角字符，多半是复制提示语时带进去的";
+  return "";
+}
+
 function writeConfig(patch) {
   const disk = (() => {
     try {
@@ -153,7 +166,9 @@ function masked(cfg) {
     adminPassword: cfg.adminPassword ? "••••••" : "",
     adminPasswordSet: !!cfg.adminPassword,
     adminPasswordWeak: isWeakPassword(cfg.adminPassword),
+    adminPasswordPlaceholder: placeholderPassword(cfg.adminPassword),
+    adminPasswordFromEnv: !!process.env.ADMIN_PASSWORD,
   };
 }
 
-module.exports = { FILE, DEFAULTS, readConfig, writeConfig, masked, isWeakPassword, webhookProblem, webhookParts, webhookHint, normalizeTargets, targetId };
+module.exports = { FILE, DEFAULTS, readConfig, writeConfig, masked, isWeakPassword, placeholderPassword, webhookProblem, webhookParts, webhookHint, normalizeTargets, targetId };

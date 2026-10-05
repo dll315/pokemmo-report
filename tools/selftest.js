@@ -147,6 +147,7 @@ async function rawPost(path, body) {
     check("admin/state 不回显完整机器人地址", !/key=[0-9a-f-]{20,}/i.test(JSON.stringify(state.json?.config || {})) && !String(state.json?.config?.wecom?.webhook || "").length, JSON.stringify(state.json?.config?.wecom).slice(0, 120));
     check("admin/state 不回显管理密码", String(state.json?.config?.adminPassword || "").replace(/•/g, "") === "", state.json?.config?.adminPassword);
     check("admin/state 标出弱口令", state.json?.config?.adminPasswordWeak === true, String(state.json?.config?.adminPasswordWeak));
+    check("admin/state 标出密码来源与占位符判定", typeof state.json?.config?.adminPasswordPlaceholder === "string" && typeof state.json?.config?.adminPasswordFromEnv === "boolean", JSON.stringify({ p: state.json?.config?.adminPasswordPlaceholder, e: state.json?.config?.adminPasswordFromEnv }));
     check("state 带机器人最后成功时间", typeof state.json?.push?.lastPushAt === "number", JSON.stringify(state.json?.push));
     check("机器人地址来源有标注", ["env", "file", "none"].includes(state.json?.config?.wecom?.webhookSource), state.json?.config?.wecom?.webhookSource);
 
