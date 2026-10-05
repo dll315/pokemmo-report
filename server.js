@@ -186,11 +186,19 @@ async function handleApi(req, res, url) {
     return send(res, r.ok ? 200 : 400, r);
   }
   if (url.pathname === "/api/admin/test-push") {
-    const hook = String(payload.webhook || "").trim() || readConfig().wecom.webhook;
-    if (!hook) return send(res, 400, { error: "缺少 webhook 地址" });
+    const cfg = readConfig();
+    const hook = String(payload.webhook || "").trim() || cfg.wecom.webhook;
+    if (!hook) return send(res, 200, { errcode: -1, errmsg: "未配置 webhook", hint: "先在「推送设置」里填机器人地址并保存（或部署时用 WECOM_WEBHOOK 环境变量）" });
     const sample = store.events({ activeOnly: true, limit: 1 }).rows[0];
     const msg = sample ? push.buildMessage(sample) : { msgtype: "markdown", markdown: { content: "**报点站连通性测试**\n当前没有活动点位。" } };
-    const r = await push.send(hook, msg);
+    let r;
+    try {
+      r = await push.send(hook, msg);
+    } catch (e) {
+      r = { errcode: -1, errmsg: e.message, hint: push.explain({ errcode: -1, errmsg: e.message }) };
+    }
+    log(`测试推送 → ${r.errcode === 0 ? "已送达" : "失败：" + r.errmsg + (r.hint ? "｜" + r.hint : "")}`);
+    if (r.errcode === 0 && !cfg.wecom.enabled) r.hint = "这条测试发出去了，但「推送总开关」是关的，真实报点不会自动发——去推送设置里打开";
     return send(res, 200, r);
   }
   if (url.pathname === "/api/admin/flush") {

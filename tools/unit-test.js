@@ -267,5 +267,14 @@ t("图鉴图：已本地镜像，且能按 git blob SHA 逐张复核", () => {
   eq([one.readUInt32BE(16), one.readUInt32BE(20)], [96, 96], "图必须是 96x96");
 });
 
+t("企业微信错误码要翻成可操作的中文", () => {
+  eq(push.explain({ errcode: 0 }), "", "成功不该给提示");
+  ok(push.explain({ errcode: 93000 }).includes("key"), "93000 要说 key 不对");
+  ok(push.explain({ errcode: 45009 }).includes("限流"), "45009 要说明是限流、等一分钟再试");
+  ok(push.explain({ errcode: -1, errmsg: "connect ETIMEDOUT 1.2.3.4:443" }).includes("出网"), "网络类错误要给排查方向");
+  ok(push.explain({ errcode: 40008 }).includes("markdown"), "40008 要说消息类型");
+  ok(push.explain({ errcode: 12345 }).includes("12345"), "没见过的码要原样带出来，不许编原因");
+});
+
 console.log(`\n单测通过 ${pass}，失败 ${fails.length}${fails.length ? "：" + fails.join(" / ") : ""}`);
 process.exit(fails.length ? 1 : 0);

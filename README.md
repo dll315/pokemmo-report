@@ -42,8 +42,8 @@ WECOM_WEBHOOK="http://127.0.0.1:3599/send?key=MOCK" node server.js 3580
 ## 自检
 
 ```bash
-npm test                                   # 纯逻辑单测 21 项，不联网
-ADMIN_USER=admin ADMIN_PASSWORD=密码 npm run selftest   # 对着跑着的服务打 58 项接口用例
+npm test                                   # 纯逻辑单测 22 组，不联网
+ADMIN_USER=admin ADMIN_PASSWORD=密码 npm run selftest   # 对着跑着的服务打 60 项接口用例
 node tools/verify-cn-data.js               # 校验宝可梦名/地点名覆盖率
 npm run verify:terms                       # 校验术语表覆盖率
 npm run phrases                            # 重新生成整句表（上游语言包有更新时）

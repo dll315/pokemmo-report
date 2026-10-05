@@ -138,7 +138,7 @@ docker run -d \
 ```bash
 docker logs -f pokemmo-report                # 看同步与推送日志（第一次要等 15~25 秒回填）
 docker inspect -f '{{.State.Health.Status}}' pokemmo-report   # healthcheck: healthy / unhealthy
-docker exec -e ADMIN_USER=admin -e ADMIN_PASSWORD=你的密码 pokemmo-report node tools/selftest.js   # 自检 58 项
+docker exec -e ADMIN_USER=admin -e ADMIN_PASSWORD=你的密码 pokemmo-report node tools/selftest.js   # 自检 60 项
 docker stop pokemmo-report && docker rm pokemmo-report        # 停止并删除（数据在宿主机，不会丢）
 ```
 
@@ -341,6 +341,11 @@ Secrets 里配 `WECOM_WEBHOOK`，Variables 里可选 `PUSH_KINDS` / `PUSH_ONLY` 
 ## 企业微信侧注意
 
 - 群机器人限速约 **20 条/分钟**，所以每轮同步最多发 `maxPerTick` 条（默认 4），超出的留在队列里下轮发。
+- **点「测试推送」报"发送失败"时先看括号里的中文原因**（管理台与 `journalctl` 都会给）：
+  `93000` = 机器人 key 不对或已被移出群；`45009` = 你点太快被限流，等一分钟再点就好（不是配置错）；
+  `40058/40008` = 消息内容或类型问题（本程序只发 markdown，出现这两条算 bug，把日志发我）；
+  `连不上机器人地址` = 服务器出网/DNS/防火墙问题，用 `curl -s -o /dev/null -w "%{http_code}\n" https://qyapi.weixin.qq.com/cgi-bin/get_api_domain_ip` 单独验。
+  测试成功但真实报点不推，通常是「推送总开关」没打开——测试接口不受开关约束，就是为了让你能单独验通路。
 - markdown 消息上限 **4096 字节**，代码里已做截断。
 - 支持的颜色只有 `info / comment / warning`，别的会退成默认色。
 - 发送失败不推进队列，重试 5 次后丢弃并记日志；点位过期也会静默丢弃（不再打扰）。
@@ -355,7 +360,7 @@ Secrets 里配 `WECOM_WEBHOOK`，Variables 里可选 `PUSH_KINDS` / `PUSH_ONLY` 
 | 日志出现 `429 / HTTP 5xx` | 抓得太急。把同步间隔调到 5 分钟以上。 |
 | 中文名显示成英文 | `data/cn-species.json` / `cn-locations.json` 没进容器（`.dockerignore` 别把它们排除），或管理台点「重载词表」。 |
 | 小图标不显示、只剩首字圆徽 | `public/assets/sprites/` 没被打进去（483 张共 0.36MB，正常随仓库走）。补一次：`npm run sprites`，它按 `data/sprite-manifest.json` 里的 git blob SHA 逐张校验后才落盘。 |
-| 推送 errcode 93000 | webhook key 不对（机器人被移出群或复制错）。 |
+| 推送 errcode 93000 | webhook key 不对（机器人被移出群或复制错）。管理台现在会把错误码翻成中文原因，见上面「企业微信侧注意」。 |
 | 上报提交后看不到 | 默认要管理员在 `/admin` 放行；想直发就关掉「上报需人工审核」。 |
 | 想重灌历史 | 停服务后 `node tools/reseed.js 168 --force`（容器里 `docker compose exec report node tools/reseed.js 168 --force`，注意先 `-e` 停调度）。 |
 | Actions 跑批报 `HTTP 403`、库存 0 | 上游 Cloudflare 拦数据中心 IP，不是代码问题。改走 DEPLOY.md 的 B2（你的机器跑批 + Pages 分支托管），用 `node tools/probe-upstream.js` 确认。 |

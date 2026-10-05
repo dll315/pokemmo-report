@@ -175,6 +175,10 @@ async function rawPost(path, body) {
 
     const tp = await hit("/api/admin/test-push", { method: "POST", admin: true, body: JSON.stringify({ webhook: "http://127.0.0.1:1/broken" }) });
     check("推送到不可达地址返回错误而不是崩溃", [200, 400].includes(tp.status) && (tp.json?.error || tp.json?.errcode !== 0), `${tp.status} ${JSON.stringify(tp.json).slice(0, 120)}`);
+    check("不可达地址要给出中文排查提示", /出网|DNS/.test(tp.json?.hint || ""), JSON.stringify(tp.json?.hint || ""));
+
+    const tpBad = await hit("/api/admin/test-push", { method: "POST", admin: true, body: JSON.stringify({ webhook: "abc" }) });
+    check("webhook 不合法时是结构化错误（不是 500）", tpBad.status === 200 && tpBad.json?.errcode === -1 && /不合法/.test(tpBad.json?.errmsg || ""), `${tpBad.status} ${JSON.stringify(tpBad.json).slice(0, 120)}`);
 
     const flush = await hit("/api/admin/flush", { method: "POST", admin: true, body: "{}" });
     check("flush 返回队列统计", typeof flush.json?.sent === "number", JSON.stringify(flush.json));

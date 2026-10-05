@@ -75,8 +75,29 @@ function buildDigest(events, meta = {}) {
   return { msgtype: "markdown", markdown: { content } };
 }
 
+/* 企业微信群机器人的常见错误码翻成人话：不给这一层，界面上就只剩一句英文 errmsg */
+const HINTS = {
+  93000: "webhook 地址里的 key 不对，或机器人已被移出群——去群设置里重新复制机器人地址",
+  95000: "请求太频繁，机器人被临时限流",
+  45009: "企业微信限流（约 20 条/分钟）——不是配置错了，等一分钟再点一次",
+  40008: "消息类型不被支持（本程序只发 markdown）",
+  40058: "消息内容为空或不合法",
+  40007: "消息体结构不对",
+  44002: "请求体为空或不是 JSON",
+  44013: "消息内容里的链接不合法",
+};
+
+function explain(r) {
+  if (!r) return "没有收到响应";
+  if (r.errcode === 0) return "";
+  const code = Number(r.errcode);
+  if (code === -1) return /超时|timeout|ETIMEDOUT|ECONN|EAI_AGAIN|socket|ENOTFOUND|getaddrinfo/i.test(String(r.errmsg))
+    ? "连不上机器人地址：查服务器出网、DNS 与防火墙（企业微信的域名是 qyapi.weixin.qq.com）" : String(r.errmsg || "发送失败");
+  return HINTS[code] || `企业微信返回 errcode ${code}`;
+}
+
 async function send(webhook, payload) {
-  if (!/^https?:\/\//.test(webhook)) throw new Error("webhook 地址不合法");
+  if (!/^https?:\/\//.test(webhook)) { const e = new Error("webhook 地址不合法（要 https:// 开头）"); e.code = "EBADHOOK"; throw e; }
   const res = await request(webhook, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -85,7 +106,9 @@ async function send(webhook, payload) {
     timeoutMs: 12000,
   });
   const body = res.json || {};
-  return { httpStatus: res.status, errcode: body.errcode ?? -1, errmsg: body.errmsg || res.text.slice(0, 120) };
+  const errcode = body.errcode ?? -1;
+  const errmsg = body.errmsg || res.text.slice(0, 120);
+  return { httpStatus: res.status, errcode, errmsg, hint: explain({ errcode, errmsg }) };
 }
 
 /* ---------- 待发队列 ---------- */
@@ -134,7 +157,7 @@ async function flushQueue(store, cfg, { log = () => {} } = {}) {
     try {
       r = await send(w.webhook, buildMessage(ev, { nowUnix }));
     } catch (e) {
-      r = { errcode: -1, errmsg: e.message };
+      r = { errcode: -1, errmsg: e.message, hint: explain({ errcode: -1, errmsg: e.message }) };
     }
     if (r.errcode === 0) {
       q.splice(i, 1);
@@ -145,8 +168,10 @@ async function flushQueue(store, cfg, { log = () => {} } = {}) {
       item.tries++;
       if (item.tries >= 5) {
         q.splice(i, 1);
-        log(`推送放弃（重试 5 次）${ev.pokemon} @ ${ev.location}: ${r.errmsg}`);
+        log(`推送放弃（重试 5 次）${ev.pokemon} @ ${ev.location}: ${r.errmsg}${r.hint ? "｜" + r.hint : ""}`);
       } else {
+        /* 只在第一次失败时喊一声，不然每 2 分钟刷一条同样的日志会淹掉 */
+        if (item.tries === 1) log(`推送失败（会自动重试到第 5 次）${ev.pokemon} @ ${ev.location}: ${r.errmsg}${r.hint ? "｜" + r.hint : ""}`);
         i++;
       }
       failed++;
@@ -157,4 +182,4 @@ async function flushQueue(store, cfg, { log = () => {} } = {}) {
   return { sent, failed, remaining: q.length };
 }
 
-module.exports = { buildMessage, buildDigest, send, enqueue, flushQueue, remainingText, displayName, placeName, regionName, hmsText, kindTitle };
+module.exports = { buildMessage, buildDigest, send, enqueue, flushQueue, remainingText, displayName, placeName, regionName, hmsText, kindTitle, explain };

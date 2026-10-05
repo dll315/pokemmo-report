@@ -32,7 +32,7 @@
       table.log th, table.log td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
       .pend { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; border-bottom: 1px solid var(--line); padding: 10px 0; }
       .pend .who { color: var(--ink-2); font-size: 12px; }
-      .toast { position: fixed; right: 16px; bottom: 16px; background: var(--ink); color: var(--bg); padding: 10px 14px; border-radius: 10px; font-size: 13px; opacity: 0; transition: 0.25s; pointer-events: none; }
+      .toast { position: fixed; right: 16px; bottom: 16px; background: var(--ink); color: var(--bg); padding: 10px 14px; border-radius: 10px; font-size: 13px; opacity: 0; transition: 0.25s; pointer-events: none; max-width: min(520px, calc(100vw - 32px)); }
       .toast.show { opacity: 0.95; }
       .empty { color: var(--ink-2); font-size: 13px; }
       code { font-family: ui-monospace, Consolas, monospace; font-size: 12px; background: var(--bg); padding: 1px 5px; border-radius: 5px; }

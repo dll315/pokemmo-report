@@ -19,7 +19,10 @@ function toast(msg) {
   const t = $("#toast");
   t.textContent = msg;
   t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 2600);
+  /* 失败原因带中文解释时句子很长，按长度多留一会儿，别让人来不及看 */
+  const ms = Math.min(9000, 2600 + Math.max(0, String(msg).length - 14) * 110);
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.classList.remove("show"), ms);
 }
 
 async function api(path, opts = {}) {
@@ -150,7 +153,10 @@ async function refresh() {
 async function act(endpoint, body) {
   const r = await api(`/api/admin/${endpoint}`, { method: "POST", body: JSON.stringify(body || {}) });
   if (r.error) return toast(r.error);
-  if (endpoint === "test-push") return toast(r.errcode === 0 ? "测试消息已送达企业微信群" : `发送失败：${r.errmsg}`);
+  if (endpoint === "test-push") {
+    const okText = r.errcode === 0 ? (r.hint ? `已送达，但${r.hint}` : "测试消息已送达企业微信群") : `发送失败：${r.errmsg}${r.hint ? "｜" + r.hint : ""}`;
+    return toast(okText);
+  }
   if (endpoint === "sync") return toast(`同步完成：新增 ${r.added} 条${r.errors && r.errors.length ? " / " + r.errors.join(";") : ""}`);
   if (endpoint === "flush") return toast(`队列发送 ${r.sent} 条，失败 ${r.failed} 条`);
   if (endpoint === "reload-dict") return toast("词表已重载");
