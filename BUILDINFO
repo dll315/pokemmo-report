@@ -1,3 +1,2 @@
-BUILD_VERSION="dev"
-BUILD_COMMIT="local"
-BUILD_TIME="2026-10-05T05:02:25Z"
+BUILD_VERSION="$Format:%h$"
+BUILD_TIME="$Format:%ci$"
