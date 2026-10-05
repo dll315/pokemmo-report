@@ -73,19 +73,19 @@ docker pull node:20-alpine      # 拉到镜像层才算真的通了，别只看 
 
 ```bash
 # 服务器上，装好 Docker 之后
-git clone git@github.com:dll315/pokemmo-report.git /opt/pokemmo-report
+git clone https://github.com/dll315/pokemmo-report.git /opt/pokemmo-report
 cd /opt/pokemmo-report
 
-# 守卫：clone 失败（私有仓库没配 key）时这里就停，不要往下 build
+# 守卫：clone 失败时目录是空的，这里就停，不要往下 build
 test -f Dockerfile && echo "代码到位 ✓" || { echo "没拿到代码，看第 0 节"; false; }
 
 cp .env.example .env
-vi .env        # 三个值：ADMIN_USER / ADMIN_PASSWORD / WECOM_WEBHOOK
+vi .env        # 只有两个值：ADMIN_USER=admin / ADMIN_PASSWORD=123456
 ```
 
 `.env` 已在 `.gitignore` 里，不会被提交。`TRUST_PROXY` 只在前面挂了 Nginx 反代时才设 1。
 
-`WECOM_WEBHOOK` 可以先留空，之后在管理台网页里填也行；**一旦用环境变量注入，环境变量优先，网页里改 webhook 不会生效**（启动日志会提醒）。
+**企业微信机器人不要写进 `.env`**：环境变量优先级高于网页，设了之后管理台里改机器人地址就不生效了。留空、起站后去「推送设置」里填。
 
 ### 2. 起服务
 
@@ -107,14 +107,13 @@ docker build -t pokemmo-report:1.0 .
 # 2) 建数据目录（宿主机上存 db.json，容器重建不丢玩家上报和历史）
 mkdir -p /opt/pokemmo/data
 
-# 3) 起容器
+# 3) 起容器（账号 admin、密码 123456；机器人地址起站后在管理台「推送设置」里填）
 docker run -d \
   --name pokemmo-report \
   --restart unless-stopped \
   -p 3580:3580 \
   -e ADMIN_USER=admin \
-  -e ADMIN_PASSWORD='换成你自己的密码' \
-  -e WECOM_WEBHOOK='https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxx' \
+  -e ADMIN_PASSWORD=123456 \
   -e TZ=Asia/Shanghai \
   -v /opt/pokemmo/data:/app/data \
   --memory 256m \
@@ -126,38 +125,45 @@ docker run -d \
 | 参数 | 作用 | 不给会怎样 |
 |---|---|---|
 | `-p 3580:3580` | 宿主机端口映射 | 外面访问不到。换端口就改冒号左边，如 `-p 8080:3580` |
-| `-e ADMIN_USER` / `-e ADMIN_PASSWORD` | 管理台登录账号与密码 | 不设则用程序默认 `admin` / `123456`（公网部署务必覆盖它）；在 .env 里把 ADMIN_PASSWORD 留空 = 禁止登录管理台 |
-| `-e WECOM_WEBHOOK` | 企业微信机器人地址 | 只更新看板，不推送；也可以在管理台网页里填 |
+| `-e ADMIN_USER=admin` / `-e ADMIN_PASSWORD=123456` | 管理台登录账号与密码 | 不设也是这一对（程序默认值），写出来只是让你看清 |
 | `-e TZ` | 容器时区 | 不影响业务时间（代码按 UTC+8 硬算北京时间），只影响日志可读性 |
-| `-v /opt/pokemmo/data:/app/data` | 数据落地 | 容器一删，玩家上报和同步游标全没 |
+| `-v /opt/pokemmo/data:/app/data` | 数据落地 | 容器一删，玩家上报、同步游标和你填的机器人地址全没 |
 | `--restart unless-stopped` | 开机/崩溃自启 | 服务器重启后服务不会自己起来 |
 | `--memory 256m` | 上限保护 | 一般用不到（常驻内存约 60MB），留着防意外 |
+
+**这里没有 `WECOM_WEBHOOK` 是有意的**：环境变量会盖过管理台里填的地址（改了不生效），所以机器人只在网页设置里配。
 
 日常操作：
 
 ```bash
 docker logs -f pokemmo-report                # 看同步与推送日志（第一次要等 15~25 秒回填）
 docker inspect -f '{{.State.Health.Status}}' pokemmo-report   # healthcheck: healthy / unhealthy
-docker exec -e ADMIN_USER=admin -e ADMIN_PASSWORD=你的密码 pokemmo-report node tools/selftest.js   # 自检 60 项
+docker exec -e ADMIN_USER=admin -e ADMIN_PASSWORD=123456 pokemmo-report node tools/selftest.js   # 自检 60 项
 docker stop pokemmo-report && docker rm pokemmo-report        # 停止并删除（数据在宿主机，不会丢）
 ```
 
 更新到新版本：
 
 ```bash
-git pull
-docker build -t pokemmo-report:1.1 .
+# 在你电脑上：打包传上去（服务器直连 GitHub 不通，见第 0 节）
+git archive --format=tar.gz -o /g/QoderCNworks/pokemmo-report.tar.gz HEAD
+scp /g/QoderCNworks/pokemmo-report.tar.gz root@159.198.67.190:/root/
+
+# 在服务器上：解包覆盖 → 重建镜像 → 换容器（数据在 /opt/pokemmo/data，不会被动）
+tar xzf /root/pokemmo-report.tar.gz -C /opt/pokemmo-report
+cd /opt/pokemmo-report && docker build -t pokemmo-report:1.1 .
 docker stop pokemmo-report && docker rm pokemmo-report
 docker run -d --name pokemmo-report --restart unless-stopped -p 3580:3580 \
-  -e ADMIN_USER='同样的账号' -e ADMIN_PASSWORD='同样的密码' -e WECOM_WEBHOOK='同样的地址' -e TZ=Asia/Shanghai \
+  -e ADMIN_USER=admin -e ADMIN_PASSWORD=123456 -e TZ=Asia/Shanghai \
   -v /opt/pokemmo/data:/app/data --memory 256m pokemmo-report:1.1
 docker image prune -f          # 清掉旧镜像
 ```
 
-备份就是一条命令（`db.json` 是唯一状态）：
+机器人地址存在 `/opt/pokemmo/data/config.json` 里，跟着 `-v` 落地，换镜像不用重填。
+备份就这一条（`db.json` 是点位与上报，`config.json` 是机器人地址和订阅规则）：
 
 ```bash
-cp /opt/pokemmo/data/db.json /opt/pokemmo/data/db.$(date +%F).json
+cd /opt/pokemmo/data && tar czf poke-backup.$(date +%F).tar.gz db.json config.json
 ```
 
 > ⚠️ 用 `-v` 挂载后，镜像里自带的 `data/` 会被宿主机目录遮住。首次运行时机程序自己会去上游拉静态参考表（约 1.6MB），要等十几秒；如果服务器出不了网，先把本仓库的 `data/upstream/` 拷到 `/opt/pokemmo/data/upstream/` 再启动。
@@ -181,15 +187,15 @@ ufw allow 3580/tcp                                                        # Ubun
 
 ### 4. 更新与备份
 
-```bash
-git pull
-docker compose up -d --build
+取代码用第 0 节的打包 scp（服务器直连 GitHub 不稳），传完再更新：
 
-# 备份：db.json 里有玩家上报和审核记录
-cp data/db.json data/db.json.bak-$(date +%F)
+```bash
+tar xzf /root/pokemmo-report.tar.gz -C /opt/pokemmo-report
+cd /opt/pokemmo-report && docker compose up -d --build      # 用 docker run 的看第 2b 节末尾
 ```
 
-`./data` 是 bind mount，重建镜像不丢数据。上游静态参考表也在 `data/upstream/`，12 小时自动刷一次。
+`./data` 是 bind mount，重建镜像不丢数据；机器人地址和订阅规则在 `data/config.json` 里，也不会被动。
+上游静态参考表在 `data/upstream/`，12 小时自动刷一次。备份打包那两个文件即可（命令见第 2b 节末尾）。
 
 ### 5. 可选：Nginx 反代
 
@@ -234,7 +240,7 @@ echo "用的解释器：$NODE_BIN"; $NODE_BIN -v
 id poke >/dev/null 2>&1 || useradd -r -s /sbin/nologin poke
 mkdir -p /opt/pokemmo-report/data && chown -R poke:poke /opt/pokemmo-report/data
 
-# 4) systemd 单元（ADMIN_PASSWORD 那行必须改；密码里别带空格和 #）
+# 4) systemd 单元：账号 admin、密码 123456，机器人不写在这里
 cat > /etc/systemd/system/poke.service <<EOF
 [Unit]
 Description=PokeMMO 报点站
@@ -245,8 +251,7 @@ Wants=network-online.target
 WorkingDirectory=/opt/pokemmo-report
 Environment=HOST=0.0.0.0
 Environment=ADMIN_USER=admin
-Environment=ADMIN_PASSWORD=换成你自己的密码
-Environment=WECOM_WEBHOOK=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=你的机器人key
+Environment=ADMIN_PASSWORD=123456
 Environment=TZ=Asia/Shanghai
 ExecStart=${NODE_BIN} server.js 3580
 Restart=always
@@ -258,7 +263,7 @@ EOF
 systemctl daemon-reload && systemctl enable --now poke
 ```
 
-`WECOM_WEBHOOK` 那行不需要就先删掉，之后在管理台网页里填（写进 unit 的话环境变量优先，网页改了不生效）。
+**unit 里不放 `WECOM_WEBHOOK`**：环境变量优先于网页，写了之后你在管理台「推送设置」里改机器人地址就不生效了。服务起来后直接在 `http://159.198.67.190:3580/admin` 填，保存即生效（写进 `data/config.json`，重启不丢）。
 
 验证与日常操作：
 
@@ -308,19 +313,19 @@ node tools/publish-pages.js        # 抓 data/ 里的数据 → 生成 dist/ →
 
 ```bash
 crontab -l 2>/dev/null | grep -v publish-pages.js > /tmp/ct; cat >> /tmp/ct <<'EOF'
-*/5 * * * * cd /opt/pokemmo-report && WECOM_WEBHOOK='https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxx' node tools/actions-sync.js && node tools/publish-pages.js --skip-build >> /var/log/poke-pages.log 2>&1
+*/5 * * * * cd /opt/pokemmo-report && STATE_DIR=data node tools/actions-sync.js && node tools/publish-pages.js --skip-build >> /var/log/poke-pages.log 2>&1
 EOF
 crontab /tmp/ct && rm -f /tmp/ct
 ```
 
-   注意上面这条用的是 `state/db.json`（`actions-sync.js` 默认写 `state/`），而 `publish-pages.js` 默认读 `data/`。
-   二选一定居：**要么**只用 `data/`（那就把 `--data=data` 传给 actions-sync：`STATE_DIR=data node tools/actions-sync.js`），
-   **要么**只用 `state/`（那就 `node tools/publish-pages.js --skip-build` 前先 `node tools/build-static.js --data=state`）。
-   推荐前者，和自建服务器路径共用同一份库。
+   这条 cron **不写机器人地址**：`actions-sync.js` 先读 `data/config.json`（就是管理台「推送设置」写的那份），
+   环境变量只在显式给了的时候覆盖。所以机器人统一在管理台配，cron 和服务用的是同一条地址、同一份订阅规则。
+   `STATE_DIR=data` 是让跑批和自建服务共用同一份库（不给的话跑批会写到 `state/`，Pages 那条读的是 `data/`，两边对不上）。
+   临时想只更新网页不推送：把 cron 那行加上 `PUSH_ENABLED=0`（比去改配置里的总开关更安全）。
 4. **验证**：浏览器开 Pages 地址，看板应有点位；`curl -s <地址>/data.json | head -c 200` 能看到
    `generatedAt` 在刷新；每次跑完 `git fetch && git log --oneline origin/pages -1` 应有新提交。
-5. **不要和 A 段同时开推送**（两处都会往同一个群发，会重复）。只在服务器跑服务、Pages 当纯展示镜像时，
-   把 `WECOM_WEBHOOK` 只给服务器那条，cron 那条留空即可只更新网页。
+5. **不要和 A 段同时开推送**（两处都会往同一个群发，会重复）。要"服务器推送 + Pages 只做展示"，
+   就给 cron 那条加 `PUSH_ENABLED=0`，管理台里的开关不用动。
 
 ### B1 如果哪天上游放行 Actions
 

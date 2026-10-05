@@ -3,11 +3,10 @@
 /* GitHub Actions 每次跑批做三件事：同步上游 → 给新点发企业微信 → 生成 dist 静态快照。
    状态存在仓库里的 state/db.json（工作流会把它提交回去），所以 Actions 这种无运行环境的
    场景也能做到"只推新点、不重复推"。
-   用到的环境变量：
-     WECOM_WEBHOOK   机器人地址（不填则只更新快照，不推送）
-     PUSH_ENABLED=0  临时停推
-     PUSH_KINDS      默认 alpha,swarm
-     PUSH_ONLY / PUSH_EXCEPT / PUSH_REGIONS / PUSH_MIN_TIER / PUSH_MAX
+   配置以 data/config.json（管理台写的那份）为底，环境变量只用于覆盖：
+     WECOM_WEBHOOK   机器人地址（不填就用 config.json 里那条；两处都没有则只更新快照、不推送）
+     PUSH_ENABLED=0/1 强制关/开推送（不给则跟随管理台的总开关）
+     PUSH_KINDS / PUSH_ONLY / PUSH_EXCEPT / PUSH_REGIONS / PUSH_MIN_TIER / PUSH_MAX
      BACKFILL_HOURS / RETENTION_DAYS / STATE_DIR */
 
 const path = require("path");
@@ -15,26 +14,32 @@ const fs = require("fs");
 const { Store } = require("../src/store");
 const sync = require("../src/sync");
 const push = require("../src/push-wecom");
+const { readConfig } = require("../src/config");
 const { main: buildStatic } = require("./build-static");
 
 const ROOT = path.resolve(__dirname, "..");
 const STATE_DIR = process.env.STATE_DIR || "state";
 const list = (s) => String(s || "").split(/[,，]/).map((x) => x.trim()).filter(Boolean);
+const pickList = (envValue, diskValue) => (list(envValue).length ? list(envValue) : diskValue);
 
+const base = readConfig();
 const cfg = {
+  ...base,
   wecom: {
-    webhook: process.env.WECOM_WEBHOOK || "",
-    enabled: process.env.PUSH_ENABLED !== "0",
-    kinds: list(process.env.PUSH_KINDS).length ? list(process.env.PUSH_KINDS) : ["alpha", "swarm"],
-    onlyPokemon: list(process.env.PUSH_ONLY),
-    exceptPokemon: list(process.env.PUSH_EXCEPT),
-    regions: list(process.env.PUSH_REGIONS),
-    minTier: Number(process.env.PUSH_MIN_TIER || 0),
-    maxPerTick: Number(process.env.PUSH_MAX || 8),
-    quietHours: { enabled: false, from: "01:00", to: "07:00" },
+    ...base.wecom,
+    enabled: process.env.PUSH_ENABLED === "0" ? false : process.env.PUSH_ENABLED === "1" ? true : base.wecom.enabled,
+    kinds: pickList(process.env.PUSH_KINDS, base.wecom.kinds),
+    onlyPokemon: pickList(process.env.PUSH_ONLY, base.wecom.onlyPokemon),
+    exceptPokemon: pickList(process.env.PUSH_EXCEPT, base.wecom.exceptPokemon),
+    regions: pickList(process.env.PUSH_REGIONS, base.wecom.regions),
+    minTier: process.env.PUSH_MIN_TIER !== undefined && process.env.PUSH_MIN_TIER !== "" ? Number(process.env.PUSH_MIN_TIER) : base.wecom.minTier,
+    maxPerTick: process.env.PUSH_MAX ? Number(process.env.PUSH_MAX) : base.wecom.maxPerTick,
   },
-  sync: { intervalMinutes: 10, backfillHours: Number(process.env.BACKFILL_HOURS || 48), retentionDays: Number(process.env.RETENTION_DAYS || 7) },
-  windows: { alphaMinutes: 75, swarmMinutes: 25 },
+  sync: {
+    ...base.sync,
+    backfillHours: Number(process.env.BACKFILL_HOURS || base.sync.backfillHours),
+    retentionDays: Number(process.env.RETENTION_DAYS || base.sync.retentionDays),
+  },
 };
 
 const log = (...a) => console.log("[sync]", ...a);

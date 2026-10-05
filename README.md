@@ -29,7 +29,7 @@ node server.js 3580 --host=127.0.0.1    # 首次启动会自动回填上游报�
 没有真实报点时可以先造几条演示数据看界面：
 
 ```bash
-ADMIN_USER=admin ADMIN_PASSWORD=你的密码 node tools/demo-events.js --url=http://127.0.0.1:3580
+ADMIN_USER=admin ADMIN_PASSWORD=123456 node tools/demo-events.js --url=http://127.0.0.1:3580
 ```
 
 验证推送排版时，建议先用本地假端点，别直接往自己群里发：
@@ -43,7 +43,7 @@ WECOM_WEBHOOK="http://127.0.0.1:3599/send?key=MOCK" node server.js 3580
 
 ```bash
 npm test                                   # 纯逻辑单测 22 组，不联网
-ADMIN_USER=admin ADMIN_PASSWORD=密码 npm run selftest   # 对着跑着的服务打 60 项接口用例
+ADMIN_USER=admin ADMIN_PASSWORD=123456 npm run selftest   # 对着跑着的服务打 60 项接口用例
 node tools/verify-cn-data.js               # 校验宝可梦名/地点名覆盖率
 npm run verify:terms                       # 校验术语表覆盖率
 npm run phrases                            # 重新生成整句表（上游语言包有更新时）
@@ -87,12 +87,11 @@ docker build -t pokemmo-report:1.0 .
 > ② **绕过 Docker**，用下面的 B 段纯 Node + systemd——本站零 npm 依赖，跑起来效果完全一样。
 
 ```bash
-# 4) 起容器
+# 4) 起容器（账号 admin、密码 123456；企业微信机器人不在这里填，起站后去管理台「推送设置」里填）
 docker run -d --name pokemmo-report --restart unless-stopped \
   -p 3580:3580 \
   -e ADMIN_USER=admin \
-  -e ADMIN_PASSWORD='换成你自己的密码' \
-  -e WECOM_WEBHOOK="https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=你的机器人key" \
+  -e ADMIN_PASSWORD=123456 \
   -e TZ=Asia/Shanghai \
   -v /opt/pokemmo/data:/app/data \
   --memory 256m pokemmo-report:1.0
@@ -108,14 +107,14 @@ docker logs -f pokemmo-report        # 首启回填 48 小时报点，约 15~25 
 | | |
 |---|---|
 | 看板 | `http://159.198.67.190:3580/` |
-| 管理台 | `http://159.198.67.190:3580/admin` → 账号密码就是你上面 `-e` 里设的那两个 |
+| 管理台 | `http://159.198.67.190:3580/admin` → 账号 `admin`、密码 `123456` |
 
 还要在**云厂商控制台的安全组**放行 TCP 3580，只开本机防火墙不够。
 
-- 程序默认账号 `admin`、默认密码 `123456`（启动日志与管理台都会标"弱口令"）。**公网部署必须改掉**：登录后「站点设置 → 修改密码」，或部署时用 `-e ADMIN_PASSWORD=` 覆盖。仓库是公开的话，别把真实密码写进任何提交或文档。
-- 不带 `WECOM_WEBHOOK` 就只更新网页不推送；填了就以它为准，网页里改 webhook 不会生效。
-- `-v` 一定要给：玩家上报、审核记录、同步游标都在 `/opt/pokemmo/data/db.json`，备份也就拷这一个文件。
-- 有 compose 更省事：`cp .env.example .env`（填三个值）→ `docker compose up -d --build`。
+- **企业微信机器人在管理台「推送设置」里填**，保存后立刻生效，不用重启容器。命令行里故意不给 `WECOM_WEBHOOK`：那个环境变量一旦设了就会盖掉网页里的填写，改了不生效。
+- 账号密码就是 `admin` / `123456`（启动日志会标一次"弱口令"，只是提醒）。想换的话在管理台「站点设置 → 修改密码」，改完其它已登录的会话会作废；登录接口限频 8 次/10 分钟。
+- `-v` 一定要给：玩家上报、审核记录、同步游标、机器人地址都在 `/opt/pokemmo/data/`（`db.json` + `config.json`），备份也就拷这两个文件。
+- 有 compose 更省事：`cp .env.example .env`（里面只有账号密码两个值）→ `docker compose up -d --build`。
 
 ### B. 不装 Docker：纯 Node + systemd
 
@@ -124,7 +123,7 @@ Docker Hub 拉不动、或者不想多一层镜像时走这条。本站零依赖
 ```bash
 # 注意 .env 只有 docker compose / --env-file 会读，裸 node 不认（零依赖=没装 dotenv）
 cd /opt/pokemmo-report
-HOST=0.0.0.0 ADMIN_USER=admin ADMIN_PASSWORD='换成你自己的密码' node server.js 3580
+HOST=0.0.0.0 ADMIN_USER=admin ADMIN_PASSWORD=123456 node server.js 3580
 
 # 先这样手动跑通（首启回填十几秒），确认 http://服务器IP:3580/ 有点位，
 # 再按 DEPLOY.md 第 6 节写成 systemd 服务常驻（含 Node 版本不够时从 npmmirror 取二进制的方法）
