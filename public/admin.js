@@ -184,6 +184,8 @@ function renderLog(meta) {
 
 async function refresh() {
   const state = await api("/api/admin/state");
+  const b = state.build || {};
+  $("#buildTag").textContent = b.version ? `版本 ${b.version}${b.time ? " · " + String(b.time).slice(0, 16) : ""}` : "版本未标记";
   renderStats(state);
   renderPending(state.reports);
   renderConfig(state.config, state.push);

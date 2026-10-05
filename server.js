@@ -28,6 +28,22 @@ const HOST = opt("host", process.env.HOST || "127.0.0.1");
 const SCHEDULER = !argv.includes("--no-scheduler");
 const TRUST_PROXY = process.env.TRUST_PROXY === "1";
 
+/* BUILDINFO 里的 $Format:...$ 由 git archive / GitHub 打包时展开，所以只有"从包里跑起来的服务"
+   才有版本号；直接 git clone 出来的是原样占位符，这时按未标记处理。界面和日志都显示它，
+   用来回答"我看到的到底是哪一版"。 */
+const BUILD = (() => {
+  try {
+    const txt = fs.readFileSync(path.join(ROOT, "BUILDINFO"), "utf8");
+    const pick = (k) => {
+      const v = (txt.match(new RegExp(`${k}="?([^"\\n]+)"?`)) || [])[1] || "";
+      return v.includes("$Format") ? "" : v;
+    };
+    return { version: pick("BUILD_VERSION"), time: pick("BUILD_TIME") };
+  } catch (e) {
+    return { version: "", time: "" };
+  }
+})();
+
 const MIME = {
   ".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8",
   ".json": "application/json; charset=utf-8", ".svg": "image/svg+xml", ".png": "image/png", ".ico": "image/x-icon",
@@ -110,13 +126,13 @@ async function handleApi(req, res, url) {
     if (url.pathname === "/api/ref/options") return send(res, 200, refdata.options());
     if (url.pathname === "/api/ref/species") return send(res, 200, refdata.speciesDetail(url.searchParams.get("name") || ""));
     if (url.pathname === "/api/ref/location") return send(res, 200, locationInfo(url.searchParams.get("name")));
-    if (url.pathname === "/api/config/public") return send(res, 200, { publicReport: cfg.publicReport, reportRequireApprove: cfg.reportRequireApprove, windows: cfg.windows });
+    if (url.pathname === "/api/config/public") return send(res, 200, { publicReport: cfg.publicReport, reportRequireApprove: cfg.reportRequireApprove, windows: cfg.windows, build: BUILD });
     if (url.pathname === "/api/admin/session") return send(res, 200, { authed: !!session, user: session ? session.user : null, expiresAt: session ? new Date(session.exp).toISOString() : null });
     if (url.pathname === "/api/admin/state") {
       /* 机器人最后成功发送的时间：判断"链接是不是还活着"最直接的证据 */
       let lastPushAt = 0;
       for (const ev of store.index.values()) if (ev.pushedAt && ev.pushedAt > lastPushAt) lastPushAt = ev.pushedAt;
-      return send(res, 200, { config: masked(cfg), push: { lastPushAt, stats: store.db.meta.pushStats || {} }, meta: store.db.meta, board: boardData(), reports: local.list(store, { status: "pending", limit: 100 }), queue: store.db.queue || [] });
+      return send(res, 200, { build: BUILD, config: masked(cfg), push: { lastPushAt, stats: store.db.meta.pushStats || {} }, meta: store.db.meta, board: boardData(), reports: local.list(store, { status: "pending", limit: 100 }), queue: store.db.queue || [] });
     }
     if (url.pathname === "/api/admin/export") {
       return send(res, 200, { generatedAt: new Date().toISOString(), events: store.events({ activeOnly: false, limit: 5000 }).rows, board: boardData() });
@@ -373,6 +389,7 @@ async function tick() {
 server.listen(PORT, HOST, async () => {
   const cfg = readConfig();
   console.log("PokeMMO 报点站");
+  console.log(`  版本     ${BUILD.version || "未标记（git clone 的工作区不会展开 BUILDINFO）"}${BUILD.time ? " · 构建于 " + BUILD.time : ""}`);
   console.log(`  站点     http://${HOST}:${PORT}/`);
   console.log(`  管理台   http://${HOST}:${PORT}/admin`);
   console.log(`  数据库   ${path.join(DATA_DIR, "db.json")}（${store.index.size} 条事件）`);

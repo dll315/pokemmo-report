@@ -79,6 +79,7 @@ async function rawPost(path, body) {
   const cfgPub = await hit("/api/config/public");
   check("config/public 不含凭据", cfgPub.status === 200 && !("wecom" in (cfgPub.json || {})) && !("adminPassword" in (cfgPub.json || {})), JSON.stringify(cfgPub.json));
   check("config/public 带有效期窗口", cfgPub.json?.windows?.alphaMinutes > 0 && cfgPub.json?.windows?.swarmMinutes > 0, JSON.stringify(cfgPub.json?.windows));
+  check("config/public 带代码版本字段（工作区里跑允许是空的）", typeof cfgPub.json?.build?.version === "string" && typeof cfgPub.json?.build?.time === "string", JSON.stringify(cfgPub.json?.build));
 
   /* 需求索引与中文术语 */
   const some = await hit("/api/events?limit=3");

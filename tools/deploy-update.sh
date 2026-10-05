@@ -61,6 +61,7 @@ echo "  部署方式：$MODE"
 mkdir -p /opt/pokemmo-report
 tar xzf "$REMOTE_TGZ" -C /opt/pokemmo-report
 test -f /opt/pokemmo-report/server.js || { echo "× 解包后没看到 server.js"; exit 1; }
+sed -n 's/BUILD_VERSION="\(.*\)"/  包里代码版本：\1/p' /opt/pokemmo-report/BUILDINFO 2>/dev/null || true
 ls /opt/pokemmo-report/public/assets/sprites | wc -l | sed 's/^/  图鉴图数量：/'
 [ -f /opt/pokemmo-report/data/config.json ] && echo "  配置与数据库在 data/ 下，本次未改动" || echo "  ! data/config.json 还没有，管理台设置是默认值"
 
@@ -85,6 +86,12 @@ echo "4/5 服务器上自检"
 curl -s -m 10 -o /dev/null -w "  本机 127.0.0.1:$POKE_PORT → HTTP %{http_code}\n" "http://127.0.0.1:$POKE_PORT/api/board" \
   || echo "  × 端口 $POKE_PORT 没在监听：看上面的 journalctl（没起来就别去查防火墙）"
 curl -s -m 10 "http://127.0.0.1:$POKE_PORT/api/board" 2>/dev/null | head -c 120; echo
+LIVE=$(curl -s -m 10 "http://127.0.0.1:$POKE_PORT/api/config/public" 2>/dev/null | sed -n 's/.*"build":{"version":"\([^"]*\)".*/\1/p' | head -1)
+PKG=$(sed -n 's/BUILD_VERSION="\(.*\)"/\1/p' /opt/pokemmo-report/BUILDINFO 2>/dev/null | head -1)
+echo "  正在运行的代码版本：${LIVE:-取不到（服务没起来）} / 磁盘包里的：${PKG:-未标记}"
+if [ -n "$LIVE" ] && [ -n "$PKG" ] && [ "${LIVE:0:7}" != "${PKG:0:7}" ]; then
+  echo "  ! 跑的还是旧版：重启没生效，手动 systemctl restart poke 再看这一行"
+fi
 REMOTE
 
 echo "5/5 外网可达性（只有云控制台放行了端口才会通）"
