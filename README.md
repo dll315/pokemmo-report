@@ -60,6 +60,7 @@ npm run audit:sources                      # 译名溯源复核：整句表回�
 ## 部署
 
 三条路，参数含义、更新、备份、放行端口、故障排查都在 **DEPLOY.md**。
+已经部署过一次的话，以后更新只要一条命令：`bash tools/deploy-update.sh`（打包 HEAD → ssh 传上去 → 解包重启 → 本机与外网各验一次；`data/` 不在包里，设置和上报数据不会被覆盖）。
 
 ### A. 服务器上直接 `docker run`（推荐）
 

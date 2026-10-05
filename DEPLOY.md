@@ -187,15 +187,49 @@ ufw allow 3580/tcp                                                        # Ubun
 
 ### 4. 更新与备份
 
-取代码用第 0 节的打包 scp（服务器直连 GitHub 不稳），传完再更新：
+#### 一条命令更新（推荐）
+
+在你自己电脑上、仓库目录里跑（Git Bash）：
 
 ```bash
-tar xzf /root/pokemmo-report.tar.gz -C /opt/pokemmo-report
-cd /opt/pokemmo-report && docker compose up -d --build      # 用 docker run 的看第 2b 节末尾
+bash tools/deploy-update.sh                  # 默认 root@159.198.67.190，端口 3580
+bash tools/deploy-update.sh root@别的IP 3581 # 换主机或端口
 ```
 
-`./data` 是 bind mount，重建镜像不丢数据；机器人地址和订阅规则在 `data/config.json` 里，也不会被动。
-上游静态参考表在 `data/upstream/`，12 小时自动刷一次。备份打包那两个文件即可（命令见第 2b 节末尾）。
+它做五件事：把**已提交的 HEAD** 打包 → 通过 ssh 传到服务器 → 识别你是 systemd 还是 docker 部署 →
+解包覆盖代码并重启 → 在服务器本机 `curl` 一次、再从你电脑外网 `curl` 一次。
+要点：
+
+- 只打包已提交的 HEAD。工作区有未提交改动时它会先提示你，那些改动不会上服务器。
+- 服务器不需要 git，也不需要能访问 GitHub（第 0 节那个坑不会再踩一次）。
+- **`data/` 不在包里**，`db.json`（点位与上报）和 `config.json`（机器人连接、订阅规则）都不会被覆盖。
+- 认不出任何已部署痕迹时会**直接退出并告诉你这是首次部署**，不会半路创建服务。
+- Docker 那条它只更新代码并打印重建镜像的两条命令，不替你 `docker rm`（删容器属于不可逆动作）。
+
+#### 手动更新（systemd 那条路）
+
+```bash
+# 本机
+git archive --format=tar.gz -o /g/QoderCNworks/pokemmo-report.tar.gz HEAD
+scp /g/QoderCNworks/pokemmo-report.tar.gz root@159.198.67.190:/root/
+
+# 服务器
+tar xzf /root/pokemmo-report.tar.gz -C /opt/pokemmo-report
+systemctl restart poke && journalctl -u poke -n 10 --no-pager
+```
+
+#### 回滚
+
+服务跑的是 `/opt/pokemmo-report` 里的代码，回滚就是拿旧包再解一次：
+
+```bash
+# 更新前先留一份（deploy-update.sh 不会帮你留，要留自己执行）
+cp -a /opt/pokemmo-report /opt/pokemmo-report.prev
+# 出问题回退
+cp -a /opt/pokemmo-report.prev/. /opt/pokemmo-report/ && systemctl restart poke
+```
+
+上游静态参考表在 `data/upstream/`，12 小时自动刷一次。备份打包那两个数据文件即可（命令见第 2b 节末尾）。
 
 ### 5. 可选：Nginx 反代
 
