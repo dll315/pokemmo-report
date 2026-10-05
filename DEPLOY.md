@@ -206,6 +206,25 @@ bash tools/deploy-update.sh root@别的IP 3581 # 换主机或端口
 - 认不出任何已部署痕迹时会**直接退出并告诉你这是首次部署**，不会半路创建服务。
 - Docker 那条它只更新代码并打印重建镜像的两条命令，不替你 `docker rm`（删容器属于不可逆动作）。
 
+#### 本机连不上服务器 22 端口时：让服务器自己取代码
+
+`deploy-update.sh` 要在能 `ssh` 通服务器的电脑上跑。如果 22 端口被云防火墙挡着（实测过：`ssh: connect to host ... port 22: Connection timed out`，而 80/443 是通的），
+就把更新脚本传到服务器上、在**云控制台的网页终端**里跑，让它自己去 GitHub 取代码：
+
+```bash
+# 服务器上（先只探测，不改任何东西）
+bash /opt/pokemmo-report/tools/server-update.sh --check
+# 探测通过就真的更新（备份 → 解包 → 重启 → 自检）
+bash /opt/pokemmo-report/tools/server-update.sh
+```
+
+它按 `codeload.github.com → gh-proxy.com → ghproxy.net` 顺序试，取到后先验包（gzip 合法、条目 >400、
+必须有 `server.js`、数一下图鉴图），验不过就直接放弃不动现有代码；更新前把整个代码目录备份成
+`.prev`，回滚就是把 `.prev` 覆盖回去。`data/` 不在仓库包里，所以点位、上报记录、机器人连接和订阅规则都不会被动。
+Docker 部署的话它只更新代码并打印重建镜像的命令，不替你 `docker rm`。
+
+想让本机脚本能用，就得在云控制台把 TCP 22 放行（更安全的做法是只放行你自己当前的出口 IP）。
+
 #### 手动更新（systemd 那条路）
 
 ```bash

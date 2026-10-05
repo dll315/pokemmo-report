@@ -21,10 +21,26 @@ if [ -n "$(git status --porcelain)" ]; then
   echo "! 工作区有未提交的改动，但只会打包已提交的 HEAD（$SHA）——这些改动不会上服务器"
 fi
 
-echo "1/4 打包 HEAD $SHA 并通过 ssh 传到 $HOST:$REMOTE_TGZ"
+echo "1/5 先确认能连上服务器的 22 端口"
+if timeout 20 ssh -o BatchMode=yes -o ConnectTimeout=10 "$HOST" true 2>/dev/null; then
+  echo "  ssh 可达，且已配好公钥（不会提示输密码）"
+else
+  ERR="$(timeout 20 ssh -o BatchMode=yes -o ConnectTimeout=10 "$HOST" true 2>&1 || true)"
+  if printf '%s' "$ERR" | grep -qiE 'permission denied|publickey|passphrase|password'; then
+    echo "  ssh 可达但没配公钥：接下来会提示输密码（一共 2 次）"
+  else
+    echo "× 连不上 $HOST 的 22 端口 —— ${ERR:-没有输出（多半是超时）}"
+    echo "  这台电脑没法远程更新。两条路："
+    echo "  ① 云控制台 → 防火墙/安全组 放行 TCP 22（更稳的做法是只放行你自己的出口 IP），再重跑本脚本；"
+    echo "  ② 保持 22 关闭，在服务器终端（云控制台网页终端也行）里跑 tools/server-update.sh，让服务器自己去 GitHub 取代码。"
+    exit 1
+  fi
+fi
+
+echo "2/5 打包 HEAD $SHA 并通过 ssh 传到 $HOST:$REMOTE_TGZ"
 git archive --format=tar.gz HEAD | ssh "$HOST" "cat > $REMOTE_TGZ && ls -la $REMOTE_TGZ"
 
-echo "2/4 远端识别部署方式并更新代码"
+echo "3/5 远端识别部署方式并更新代码"
 ssh "$HOST" "POKE_PORT='$PORT' REMOTE_TGZ='$REMOTE_TGZ' bash -s" <<'REMOTE'
 set -e
 test -f "$REMOTE_TGZ" || { echo "× 服务器上没收到包"; exit 1; }
@@ -65,7 +81,7 @@ case "$MODE" in
     ;;
 esac
 
-echo "4/4 服务器上自检"
+echo "4/5 服务器上自检"
 curl -s -m 10 -o /dev/null -w "  本机 127.0.0.1:$POKE_PORT → HTTP %{http_code}\n" "http://127.0.0.1:$POKE_PORT/api/board" \
   || echo "  × 端口 $POKE_PORT 没在监听：看上面的 journalctl（没起来就别去查防火墙）"
 curl -s -m 10 "http://127.0.0.1:$POKE_PORT/api/board" 2>/dev/null | head -c 120; echo

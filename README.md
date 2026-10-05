@@ -60,7 +60,10 @@ npm run audit:sources                      # 译名溯源复核：整句表回�
 ## 部署
 
 三条路，参数含义、更新、备份、放行端口、故障排查都在 **DEPLOY.md**。
-已经部署过一次的话，以后更新只要一条命令：`bash tools/deploy-update.sh`（打包 HEAD → ssh 传上去 → 解包重启 → 本机与外网各验一次；`data/` 不在包里，设置和上报数据不会被覆盖）。
+已经部署过一次的话，以后更新两条命令任选：
+- 本机（Git Bash）能 `ssh` 通服务器：**`bash tools/deploy-update.sh`** —— 打包 HEAD → ssh 传上去 → 解包重启 → 本机与外网各验一次。
+- 22 端口被云防火墙挡着：在服务器上跑 **`bash tools/server-update.sh`** —— 让服务器自己去 GitHub 取包（验包 → 备份 `.prev` → 解包 → 重启 → 自检）。
+两者的 `data/`（点位、上报、机器人连接、订阅规则）都不在包里，不会被覆盖。
 
 ### A. 服务器上直接 `docker run`（推荐）
 
