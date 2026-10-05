@@ -6,8 +6,10 @@
 #
 # 安全设计：
 #   - 先取代码、先 build，build 失败就到此为止，旧容器不受任何影响；
-#   - 确认现有容器把 /app/data 挂在宿主机上才敢删旧容器，否则直接停手（不然数据随容器一起没了）；
-#   - 旧镜像保留为 pokemmo-report:rollback，回滚只要一条 docker run。
+#   - 确认现有容器把 /app/data 挂在宿主机上才动手（否则停手，不然数据随容器一起没了）；
+#   - **旧容器只改名不删除**（pokemmo-report-old），新容器 HTTP 200 验证通过才 rm 它；
+#     中途任何失败都会把旧容器恢复原名并 start 回去，站点不会停着不管；
+#   - 旧镜像同时留一份 pokemmo-report:rollback 标签。
 set -euo pipefail
 
 REPO="dll315/pokemmo-report"
@@ -50,14 +52,37 @@ echo "3/5 构建新镜像（旧镜像先留一份做回滚）"
 docker tag "$NAME:latest" "$NAME:rollback" 2>/dev/null || echo "   （没有 $NAME:latest 这个标签，跳过回滚标签）"
 docker build -t "$NAME:new" "$DIR"
 
-echo "4/5 换容器"
+echo "4/5 换容器（旧容器改名留着，新容器验证通过才删）"
 ARGS=()
 for m in "${MNTS[@]}"; do ARGS+=(-v "$m"); done
-for e in "${ENVS[@]:-}"; do [ -n "$e" ] && ARGS+=(-e "$e"); done
-docker update --restart=no "$NAME"
-docker stop "$NAME"
-docker rm "$NAME"
-docker run -d --name "$NAME" --restart unless-stopped -p "$PORT:$PORT" --memory 256m "${ARGS[@]}" "$NAME:new"
+for e in "${ENVS[@]:-}"; do if [ -n "$e" ]; then ARGS+=(-e "$e"); fi; done
+OLD="$NAME-old"
+docker rm -f "$OLD" >/dev/null 2>&1 || true
+if ! docker rename "$NAME" "$OLD"; then echo "× 改不出 $OLD，停手（旧容器原样在跑）"; exit 5; fi
+docker update --restart=no "$OLD" >/dev/null
+docker stop "$OLD" >/dev/null
+restore_old() {
+  echo "→ 先把旧容器恢复回去"
+  docker rm -f "$NAME" >/dev/null 2>&1 || true
+  docker rename "$OLD" "$NAME" 2>/dev/null || true
+  docker update --restart=unless-stopped "$NAME" >/dev/null 2>&1 || true
+  docker start "$NAME" >/dev/null 2>&1 || true
+  docker ps --filter "name=$NAME" --format '已恢复：{{.Names}} | {{.Status}}'
+}
+if ! docker run -d --name "$NAME" --restart unless-stopped -p "$PORT:$PORT" --memory 256m "${ARGS[@]}" "$NAME:new"; then
+  echo "× 新容器启动失败"
+  restore_old
+  exit 6
+fi
+sleep 15
+CODE=$(curl -s -m 8 -o /dev/null -w '%{http_code}' "http://127.0.0.1:$PORT/api/board" || echo 000)
+if [ "$CODE" != "200" ]; then
+  echo "× 新容器起来了但 $PORT 没答 200（HTTP $CODE），日志："
+  docker logs --tail 20 "$NAME" 2>&1 | tail -20
+  restore_old
+  exit 7
+fi
+docker rm "$OLD" >/dev/null && echo "   新容器已验证通过，旧容器 $OLD 删除（镜像 $NAME:rollback 仍留着）"
 
 echo "5/5 自检"
 sleep 15
