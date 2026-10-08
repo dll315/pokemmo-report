@@ -36,6 +36,13 @@ const hhmmss = (unixSec) => {
   const d = beijingDate(unixSec);
   return `${hhmm(unixSec)}:${String(d.getUTCSeconds()).padStart(2, "0")}`;
 };
+/* 北京时间日期+时分（管理台与"我的上报"用，不走浏览器时区） */
+const bjStamp = (msOrIso) => {
+  const t = typeof msOrIso === "number" ? msOrIso : Date.parse(msOrIso);
+  if (!Number.isFinite(t)) return String(msOrIso ?? "—");
+  const d = beijingDate(Math.floor(t / 1000));
+  return `${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")} ${hhmm(Math.floor(t / 1000))}`;
+};
 function humanLeft(seconds) {
   if (seconds <= 0) return "已到点";
   const m = Math.floor(seconds / 60);
@@ -164,7 +171,7 @@ function renderBoard() {
     : b.slots.inGap
     ? `空档 · 下段 ${hhmm(b.slots.next.start)}`
     : "时段 --";
-  $("#syncChip").textContent = b.lastSyncError ? `同步异常：${b.lastSyncError}` : `同步 ${new Date(b.lastSyncAt || Date.now()).toLocaleTimeString("zh-CN", { hour12: false })}`;
+  $("#syncChip").textContent = b.lastSyncError ? `同步异常：${b.lastSyncError}` : `同步 ${b.lastSyncAt ? bjStamp(b.lastSyncAt) : "—"}`;
   renderSlots(b.slots, b.now);
 }
 
@@ -296,8 +303,16 @@ function cnList(en, cn) {
 
 /* 图鉴参考里的宝可梦名：可见文本给中文，英文原名放 title（要跟 Alphapedia 对得上时悬停看） */
 const speciesLabel = (p) => {
-  const sp = state.options.species.find((s) => s.en.toLowerCase() === String(p).toLowerCase());
+  const sp = (state.options && state.options.species || []).find((s) => s.en.toLowerCase() === String(p).toLowerCase());
   return sp && sp.cn ? { text: sp.cn, title: sp.en } : { text: String(p), title: "" };
+};
+
+/* 地点同理：表单存的是上游英文名，回显要查词表 */
+const locationLabel = (l) => {
+  const en = String(l || "");
+  const all = Object.values((state.options && state.options.locationsByRegion) || {}).flat();
+  const hit = all.find((x) => x.en === en);
+  return hit && hit.cn ? { text: hit.cn, title: hit.en } : { text: en, title: "" };
 };
 
 function liForRef(x, kind) {
@@ -341,8 +356,9 @@ function renderMyReports() {
     ...list.map((r) =>
       el("li", {}, [
         el("span", { class: "st", text: r.status || "已提交" }),
-        el("b", { text: `${r.pokemon} @ ${r.location}` }),
-        el("span", { class: "when", text: new Date(r.at).toLocaleString("zh-CN", { hour12: false }) }),
+        /* 表单存的是上游英文名，这里按词表回显中文，英文放悬停 */
+        el("b", { text: `${speciesLabel(r.pokemon).text} @ ${locationLabel(r.location).text}`, title: `${r.pokemon} @ ${r.location}` }),
+        el("span", { class: "when", text: bjStamp(r.at) }),
         r.message ? el("em", { text: r.message }) : null,
       ])
     )
