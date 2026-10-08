@@ -578,5 +578,14 @@ t("同步失败提示用中文类型名（起子进程真跑错误分支）", ()
   ok(errs.some((x) => /ECONNREFUSED|超时|refused/.test(x)), "技术原因被吃掉了，站主没法判断");
 });
 
+/* 文档里写的用例数必须等于本次真实跑出来的数。这个数字今天漂过两次（25→27→29），
+   靠人记是记不住的，所以把它变成断言。 */
+{
+  const readme = fs.readFileSync(path.join(ROOT, "README.md"), "utf8");
+  const m = readme.match(/纯逻辑单测 (\d+) 组/);
+  if (!m) { fails.push("README 里找不到「纯逻辑单测 N 组」"); console.log("  FAIL README 里找不到「纯逻辑单测 N 组」"); }
+  else if (Number(m[1]) !== pass) { fails.push("README 的单测组数与实际不符"); console.log(`  FAIL README 写的是 ${m[1]} 组，实际 ${pass} 组 —— 改 README 或删用例，别让它漂`); }
+}
+
 console.log(`\n单测通过 ${pass}，失败 ${fails.length}${fails.length ? "：" + fails.join(" / ") : ""}`);
 process.exit(fails.length ? 1 : 0);

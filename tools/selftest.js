@@ -259,6 +259,22 @@ async function rawPost(path, body) {
     check("自检跑完不改变机器人连接数", endN === targetsBefore, `跑完 ${endN} 条 vs 跑前 ${targetsBefore} 条`);
   }
 
+  /* 文档里写的用例数必须等于本次真实跑出来的数（这个数字漂过，靠人记不住）。
+     下面要加 2 条断言，而 check() 是在比对之后才 +1，所以总数要先算进来。 */
+  const fs2 = require("fs");
+  const path2 = require("path");
+  const ROOT = path2.resolve(__dirname, "..");
+  const total = pass + 2;
+  for (const [file, re, label] of [
+    ["README.md", /打 (\d+) 项接口用例/, "README「打 N 项接口用例」"],
+    ["DEPLOY.md", /自检 (\d+) 项/, "DEPLOY「自检 N 项」"],
+  ]) {
+    const txt = fs2.readFileSync(path2.join(ROOT, file), "utf8");
+    const m = txt.match(re);
+    if (!m) check(`${label} 存在`, false, "文档里找不到这句话");
+    else check(`${label} 与实际一致（${total}）`, Number(m[1]) === total, `文档写 ${m[1]}，实际 ${total} —— 改文档，别让它漂`);
+  }
+
   console.log(`\n通过 ${pass}，失败 ${fails.length}${fails.length ? "：" + fails.join(" / ") : ""}`);
   process.exit(fails.length ? 1 : 0);
 })().catch((e) => {
