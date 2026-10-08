@@ -2,13 +2,13 @@
 # 在你自己电脑上跑（Git Bash，仓库目录里）：把当前 HEAD 打包 → 传到服务器 → 解包 → 重启 → 验证。
 # 服务器上不装 git、不需要能访问 GitHub；数据文件（db.json / config.json）不在包里，不会被覆盖。
 #
-#   bash tools/deploy-update.sh                    # 默认 root@159.198.67.190
+#   bash tools/deploy-update.sh                    # 默认 root@101.33.221.33
 #   bash tools/deploy-update.sh root@1.2.3.4 3580  # 换主机或端口
 #
 # 首次部署不要用这个：那时还没有服务可重启，去看 DEPLOY.md 第 0 节和第 6 节。
 set -euo pipefail
 
-HOST="${1:-root@159.198.67.190}"
+HOST="${1:-root@101.33.221.33}"
 PORT="${2:-3580}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 REMOTE_TGZ="/root/pokemmo-report.tar.gz"

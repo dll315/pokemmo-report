@@ -578,6 +578,44 @@ t("同步失败提示用中文类型名（起子进程真跑错误分支）", ()
   ok(errs.some((x) => /ECONNREFUSED|超时|refused/.test(x)), "技术原因被吃掉了，站主没法判断");
 });
 
+t("挂载遮住 data/ 时词表仍从镜像内置目录兜底（服务器上全英文的真因）", () => {
+  const { execFileSync } = require("child_process");
+  /* 复现 Docker 部署的实际形态：-v 宿主机目录:/app/data 之后，
+     可写目录里只有 db.json / config.json / upstream/，cn-*.json 全不见，
+     甚至可能留着一个 6 个类别全空的 cn-terms.json 空壳。 */
+  const script = `
+    const fs=require("fs"), os=require("os"), path=require("path");
+    const shadow=fs.mkdtempSync(path.join(os.tmpdir(),"shadow-"));
+    fs.writeFileSync(path.join(shadow,"cn-terms.json"), JSON.stringify({moves:{},abilities:{},types:{},hms:{},balls:{},concepts:{}}));
+    process.env.DATA_DIR=shadow;
+    process.env.DICT_DIR=process.env.REALDATA;
+    const d=require("./src/dict");
+    console.log(JSON.stringify({
+      loaded:d.loaded,
+      crobat:d.speciesOf("Crobat").cn,
+      loc:d.locationOf("Route 119"),
+      hm:d.term("hms","Surf"),
+      concept:d.concept("Alpha"),
+      phrase:d.translateText("Acro Bike required"),
+      chamber:d.locationOf("Rixy Chamber")
+    }));
+    fs.rmSync(shadow,{recursive:true,force:true});`;
+  const out = execFileSync(process.execPath, ["-e", script], {
+    cwd: ROOT,
+    env: { ...process.env, REALDATA: path.join(ROOT, "data") },
+    encoding: "utf8",
+    timeout: 30000,
+  });
+  const r = JSON.parse(out.trim().split("\n").pop());
+  eq(r.crobat, "叉字蝠", "宝可梦词表没兜住");
+  eq(r.loc, "119号道路", "地点词表没兜住");
+  eq(r.hm, "冲浪", "术语词表没兜住（空壳文件被当成有效数据了）");
+  eq(r.concept, "头目", "概念词没兜住");
+  eq(r.phrase, "需要越野自行车", "整句表没兜住");
+  eq(r.chamber, "Rixy 石室", "通名表没兜住");
+  ok(r.loaded.species && r.loaded.terms && r.loaded.phrases, `loaded 标记不对：${JSON.stringify(r.loaded)}`);
+});
+
 /* 文档里写的用例数必须等于本次真实跑出来的数。这个数字今天漂过两次（25→27→29），
    靠人记是记不住的，所以把它变成断言。 */
 {

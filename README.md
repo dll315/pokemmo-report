@@ -43,7 +43,7 @@ WECOM_WEBHOOK="http://127.0.0.1:3599/send?key=MOCK" node server.js 3580
 ## 自检
 
 ```bash
-npm test                                   # 纯逻辑单测 32 组，不联网
+npm test                                   # 纯逻辑单测 33 组，不联网
 ADMIN_USER=admin ADMIN_PASSWORD=123456 npm run selftest   # 对着跑着的服务打 86 项接口用例
 node tools/verify-cn-data.js               # 校验宝可梦名/地点名覆盖率
 npm run verify:terms                       # 校验术语表覆盖率
@@ -76,7 +76,7 @@ npm run audit:sources                      # 译名溯源复核：整句表回�
 
 ```bash
 # 1) 登上服务器
-ssh root@159.198.67.190
+ssh root@101.33.221.33
 
 # 2) 取代码（仓库已公开，HTTPS 免密 clone 即可）
 git clone https://github.com/dll315/pokemmo-report.git /opt/pokemmo-report
@@ -117,8 +117,8 @@ docker logs -f pokemmo-report        # 首启回填 48 小时报点，约 15~25 
 
 | | |
 |---|---|
-| 看板 | `http://159.198.67.190:3580/` |
-| 管理台 | `http://159.198.67.190:3580/admin` → 账号 `admin`、密码 `123456` |
+| 看板 | `http://101.33.221.33:3580/` |
+| 管理台 | `http://101.33.221.33:3580/admin` → 账号 `admin`、密码 `123456` |
 
 还要在**云厂商控制台的安全组**放行 TCP 3580，只开本机防火墙不够。
 

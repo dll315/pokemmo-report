@@ -6,6 +6,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 const { Store } = require("../src/store");
 const { boardData } = require("../src/board");
 const refdata = require("../src/refdata");
@@ -64,11 +65,16 @@ function main(dataDir) {
   copy("assets/favicon.svg");
   const sprites = copySprites();
 
-  /* Pages 可能挂在仓库子路径下，绝对路径会 404，这里一律改成相对路径并打开静态模式 */
+  /* Pages 可能挂在仓库子路径下，绝对路径会 404，这里一律改成相对路径并打开静态模式。
+     资源版本号取文件内容哈希：以前写死 ?v=1，每次发布 URL 都一样，
+     浏览器与 Pages 边缘缓存会继续发旧的 app.js —— 表现为"明明更新了却没啥变化"。 */
+  const ver = (f) => crypto.createHash("sha1").update(fs.readFileSync(path.join(PUB, f))).digest("hex").slice(0, 8);
   let html = fs.readFileSync(path.join(PUB, "index.html"), "utf8");
   html = html
     .replace(/\/styles\.css/g, "styles.css")
     .replace(/\/app\.js/g, "app.js")
+    .replace(/styles\.css\?v=[^"']*/g, `styles.css?v=${ver("styles.css")}`)
+    .replace(/app\.js\?v=[^"']*/g, `app.js?v=${ver("app.js")}`)
     .replace(/\/assets\/favicon\.svg/g, "assets/favicon.svg")
     .replace(/<a class="tab link" href="\/admin">管理<\/a>/, "")
     .replace('<script src="app.js', '<script>window.__STATIC__ = true;</script>\n    <script src="app.js');

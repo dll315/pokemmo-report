@@ -26,7 +26,7 @@
 # 在你电脑上（Git Bash）
 cd /g/QoderCNworks/pokemmo-spawns
 git archive --format=tar.gz -o /g/QoderCNworks/pokemmo-report.tar.gz HEAD
-scp /g/QoderCNworks/pokemmo-report.tar.gz root@159.198.67.190:/root/
+scp /g/QoderCNworks/pokemmo-report.tar.gz root@101.33.221.33:/root/
 
 # 在服务器上
 mkdir -p /opt/pokemmo-report
@@ -94,7 +94,7 @@ docker compose up -d --build
 docker compose logs -f      # 首次启动会回填 48 小时报点，看到"同步 每 2 分钟一次"就算好了
 ```
 
-访问 **`http://159.198.67.190:3580/`**，管理台 **`http://159.198.67.190:3580/admin`**，账号密码就是 .env 里那两个值。
+访问 **`http://101.33.221.33:3580/`**，管理台 **`http://101.33.221.33:3580/admin`**，账号密码就是 .env 里那两个值。
 
 ### 2b. 不用 compose，直接 `docker run`
 
@@ -151,7 +151,7 @@ docker stop pokemmo-report && docker rm pokemmo-report        # 停止并删除�
 ```bash
 # 在你电脑上：打包传上去（服务器直连 GitHub 不通，见第 0 节）
 git archive --format=tar.gz -o /g/QoderCNworks/pokemmo-report.tar.gz HEAD
-scp /g/QoderCNworks/pokemmo-report.tar.gz root@159.198.67.190:/root/
+scp /g/QoderCNworks/pokemmo-report.tar.gz root@101.33.221.33:/root/
 
 # 在服务器上：解包覆盖 → 重建镜像 → 换容器（数据在 /opt/pokemmo/data，不会被动）
 tar xzf /root/pokemmo-report.tar.gz -C /opt/pokemmo-report
@@ -242,7 +242,7 @@ bash /root/sdu.sh --mount=/opt/pokemmo/data:/app/data --reset-admin
 在你自己电脑上、仓库目录里跑（Git Bash）：
 
 ```bash
-bash tools/deploy-update.sh                  # 默认 root@159.198.67.190，端口 3580
+bash tools/deploy-update.sh                  # 默认 root@101.33.221.33，端口 3580
 bash tools/deploy-update.sh root@别的IP 3581 # 换主机或端口
 ```
 
@@ -290,7 +290,7 @@ bash /opt/pokemmo-report/tools/server-update.sh
 ```bash
 # 本机 Git Bash（仓库目录里）
 git archive --format=tar.gz -o /g/QoderCNworks/pokemmo-report.tar.gz HEAD
-scp /g/QoderCNworks/pokemmo-report.tar.gz root@159.198.67.190:/root/
+scp /g/QoderCNworks/pokemmo-report.tar.gz root@101.33.221.33:/root/
 
 # 服务器
 tar xzf /root/pokemmo-report.tar.gz -C /opt/pokemmo-report
@@ -398,7 +398,7 @@ EOF
 systemctl daemon-reload && systemctl enable --now poke
 ```
 
-**unit 里不放 `WECOM_WEBHOOK`**：设了它，管理台的连接列表里就会多出一条**锁定的**记录（改不动也删不掉，要取消得先删掉这行再 `systemctl restart poke`）。服务起来后直接在 `http://159.198.67.190:3580/admin` 添加机器人地址，保存即生效（写进 `data/config.json`，重启不丢）。
+**unit 里不放 `WECOM_WEBHOOK`**：设了它，管理台的连接列表里就会多出一条**锁定的**记录（改不动也删不掉，要取消得先删掉这行再 `systemctl restart poke`）。服务起来后直接在 `http://101.33.221.33:3580/admin` 添加机器人地址，保存即生效（写进 `data/config.json`，重启不丢）。
 
 验证与日常操作：
 
@@ -514,6 +514,8 @@ Secrets 里配 `WECOM_WEBHOOK`，Variables 里可选 `PUSH_KINDS` / `PUSH_ONLY` 
 | `listen ... port 3580 errno: -98`（EADDRINUSE） | 端口已被占着。`ss -lntp \| grep ':3580 '` 看占的进程：`docker-proxy` 说明容器在跑（改用第 4.1 节，别再起 systemd），`node server.js` 且 cwd 是本项目就是手动起的游离进程，`kill` 掉它。 |
 | `docker: invalid empty volume spec` 并触发回滚 | 旧容器的挂载表里混着空项，`docker inspect` 抄出来的 `-v` 有空的。用第 4.1 节的 `--mount=/opt/pokemmo/data:/app/data` 显式指定挂载，不去读旧容器的表。 |
 | 管理台改了密码，下次登录还是旧密码 | `ADMIN_PASSWORD` 环境变量优先于 `config.json`（容器是 `-e` 起的，升级时又被继承了一遍）。要么在容器里改掉那行，要么直接 `bash /root/sdu.sh --mount=... --reset-admin` 归正回 `admin` / `123456`。 |
+| **整站都是英文**（栏目写 `Alpha/Swarm/Pheno`、点位写 `Bulbasaur @ Viridian Forest`、备注 `⚠ Has Double-Edge ⚠`），但代码明明是最新的 | **不是代码问题，是词表被挂载遮掉了。** 部署用 `-v 宿主机目录:/app/data` 保数据，这一挂会把镜像里 `COPY data` 进去的 `cn-*.json` 整个盖掉，程序读不到词表就全部回落英文。判据：`curl -s http://127.0.0.1:3580/api/ref/options \| grep -o "\"concepts\":{[^}]*}"` 若显示 `{"alpha":"Alpha",...}` 就是中了这一招（正常是 `{"alpha":"头目",...}`）。`ae7b146` 之后的版本把词表另存一份到 `/app/dict` 兜底，重跑第 4.1 节升级即可，宿主机数据不用动。 |
+| 界面还是英文但 `build.version` 已是最新 | 同上，或浏览器缓存了旧的 `app.js`（Pages 那条路以前写死 `?v=1`，已改成按文件内容打哈希）。先 Ctrl+F5，再按上一行查词表。 |
 | 外网 `HTTP 000`／浏览器打不开，而服务器本机 `127.0.0.1:3580` 是 200 | 云控制台的防火墙/安全组没放行 TCP 3580（本机服务是好的，别查代码）。见第 3 节。 |
 | 界面或卡片里出现英文 | 两种情况：① **跑的是旧版本**——早期版本故意写成「冲浪（Surf）」这种双语，玩家反馈满屏英文，已改成只出中文、英文进鼠标悬停，比一下 `build.version` 就知道；② **那个词确实没有可核译名**——上游语言包和 PokeAPI 都没有的专名（如阿斯卡纳遗迹的 `Rixy` 石室）按口径保留原文，不自己造词（见 README 的术语来源一节）。`npm test` 里有一组"可见文本一律中文"的对账，会把双语形态直接判失败。 |
 | `bash: /opt/pokemmo-report/tools/server-docker-upgrade.sh: No such file or directory` | 代码根本没到那个目录（clone/解包失败却继续往下跑）。`ls /opt/pokemmo-report/Dockerfile` 确认，取不到代码看第 0 节；本机 `scp` 那类路径要在 **Git Bash** 里写，PowerShell 不认 `/g/...`。 |

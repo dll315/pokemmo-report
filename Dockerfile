@@ -13,6 +13,11 @@ COPY public ./public
 COPY tools ./tools
 COPY data ./data
 
+# 词表另存一份到挂载盖不到的目录：部署时 -v 宿主机目录:/app/data 会把上一行 COPY 进来的
+# cn-*.json 整个遮掉（那是为了保 db.json 与配置），结果服务器上词表全空、界面退回英文。
+# src/dict.js 会先读 /app/data（站主可覆盖），读不到或读到空壳再读这里。
+COPY data/cn-species.json data/cn-locations.json data/cn-terms.json data/cn-phrases.json data/cn-place-words.json /app/dict/
+
 # .dockerignore 已排除 db.json / config.json，容器里只带静态参考表
 
 # 图鉴图已经随仓库发布（public/assets/sprites，0.36MB），默认这步不用开。

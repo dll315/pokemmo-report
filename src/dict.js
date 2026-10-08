@@ -5,7 +5,12 @@
 const fs = require("fs");
 const path = require("path");
 
-const DATA = path.resolve(__dirname, "..", "data");
+/* 词表是只读数据，但 Docker 部署会把宿主机的 data/ 整个挂到 /app/data（为了存 db.json 与配置），
+   这一挂就把镜像里 COPY 进去的词表全遮掉了——服务器上 concepts 变回 Alpha、pokemonCn 变 null，
+   玩家看到的就是满屏英文。所以再读一份镜像内置的 /app/dict 兜底：可写目录优先（站主能改），
+   缺的、空的，都从内置那份补。 */
+const DATA = process.env.DATA_DIR ? path.resolve(process.env.DATA_DIR) : path.resolve(__dirname, "..", "data");
+const BAKED = process.env.DICT_DIR ? path.resolve(process.env.DICT_DIR) : path.resolve(__dirname, "..", "dict");
 const FALLBACK_REGIONS = { Hoenn: "丰缘地区", Johto: "城都地区", Kanto: "关都地区", Sinnoh: "神奥地区", Unova: "合众地区" };
 
 let species = {};
@@ -18,12 +23,19 @@ let phrases = new Map();
 let placeWords = [];
 let loaded = { species: false, locations: false, terms: false };
 
+/* 空对象/全空类别等于"没有"：被遮掉的目录里可能留着上一次的空壳 */
+const blank = (v) => !v || (typeof v === "object" && !Array.isArray(v) && Object.values(v).every(blank));
+
 function readJson(name) {
-  try {
-    return JSON.parse(fs.readFileSync(path.join(DATA, name), "utf8"));
-  } catch (e) {
-    return null;
+  for (const dir of [DATA, BAKED]) {
+    try {
+      const v = JSON.parse(fs.readFileSync(path.join(dir, name), "utf8"));
+      if (!blank(v)) return v;
+    } catch (e) {
+      /* 这个目录没有该文件，试下一个 */
+    }
   }
+  return null;
 }
 
 function reload() {
