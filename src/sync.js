@@ -5,10 +5,14 @@
 const fs = require("fs");
 const path = require("path");
 const up = require("./upstream");
+const dict = require("./dict");
 const { fromUpstream } = require("./normalize");
 
 const UP_DIR = path.resolve(__dirname, "..", "data", "upstream");
 const STATIC_TTL_MS = 12 * 3600 * 1000;
+
+/* 日志与错误提示给人看，用中文类型名；perKind / cursors 这些键仍按英文原样存 */
+const zhKind = (kind) => dict.concept({ alpha: "Alpha", swarm: "Swarm", pheno: "Pheno" }[kind] || kind);
 
 async function refreshStatic(log) {
   const marker = path.join(UP_DIR, ".fetched-at");
@@ -71,10 +75,11 @@ async function syncOnce(store, cfg, { log = () => {} } = {}) {
       }
       store.db.meta.cursors[kind] = maxId;
       perKind[kind] = { fetched: rows.length, inserted, cursor: maxId };
-      log(`${kind}: 取回 ${rows.length} 行，新增 ${inserted} 条，游标 -> ${maxId}`);
+      log(`${zhKind(kind)}: 取回 ${rows.length} 行，新增 ${inserted} 条，游标 -> ${maxId}`);
     } catch (e) {
-      errors.push(`${kind}: ${e.message}`);
-      log(`${kind} 同步失败: ${e.message}`);
+      /* 这条会进管理台的"错误"列，用中文类型名，别把 alpha/swarm 原始键甩给站主 */
+      errors.push(`${zhKind(kind)}: ${e.message}`);
+      log(`${zhKind(kind)} 同步失败: ${e.message}`);
     }
   }
 

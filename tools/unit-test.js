@@ -506,5 +506,77 @@ t("可见文本一律中文：有译名就不许带英文尾巴（前端与卡�
   }
 });
 
+t("订阅规则：名单与地区认中文名，拒绝理由是中文（含错误分支实测）", () => {
+  const now = Math.floor(Date.now() / 1000);
+  const base = { kind: "alpha", source: "upstream", pokemon: "Breloom", pokemonCn: "斗笠菇", location: "Route 119", locationCn: "119号道路", region: "Hoenn", regionCn: "丰缘地区", tier: 3, tsUnix: now, expiresUnix: now + 1800 };
+  const cfgOf = (w) => ({ wecom: { webhook: "https://q/y?key=1", enabled: true, kinds: ["alpha"], minTier: 0, onlyPokemon: [], exceptPokemon: [], regions: [], quietHours: { enabled: false }, ...w } });
+
+  /* 中文名进名单要能命中（以前只认英文，站主照界面填就永远不推） */
+  eq(rules.decide(base, cfgOf({ onlyPokemon: ["斗笠菇"] }), now).ok, true, "中文名单没命中");
+  eq(rules.decide(base, cfgOf({ onlyPokemon: ["Breloom"] }), now).ok, true, "英文名单不该失效");
+  eq(rules.decide(base, cfgOf({ onlyPokemon: ["大针蜂"] }), now).ok, false, "不在名单里却放行了");
+  eq(rules.decide(base, cfgOf({ exceptPokemon: ["斗笠菇"] }), now).ok, false, "中文屏蔽名单没生效");
+  eq(rules.decide(base, cfgOf({ regions: ["丰缘地区"] }), now).ok, true, "中文地区名没命中");
+  eq(rules.decide(base, cfgOf({ regions: ["关都地区"] }), now).ok, false, "地区不匹配却放行了");
+
+  /* 拒绝理由给人看，不许漏 alpha/swarm/tier 这类原始键 */
+  for (const [w, want] of [
+    [{ kinds: ["swarm"] }, "类型 头目 未订阅"],
+    [{ minTier: 5 }, "价值 3 档低于阈值"],
+    [{ regions: ["关都地区"] }, "地区 丰缘地区 未订阅"],
+  ]) {
+    const d = rules.decide(base, cfgOf(w), now);
+    eq(d.ok, false, "本该拒绝");
+    ok(d.reason.includes(want), `理由应是「${want}」，实际「${d.reason}」`);
+    ok(!/(^|[^A-Za-z])(alpha|swarm|tier)([^A-Za-z]|$)/.test(d.reason), `理由里漏了英文原始键：${d.reason}`);
+  }
+});
+
+t("待审核列表会补中文名（管理台不再显示 Breloom @ Route 119）", () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "poke-list-"));
+  const s = new Store(dir);
+  s.load();
+  const cfg = conf.readConfig();
+  const created = require("../src/local").create(s, {
+    kind: "alpha", pokemon: "Bellossom", location: "Route 119", region: "Hoenn",
+    note: "自检用", reporter: "自检", ip: "127.0.0.1",
+  }, cfg);
+  ok(created.ok, `上报没被接受：${JSON.stringify(created)}`);
+  const row = require("../src/local").list(s, { status: "pending" }).rows[0];
+  eq(row.pokemonCn, "美丽花", "待审核行应带中文宝可梦名");
+  eq(row.locationCn, "119号道路", "待审核行应带中文地点名");
+  /* 词表补全不该把原始字段改掉（审核放行要用英文键回查上游） */
+  eq(row.pokemon, "Bellossom", "补中文名不能动原始英文键");
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
+t("同步失败提示用中文类型名（起子进程真跑错误分支）", () => {
+  const { execFileSync } = require("child_process");
+  const script = `
+    process.env.UPSTREAM_BASE = "http://127.0.0.1:1";
+    process.env.CONFIG_FILE = require("path").join(require("os").tmpdir(), "poke-unit-cfg.json");
+    const fs=require("fs"), os=require("os"), path=require("path");
+    const { Store } = require("./src/store"); const { syncOnce } = require("./src/sync"); const { readConfig } = require("./src/config");
+    (async () => {
+      const dir = fs.mkdtempSync(path.join(os.tmpdir(), "poke-unit-"));
+      const s = new Store(dir); s.load();
+      const r = await syncOnce(s, readConfig(), { log: () => {} });
+      console.log(JSON.stringify(r.errors));
+      fs.rmSync(dir, { recursive: true, force: true });
+    })().catch((e) => { console.log("THROW " + e.message); process.exit(1); });`;
+  let out = "";
+  try {
+    out = execFileSync(process.execPath, ["-e", script], { cwd: ROOT, encoding: "utf8", timeout: 60000 });
+  } catch (e) {
+    throw new Error(`子进程失败：${e.message} ${e.stdout || ""}`);
+  }
+  ok(!out.includes("THROW"), `错误分支本身崩了：${out.trim()}`);
+  const errs = JSON.parse(out.trim().split("\n").pop());
+  ok(errs.length >= 1, "没触发到同步错误，这条测试失效");
+  ok(errs.every((x) => /头目|大量出现|奇遇/.test(x)), `错误提示该用中文类型名：${JSON.stringify(errs)}`);
+  ok(errs.every((x) => !/(^|[^A-Za-z])(alpha|swarm):/.test(x)), `错误提示里漏了原始键：${JSON.stringify(errs)}`);
+  ok(errs.some((x) => /ECONNREFUSED|超时|refused/.test(x)), "技术原因被吃掉了，站主没法判断");
+});
+
 console.log(`\n单测通过 ${pass}，失败 ${fails.length}${fails.length ? "：" + fails.join(" / ") : ""}`);
 process.exit(fails.length ? 1 : 0);

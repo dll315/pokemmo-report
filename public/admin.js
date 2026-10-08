@@ -80,7 +80,7 @@ function renderPending(reports) {
           el("b", { text: `${r.pokemonCn || r.pokemon} @ ${r.locationCn || r.location}`, title: r.pokemonCn ? `${r.pokemon} @ ${r.location}` : "" }),
           el("div", {
             class: "who",
-            text: `${KIND_CN[r.kind] || r.kind}${r.phenoType ? " / " + r.phenoType : ""} · ${r.regionCn || r.region || "地区自动"} · ${r.reporter || "匿名"} · ${new Date(r.createdAt * 1000).toLocaleString("zh-CN", { hour12: false })}`,
+            text: `${KIND_CN[r.kind] || r.kind}${r.phenoType ? " / " + r.phenoType : ""} · ${r.regionCn || r.region || "地区自动"} · ${r.reporter || "匿名"} · ${bjTime(r.createdAt)}`,
           }),
           r.note ? el("div", { class: "who", text: "备注：" + r.note }) : null,
         ]),
@@ -101,6 +101,17 @@ function relTime(unix) {
   return `${Math.floor(d / 86400)} 天前`;
 }
 
+/* 服务端业务时间按北京时间硬算，管理台也固定东八区：
+   用浏览器时区的话，站主在别的机器上打开会和看板上的时间对不上 */
+function bjTime(v) {
+  const d = v instanceof Date ? v : new Date(typeof v === "number" && v < 1e12 ? v * 1000 : v);
+  if (isNaN(d.getTime())) return String(v ?? "—");
+  return new Intl.DateTimeFormat("zh-CN", {
+    timeZone: "Asia/Shanghai", hour12: false,
+    month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit",
+  }).format(d);
+}
+
 /* 连接列表：每条机器人地址单独启用/改名/删除/测试。完整 key 不进浏览器，只显示尾号。 */
 function renderHooks(w, push) {
   const list = w.targets || [];
@@ -112,7 +123,7 @@ function renderHooks(w, push) {
   }
   for (const t of list) {
     const s = stats[t.id];
-    const when = s ? new Date(s.at * 1000).toLocaleString("zh-CN", { hour12: false, month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
+    const when = s ? bjTime(s.at) : "";
     const cell = el("td", { class: s && !s.ok ? "no" : "", text: s ? `${s.ok ? "成功" : "失败"} ${when}（${relTime(s.at)}）${s.err ? " · " + s.err : ""}` : "还没发过" });
     rows.push(
       el("tr", {}, [
@@ -177,7 +188,7 @@ function renderLog(meta) {
     el("tr", {}, ["时间", "耗时", "头目", "大量出现", "裁剪", "错误"].map((h) => el("th", { text: h }))),
     ...rows.map((r) =>
       el("tr", {}, [
-        new Date(r.at).toLocaleString("zh-CN", { hour12: false }),
+        bjTime(r.at),
         `${r.ms || 0}ms`,
         String(r.alphaAdded ?? ""),
         String(r.swarmAdded ?? ""),
@@ -186,7 +197,7 @@ function renderLog(meta) {
       ].map((c) => el("td", { text: c })))
     )
   );
-  $("#metaHint").textContent = `游标 alpha=${meta.cursors.alpha} swarm=${meta.cursors.swarm} · 上轮同步 ${meta.lastSyncAt || "—"}${meta.lastSyncError ? " · 异常：" + meta.lastSyncError : ""}`;
+  $("#metaHint").textContent = `游标：头目 ${meta.cursors.alpha} 条 / 大量出现 ${meta.cursors.swarm} 条 · 上轮同步 ${meta.lastSyncAt ? bjTime(meta.lastSyncAt) : "—"}（北京时间）${meta.lastSyncError ? " · 异常：" + meta.lastSyncError : ""}`;
 }
 
 async function refresh() {
@@ -254,7 +265,7 @@ async function saveAll() {
   if (r.error) return toast(r.error);
   $("#newUser").value = "";
   $("#newToken").value = "";
-  $("#saveMsg").textContent = "已保存 " + new Date().toLocaleTimeString("zh-CN", { hour12: false });
+  $("#saveMsg").textContent = "已保存 " + bjTime(Date.now()) + "（北京时间）";
   /* 改过账号/密码，服务端已把旧会话作废，必须重新登录一次 */
   if (r.credentialsChanged || changed) {
     showGate({ error: "账号或密码已更新，请用新密码重新登录" });
