@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>PokeMMO 报点 · 头目 / 大量出现 / 奇遇 实时看板</title>
-    <meta name="description" content="PokeMMO 国内报点看板：头目（Alpha）、大量出现（Swarm）、奇遇（Pheno）实时点位与刷新时段，支持企业微信群推送。" />
+    <meta name="description" content="PokeMMO 国内报点看板：头目、大量出现、奇遇实时点位与刷新时段，支持企业微信群推送。" />
     <meta name="theme-color" content="#b3324a" />
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="styles.css?v=1" />
@@ -43,17 +43,17 @@
 
         <div class="board">
           <div class="board-col" data-kind="alpha">
-            <h2><span class="dot alpha"></span><span id="label-alpha">头目（Alpha）</span> <em id="count-alpha">0</em></h2>
+            <h2><span class="dot alpha"></span><span id="label-alpha" title="Alpha">头目</span> <em id="count-alpha">0</em></h2>
             <p class="hint" id="hint-alpha">报出后一段时间内有效</p>
             <ul class="list" id="list-alpha"></ul>
           </div>
           <div class="board-col" data-kind="swarm">
-            <h2><span class="dot swarm"></span><span id="label-swarm">大量出现（Swarm）</span> <em id="count-swarm">0</em></h2>
+            <h2><span class="dot swarm"></span><span id="label-swarm" title="Swarm">大量出现</span> <em id="count-swarm">0</em></h2>
             <p class="hint" id="hint-swarm">报出后一段时间内有效</p>
             <ul class="list" id="list-swarm"></ul>
           </div>
           <div class="board-col" data-kind="pheno">
-            <h2><span class="dot pheno"></span><span id="label-pheno">奇遇（Pheno）</span> <em id="count-pheno">0</em></h2>
+            <h2><span class="dot pheno"></span><span id="label-pheno" title="Pheno">奇遇</span> <em id="count-pheno">0</em></h2>
             <p class="hint" id="hint-pheno">仅本站玩家上报</p>
             <ul class="list" id="list-pheno"></ul>
           </div>
@@ -66,7 +66,7 @@
         </div>
 
         <details class="slotsbox">
-          <summary>今日头目（Alpha）刷新时段</summary>
+          <summary title="Alpha">今日头目刷新时段</summary>
           <table class="slots" id="slotTable"></table>
           <p class="hint">时段取自上游规则：UTC 0/6/12/18 点起，每段 4 小时 45 分，段间空档 1 小时 15 分。</p>
         </details>
@@ -81,9 +81,9 @@
         <form id="reportForm" class="form">
           <label>类型
             <select name="kind" id="rKind">
-              <option value="alpha">头目（Alpha）</option>
-              <option value="swarm">大量出现（Swarm）</option>
-              <option value="pheno">奇遇（Pheno）</option>
+              <option value="alpha">头目</option>
+              <option value="swarm">大量出现</option>
+              <option value="pheno">奇遇</option>
             </select>
           </label>
           <label>天气类型 <span class="opt">（仅奇遇）</span>
@@ -118,7 +118,7 @@
       <!-- 图鉴参考 -->
       <section id="tab-ref" class="panel" hidden>
         <h2>地点与点位参考</h2>
-        <p class="lead">静态资料镜像自 Alphapedia：某地能刷什么、需要什么秘传（HM）、值不值得去。</p>
+        <p class="lead">静态资料镜像自 Alphapedia：某地能刷什么、需要什么秘传、值不值得去。</p>
         <div class="filters">
           <select id="refRegion" aria-label="地区"></select>
           <select id="refLocation" aria-label="地点"></select>
