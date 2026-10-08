@@ -168,6 +168,7 @@ async function rawPost(path, body) {
     check("词表重载 200", reload.json?.ok === true, JSON.stringify(reload.json));
 
     const cfg = await hit("/api/admin/config", { admin: true });
+    const targetsBefore = (cfg.json?.wecom?.targets || []).length;
     check("GET admin/config", cfg.status === 200 && cfg.json?.sync?.intervalMinutes > 0, JSON.stringify(cfg.json?.sync));
 
     const save = await hit("/api/admin/config", { method: "PUT", admin: true, body: JSON.stringify({ sync: { intervalMinutes: 3 } }) });
@@ -217,6 +218,13 @@ async function rawPost(path, body) {
 
     const flush = await hit("/api/admin/flush", { method: "POST", admin: true, body: "{}" });
     check("flush 返回队列统计", typeof flush.json?.sent === "number", JSON.stringify(flush.json));
+
+    /* 收尾不变量：自检跑完必须把人配的连接原样留着（曾经有一条 PUT {webhook:""} 的路径会一把清空） */
+    const clr = await hit("/api/admin/config", { method: "PUT", admin: true, body: JSON.stringify({ webhook: "" }) });
+    check("空 webhook 的 PUT 被拒（不再一把清空）", clr.status === 400 && /target-remove/.test(clr.json?.error || ""), `${clr.status} ${JSON.stringify(clr.json).slice(0, 90)}`);
+    const cfgEnd = await hit("/api/admin/config", { admin: true });
+    const endN = (cfgEnd.json?.wecom?.targets || []).length;
+    check("自检跑完不改变机器人连接数", endN === targetsBefore, `跑完 ${endN} 条 vs 跑前 ${targetsBefore} 条`);
   }
 
   console.log(`\n通过 ${pass}，失败 ${fails.length}${fails.length ? "：" + fails.join(" / ") : ""}`);

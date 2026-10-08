@@ -177,10 +177,10 @@ async function handleApi(req, res, url) {
     if (typeof payload.reportRequireApprove === "boolean") patch.reportRequireApprove = payload.reportRequireApprove;
 
     const wecom = {};
-    /* 兼容旧的单地址写法：webhook 字段现在落到"第一条能改的连接"上，清空=删掉所有非锁定的 */
-    if (payload.webhook === "__clear__" || payload.webhook === "") {
-      wecom.targets = readConfig().wecom.targets.filter((t) => t.locked);
-      wecom.webhook = "";
+    /* 旧版"清空单条地址"的语义等于删光所有连接，一次误调用就能把机器人配置抹掉（实测过）。
+       连接列表已经有了逐条删除接口，这里一律拒绝，不再提供"一把清空"。 */
+    if (payload.webhook === "" || payload.webhook === "__clear__") {
+      return send(res, 400, { error: "清空全部连接请用逐条删除（target-remove）：这个接口不再接受空 webhook，避免一次误调用抹掉所有机器人地址" });
     } else if (typeof payload.webhook === "string" && payload.webhook.trim()) {
       const bad = webhookProblem(payload.webhook);
       /* 不合法就不写盘：存了坏地址只会让后面每次推送都失败，还不如当场拒绝 */
