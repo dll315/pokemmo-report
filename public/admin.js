@@ -67,6 +67,8 @@ function renderStats(state) {
   );
 }
 
+const KIND_CN = { alpha: "头目", swarm: "大量出现", pheno: "奇遇" };
+
 function renderPending(reports) {
   const list = reports.rows || [];
   $("#pendCount").textContent = list.length ? `共 ${reports.total} 条` : "";
@@ -75,10 +77,10 @@ function renderPending(reports) {
     ...list.map((r) =>
       el("div", { class: "pend" }, [
         el("div", {}, [
-          el("b", { text: `${r.pokemon} @ ${r.location}` }),
+          el("b", { text: `${r.pokemonCn || r.pokemon} @ ${r.locationCn || r.location}`, title: r.pokemonCn ? `${r.pokemon} @ ${r.location}` : "" }),
           el("div", {
             class: "who",
-            text: `${r.kind}${r.phenoType ? " / " + r.phenoType : ""} · ${r.region || "地区自动"} · ${r.reporter || "匿名"} · ${new Date(r.createdAt * 1000).toLocaleString("zh-CN", { hour12: false })}`,
+            text: `${KIND_CN[r.kind] || r.kind}${r.phenoType ? " / " + r.phenoType : ""} · ${r.regionCn || r.region || "地区自动"} · ${r.reporter || "匿名"} · ${new Date(r.createdAt * 1000).toLocaleString("zh-CN", { hour12: false })}`,
           }),
           r.note ? el("div", { class: "who", text: "备注：" + r.note }) : null,
         ]),
@@ -172,7 +174,7 @@ function renderConfig(cfg, push) {
 function renderLog(meta) {
   const rows = (meta.syncLog || []).slice().reverse().slice(0, 20);
   $("#logTable").replaceChildren(
-    el("tr", {}, ["时间", "耗时", "Alpha", "群蜂", "裁剪", "错误"].map((h) => el("th", { text: h }))),
+    el("tr", {}, ["时间", "耗时", "头目", "大量出现", "裁剪", "错误"].map((h) => el("th", { text: h }))),
     ...rows.map((r) =>
       el("tr", {}, [
         new Date(r.at).toLocaleString("zh-CN", { hour12: false }),

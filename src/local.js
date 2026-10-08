@@ -5,6 +5,7 @@
 
 const { fromLocalReport } = require("./normalize");
 const refdata = require("./refdata");
+const dict = require("./dict");
 const push = require("./push-wecom");
 const { readConfig } = require("./config");
 
@@ -121,7 +122,9 @@ function reject(store, id, note = "") {
 
 function list(store, { status = "", limit = 50 } = {}) {
   const rows = (store.db.reports || []).filter((r) => !status || r.status === status);
-  return { total: rows.length, rows: rows.slice(0, limit) };
+  /* 待审核列表也要按当前词表补中文名：不补的话管理台看到的永远是 Breloom @ Route 119 */
+  const named = rows.map((r) => dict.refreshNames(r) || r);
+  return { total: rows.length, rows: named.slice(0, limit) };
 }
 
 module.exports = { create, approve, reject, list, validate, sweep };

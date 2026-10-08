@@ -143,11 +143,11 @@ function requirementFor(ev) {
     note: plain(rec.note),
     notes: [...rec.notes].map(plain),
     types: [...rec.types],
-    typesCn: [...rec.types].map((t) => dict.termPair("types", t) || t),
+    typesCn: [...rec.types].map((t) => dict.term("types", t) || t),
     ability: rec.ability || "",
-    abilityCn: rec.ability ? dict.termPair("abilities", rec.ability) : "",
+    abilityCn: rec.ability ? dict.term("abilities", rec.ability) || rec.ability : "",
     moveset: [...(rec.moveset || [])],
-    movesetCn: (rec.moveset || []).map((m) => dict.termPair("moves", m) || m),
+    movesetCn: (rec.moveset || []).map((m) => dict.term("moves", m) || m),
     valuable: !!rec.valuable,
   };
 }

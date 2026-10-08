@@ -338,7 +338,7 @@ t("头目推送要报得详细：特性/配招/本波时段/同点其它/本波�
   const refdata = require("../src/refdata");
   const req = refdata.requirementFor({ kind: "alpha", pokemon: "Crawdaunt", location: "Abandoned Ship" });
   ok(req.abilityCn && req.abilityCn !== "Adaptability", `特性要有中文名：${req.abilityCn}`);
-  ok(req.movesetCn.length >= 3 && /（/.test(req.movesetCn[0]), `配招要中文带括注：${req.movesetCn && req.movesetCn[0]}`);
+  ok(req.movesetCn.length >= 3 && !/[A-Za-z]/.test(req.movesetCn[0]), `配招只出中文（英文进不了卡片）：${req.movesetCn && req.movesetCn[0]}`);
   eq(req.hmsCn.length, req.hms.length, "hmsCn 与 hms 一一对应");
   eq(req.hmsCn[0].cn, "冲浪", "hmsCn 必须仍是 {en,cn} 结构（前端与卡片都依赖）");
 
@@ -353,7 +353,7 @@ t("头目推送要报得详细：特性/配招/本波时段/同点其它/本波�
   ok(/特性：/.test(c), "卡片要有特性");
   ok(/配招：/.test(c), "卡片要有配招");
   ok(/本波：第 \d 波 \d\d:\d\d–\d\d:\d\d/.test(c) || /现在在两波之间/.test(c), `卡片要交代时段（第几波、起止）`);
-  ok(/本波共 3 个头目，其中 tier≥4 的 2 个/.test(c), "卡片要有本波统计");
+  ok(/本波共 3 个头目，其中 4 档及以上的 2 个/.test(c), "卡片要有本波统计");
   ok(/同点还有：.*双尾怪手/.test(c), "卡片要列出同点其它头目");
   ok(/★ 上游标记为有价值/.test(c) === !!req.valuable, "有价值标记跟着静态表走，不自造");
   ok(Buffer.byteLength(c, "utf8") <= 4096, "不能超企业微信 markdown 上限");
@@ -444,6 +444,65 @@ t("部署文档里的命令与脚本对得上（守卫串、参数、引用的�
   /* 机器人地址只能在管理台管：命令里不该带 WECOM_WEBHOOK（<TOKEN> 那条是 git 令牌，允许） */
   for (const [name, body] of [["DEPLOY.md", doc], ["README.md", readme], ["deploy-update.sh", du], ["server-bootstrap.sh", bs]]) {
     ok(!/-e\s+WECOM_WEBHOOK|--wecom-webhook/.test(body), `${name} 又把 webhook 写进命令行里了`);
+  }
+});
+
+t("可见文本一律中文：有译名就不许带英文尾巴（前端与卡片同一口径）", () => {
+  const BILINGUAL = /（[A-Za-z]/; /* 「冲浪（Surf）」这种形态就是玩家说的"不是中文" */
+  const ascii = /[A-Za-z]/;
+  const cjk = /[㐀-鿿]/;
+
+  /* 1) 上游全量表里出现的每个术语：命中词表的那批必须是纯中文，不带括注 */
+  const read = (n) => JSON.parse(fs.readFileSync(path.join(ROOT, "data/upstream", n), "utf8"));
+  const words = { hms: new Set(), moves: new Set(), abilities: new Set(), types: new Set(), concepts: new Set() };
+  const species = new Set();
+  for (const f of ["alpha-spawn-data.json", "swarm-spawn-data.json"]) {
+    const j = read(f);
+    for (const reg of Object.keys(j)) for (const loc of Object.keys(j[reg])) for (const e of j[reg][loc] || []) {
+      const d = e.data || {};
+      species.add(e.name);
+      (d.HMs || []).forEach((x) => words.hms.add(x));
+      (d.Moveset || []).forEach((x) => words.moves.add(x));
+      if (d.Ability) words.abilities.add(d.Ability);
+      (d["Egg Group"] || []).forEach((x) => words.concepts.add(x));
+    }
+  }
+  for (const loc of Object.keys(read("pheno-spawn-data.json"))) for (const t of Object.keys(read("pheno-spawn-data.json")[loc])) words.concepts.add(t);
+  /* 属性不在点位表里，从 pokesearch 全量取 */
+  const ps = read("pokesearch-data.json");
+  for (const k of Object.keys(ps)) (ps[k].types || []).forEach((t) => words.types.add(typeof t === "string" ? t : t.name));
+
+  for (const [cat, set] of Object.entries(words)) {
+    const hit = [...set].filter((w) => dict.term(cat, w));
+    const dirty = hit.filter((w) => BILINGUAL.test(dict.term(cat, w)) || !cjk.test(dict.term(cat, w)));
+    ok(dirty.length === 0, `${cat} 有 ${dirty.length} 个不是纯中文：${dirty.slice(0, 6).join(" | ")}`);
+  }
+  ok(Object.values(words).every((s) => s.size > 0), "上游表里没取到术语，取样本身失效");
+
+  /* 2) 宝可梦与地点：有中文的那批也不许再拼英文 */
+  const mon = [...species].filter((s) => dict.speciesOf(s).cn);
+  ok(mon.length > 300, `图鉴命中太少：${mon.length}`);
+  ok(mon.every((s) => !ascii.test(dict.speciesOf(s).cn)), "宝可梦中文名里混进了拉丁字母");
+  const place = dict.locationOf("Route 119");
+  eq(place, "119号道路", "地点整条命中时不该带原文");
+  ok(!BILINGUAL.test(dict.locationOf("Abandoned Ship") || ""), "地点名不许「中文（English）」");
+
+  /* 3) 卡片全文：剥掉标签与链接、去掉专名白名单后，不许还剩拉丁字母 */
+  const now = Math.floor(Date.now() / 1000);
+  const ev = { key: "alpha|c|x|1", kind: "alpha", source: "upstream", pokemon: "Crawdaunt", pokemonCn: "铁螯龙虾", location: "Abandoned Ship", locationCn: "废弃船坞", region: "Hoenn", regionCn: "丰缘地区", tier: 4, tsUnix: now, expiresUnix: now + 3600 };
+  const PROPER = /(Alphapedia|PokeMMO)/g; /* 上游站名与游戏名是专名，不算"没翻译" */
+  const visible = (s) => s.replace(/<[^>]+>/g, "").replace(/\]\([^)]*\)/g, "").replace(PROPER, "");
+  const content = push.buildMessage(ev, { nowUnix: now }).markdown.content;
+  const latin = content.split("\n").map(visible).filter((l) => ascii.test(l));
+  ok(latin.length === 0, `卡片里还有英文行：${JSON.stringify(latin)}`);
+  ok(/地点：废弃船坞/.test(visible(content)) && !/Abandoned Ship/.test(visible(content)), "地点只显示中文，原文不进卡片");
+  ok(/头目｜铁螯龙虾/.test(visible(content)), "标题用中文类型名");
+
+  /* 4) 前端源码里不能再出现把英文名拼进括号的写法：「${中文}（${x.en}）」
+        （只盯 .en 变量，免得把「成功 19:41（2 分钟前）」这种中文括注误判成双显） */
+  for (const f of ["public/app.js", "public/index.html", "public/admin.html", "public/admin.js"]) {
+    const srcTxt = fs.readFileSync(path.join(ROOT, f), "utf8");
+    ok(!/（\$\{[^}]*\ben\b[^}]*\}）/.test(srcTxt) && !/\$\{[^}]*\}（\$\{[^}]*\ben\b/.test(srcTxt), `${f} 又拼回「中文（英文名）」双显了`);
   }
 });
 

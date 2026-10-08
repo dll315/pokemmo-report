@@ -68,21 +68,20 @@ function TERM(cat, en) {
   if (!map || !en) return null;
   return map[String(en).trim().toLowerCase()] || null;
 }
-const pair = (cat, en) => {
-  const cn = TERM(cat, en);
-  return cn && cn !== en ? `${cn}（${en}）` : String(en || "");
-};
-const conceptOf = (k) => (((state.options || {}).concepts || {})[k] || { alpha: "Alpha", swarm: "Swarm", pheno: "Pheno" }[k]);
+/* 可见文本一律中文，英文原名进 title（悬停看），缺译名才显示原文 */
+const pair = (cat, en) => TERM(cat, en) || String(en || "");
+const zhList = (list, key) => (list || []).map((x) => (key ? (x && x[key]) || "" : String(x || ""))).filter(Boolean);
+const conceptOf = (k) => (((state.options || {}).concepts || {})[k] || { alpha: "头目", swarm: "大量出现", pheno: "奇遇" }[k]);
 
 /* "去这个点要准备什么"——需求索引由后端从上游静态表算好 */
 function reqBlock(ev) {
   const r = ev.req;
   if (!r) return null;
   const kids = [];
-  const hms = (r.hmsCn || []).map((x) => (x.cn && x.cn !== x.en ? `${x.cn}（${x.en}）` : x.en)).filter(Boolean);
-  if (hms.length) kids.push(el("span", { class: "req need", text: "需要：" + hms.join(" / ") }));
-  if ((r.typesCn || []).length) kids.push(el("span", { class: "req", text: "属性：" + r.typesCn.join(" / ") }));
-  if (r.abilityCn) kids.push(el("span", { class: "req", text: "特性：" + r.abilityCn }));
+  const hms = zhList(r.hmsCn, "cn");
+  if (hms.length) kids.push(el("span", { class: "req need", text: "需要：" + hms.join(" / "), title: zhList(r.hmsCn, "en").join(" / ") }));
+  if ((r.typesCn || []).length) kids.push(el("span", { class: "req", text: "属性：" + r.typesCn.join(" / "), title: (r.types || []).join(" / ") }));
+  if (r.abilityCn) kids.push(el("span", { class: "req", text: "特性：" + r.abilityCn, title: r.ability || "" }));
   if ((r.movesetCn || []).length) kids.push(el("span", { class: "req", title: (r.moveset || []).join(" / "), text: "配招：" + r.movesetCn.slice(0, 4).join("、") + (r.movesetCn.length > 4 ? ` +${r.movesetCn.length - 4}` : "") }));
   if (r.note) kids.push(el("span", { class: "req", text: r.note }));
   if (r.specific) kids.push(el("span", { class: "req", text: "位置：" + r.specific }));
@@ -93,19 +92,17 @@ function reqBlock(ev) {
 }
 
 function nameBlock(ev) {
-  const cn = ev.pokemonCn || ev.pokemon;
-  const kids = [el("span", { class: "cn", text: cn })];
-  if (ev.pokemonCn) kids.push(el("span", { class: "en", text: ev.pokemon }));
-  return el("div", { class: "names" }, kids);
+  return el("div", { class: "names" }, [
+    el("span", { class: "cn", text: ev.pokemonCn || ev.pokemon, title: ev.pokemonCn ? ev.pokemon : "" }),
+  ]);
 }
 
 function placeBlock(ev) {
-  const kids = [el("span", { class: "loc", text: ev.locationCn || ev.location })];
-  if (ev.locationCn && ev.locationCn !== ev.location) kids.push(el("span", { class: "locsub", text: ev.location }));
+  const kids = [el("span", { class: "loc", text: ev.locationCn || ev.location, title: ev.locationCn && ev.locationCn !== ev.location ? ev.location : "" })];
   const meta = [];
   if (ev.regionCn || ev.region) meta.push(`${ev.regionCn || ev.region}`);
   if (ev.phenoType) meta.push(pair("concepts", ev.phenoType) || ev.phenoType);
-  if (ev.tier) meta.push(`tier ${ev.tier}`);
+  if (ev.tier) meta.push(`价值 ${ev.tier} 档`);
   if (ev.source === "local") meta.push("玩家上报");
   if (meta.length) kids.push(el("span", { class: "meta", text: meta.join(" · ") }));
   if (ev.note) kids.push(el("span", { class: "note", text: ev.note }));
@@ -226,7 +223,7 @@ async function loadBoard() {
 function applyOptions() {
   const o = state.options;
   if (!o) return;
-  const regions = o.regions.map((r) => el("option", { value: r.en, text: r.cn ? `${r.cn}（${r.en}）` : r.en }));
+  const regions = o.regions.map((r) => el("option", { value: r.en, text: r.cn || r.en }));
   $("#fRegion").append(el("option", { value: "", text: "全部地区" }), ...regions);
   $("#refRegion").append(...regions.map((n) => n.cloneNode(true)));
   window.setTimeout(fillRefLocations, 0);
@@ -234,7 +231,7 @@ function applyOptions() {
 
 function fillFormRegions() {
   const o = state.options;
-  $("#rRegion").replaceChildren(el("option", { value: "", text: "自动按地点判定" }), ...o.regions.map((r) => el("option", { value: r.en, text: r.cn ? `${r.cn}（${r.en}）` : r.en })));
+  $("#rRegion").replaceChildren(el("option", { value: "", text: "自动按地点判定" }), ...o.regions.map((r) => el("option", { value: r.en, text: r.cn || r.en })));
   $("#rPheno").replaceChildren(el("option", { value: "", text: "选择天气" }), ...o.phenoTypes.map((t) => el("option", { value: t, text: pair("concepts", t) || t })));
   fillFormLocations();
 }
@@ -257,7 +254,7 @@ function fillRefLocations() {
   const sel = $("#refLocation");
   const region = $("#refRegion").value;
   const bucket = region ? state.options.locationsByRegion[region] || [] : Object.values(state.options.locationsByRegion).flat();
-  sel.replaceChildren(...bucket.map((l) => el("option", { value: l.en, text: l.cn ? `${l.cn}（${l.en}）` : l.en })));
+  sel.replaceChildren(...bucket.map((l) => el("option", { value: l.en, text: l.cn || l.en })));
   renderRef();
 }
 
@@ -285,40 +282,45 @@ function renderRef() {
       ]);
     $("#refBody").replaceChildren(
       el("div", { class: "refgrid" }, [
-        col("Alpha 点位", d.alpha || [], "alpha"),
-        col("群蜂点位", d.swarm || [], "swarm"),
-        col("特异天气", d.pheno || [], "pheno"),
+        col(`${conceptOf("alpha")}点位`, d.alpha || [], "alpha"),
+        col(`${conceptOf("swarm")}点位`, d.swarm || [], "swarm"),
+        col(`${conceptOf("pheno")}点位`, d.pheno || [], "pheno"),
       ])
     );
   });
 }
 
 function cnList(en, cn) {
-  return (en || []).map((e, i) => (cn && cn[i] && cn[i] !== e ? `${cn[i]}（${e}）` : e));
+  return (en || []).map((e, i) => (cn && cn[i]) || e);
 }
+
+/* 图鉴参考里的宝可梦名：可见文本给中文，英文原名放 title（要跟 Alphapedia 对得上时悬停看） */
+const speciesLabel = (p) => {
+  const sp = state.options.species.find((s) => s.en.toLowerCase() === String(p).toLowerCase());
+  return sp && sp.cn ? { text: sp.cn, title: sp.en } : { text: String(p), title: "" };
+};
 
 function liForRef(x, kind) {
   if (kind === "pheno") {
-    const typeLabel = x.typeCn && x.typeCn !== x.type ? `${x.typeCn}（${x.type}）` : x.type;
+    const mons = (x.pokemon || []).map(speciesLabel);
     return el("li", {}, [
-      el("b", { text: typeLabel }),
-      el("span", { text: (x.pokemon || []).map((p) => { const sp = state.options.species.find((s) => s.en.toLowerCase() === String(p).toLowerCase()); return sp && sp.cn ? `${sp.cn}（${p}）` : p; }).join("、") }),
-      x.hms && x.hms.length ? el("em", { text: "需要：" + cnList(x.hms, x.hmsCn).join(" / ") }) : null,
+      el("b", { text: x.typeCn || x.type, title: x.typeCn ? x.type : "" }),
+      el("span", { text: mons.map((m) => m.text).join("、"), title: mons.map((m) => m.title).filter(Boolean).join(" / ") }),
+      x.hms && x.hms.length ? el("em", { text: "需要：" + cnList(x.hms, x.hmsCn).join(" / "), title: x.hms.join(" / ") }) : null,
       (x.notes || []).length ? el("span", { class: "warn", text: x.notes.join(" · ") }) : null,
     ]);
   }
   const sp = state.options.species.find((s) => s.en.toLowerCase() === String(x.name).toLowerCase());
   const kids = [
     sp && sp.natdex ? spriteNode({ natdex: sp.natdex, pokemonCn: sp.cn, pokemon: x.name }) : null,
-    el("b", { text: (sp && sp.cn) || x.name }),
-    el("span", { class: "en", text: x.name }),
-    x.HMs && x.HMs.length ? el("em", { text: "需要：" + cnList(x.HMs, x.hmsCn).join(" / ") }) : null,
-    x.Moveset && x.Moveset.length ? el("span", { class: "moves", text: "招式：" + cnList(x.Moveset, x.movesetCn).join("、") }) : null,
-    x.Ability ? el("span", { class: "moves", text: "特性：" + (x.abilityCn && x.abilityCn !== x.Ability ? `${x.abilityCn}（${x.Ability}）` : x.Ability) }) : null,
-    x["Egg Group"] && x["Egg Group"].length ? el("span", { class: "moves", text: "蛋组：" + cnList(x["Egg Group"], x.eggGroupsCn).join("、") }) : null,
+    el("b", { text: (sp && sp.cn) || x.name, title: sp && sp.cn ? x.name : "" }),
+    x.HMs && x.HMs.length ? el("em", { text: "需要：" + cnList(x.HMs, x.hmsCn).join(" / "), title: x.HMs.join(" / ") }) : null,
+    x.Moveset && x.Moveset.length ? el("span", { class: "moves", text: "招式：" + cnList(x.Moveset, x.movesetCn).join("、"), title: x.Moveset.join(" / ") }) : null,
+    x.Ability ? el("span", { class: "moves", text: "特性：" + (x.abilityCn || x.Ability), title: x.abilityCn ? x.Ability : "" }) : null,
+    x["Egg Group"] && x["Egg Group"].length ? el("span", { class: "moves", text: "蛋组：" + cnList(x["Egg Group"], x.eggGroupsCn).join("、"), title: x["Egg Group"].join(" / ") }) : null,
     x.locationNoteCn ? el("span", { class: "moves", text: x.locationNoteCn }) : null,
     (x.notesCn || []).length ? el("span", { class: "warn", text: x.notesCn.join(" · ") }) : null,
-    x.Tier !== undefined ? el("span", { class: "tier", text: `tier ${x.Tier}` }) : null,
+    x.Tier !== undefined ? el("span", { class: "tier", text: `价值 ${x.Tier} 档` }) : null,
   ];
   return el("li", {}, kids);
 }
@@ -419,15 +421,14 @@ function initTheme() {
   });
 }
 
-/* 列标题与时效提示都跟着词表和配置走，不在 HTML 里写死 */
-function labelFor(kind, en) {
-  const cn = conceptOf(kind === "alpha" ? "alpha" : kind === "swarm" ? "swarm" : "pheno");
-  return cn && cn !== en ? `${cn}（${en}）` : en;
+/* 列标题与时效提示都跟着词表和配置走，不在 HTML 里写死；只出中文 */
+function labelFor(kind) {
+  return conceptOf(kind);
 }
 function applyTerms(windows) {
   for (const kind of ["alpha", "swarm", "pheno"]) {
     const l = $(`#label-${kind}`);
-    if (l) l.textContent = labelFor(kind, { alpha: "Alpha", swarm: "Swarm", pheno: "Pheno" }[kind]);
+    if (l) l.textContent = labelFor(kind);
   }
   if (windows) {
     $(`#hint-alpha`).textContent = `报出后 ${windows.alphaMinutes || 75} 分钟内有效`;

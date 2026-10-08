@@ -125,12 +125,8 @@ function term(cat, en) {
   return direct || phrases.get(lower(en)) || null;
 }
 
-/* 中文（English）双显，缺译名时只显示原文 */
-function termPair(cat, en) {
-  const raw = String(en ?? "");
-  const cn = term(cat, raw);
-  return cn && cn !== raw ? `${cn}（${raw}）` : raw;
-}
+/* 术语一律只回中文，缺译名才回原文。以前有个 termPair 返回「中文（English）」双显，
+   玩家满屏看到的其实是英文——界面与推送以中文为主是硬要求，英文靠悬停 title / 上游链接核对。 */
 
 const concept = (en) => term("concepts", en) || en;
 
@@ -175,6 +171,6 @@ function refreshNames(ev) {
   return ev;
 }
 
-module.exports = { reload, speciesOf, locationOf, regionOf, refreshNames, term, termPair, concept, termsFlat, translateText, loaded, raw: () => terms, DATA };
+module.exports = { reload, speciesOf, locationOf, regionOf, refreshNames, term, concept, termsFlat, translateText, loaded, raw: () => terms, DATA };
 
 reload();

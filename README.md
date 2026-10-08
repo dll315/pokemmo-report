@@ -10,7 +10,7 @@
 - **点位需求**：每条报点直接显示"去之前要什么秘传兽"、属性、特性、配招、具体位置说明、上游备注（含反伤招式警告）与点位地图截图链接
 - **头目推送带上下文**：卡片里给本波时段（第几波、起止北京时间）、本波头目数与高价值数、同地点其它头目，让玩家判断值不值得现在赶过去
 - **Alpha 刷新时段**：按 UTC 0/6/12/18 点起、每段 4 小时 45 分现算，同时给北京时间
-- **中文对照**：宝可梦名、地区名、地点名、招式名、特性名、属性名、天气类型全部中文为主、英文括注
+- **中文对照**：宝可梦名、地区名、地点名、招式名、特性名、属性名、天气类型**界面只出中文**，英文原名放在鼠标悬停（`title`）里，缺译名的专名才回落原文
 - **图鉴图标**：483 张第五世代 96×96 图随仓库发布（0.36MB），不热链 GitHub，缺图自动降级为中文名首字徽标
 - **玩家上报**：下拉选择宝可梦与地点（不接受自由文本编新地点），提交后进待审核队列
 - **管理台** `/admin`：审核队列、**企业微信机器人连接列表（多条地址：添加 / 改名 / 启用停用 / 删除 / 逐条测试，显示尾号与最后一次发送结果）**、推送订阅规则、同步日志、手动触发同步
@@ -43,8 +43,8 @@ WECOM_WEBHOOK="http://127.0.0.1:3599/send?key=MOCK" node server.js 3580
 ## 自检
 
 ```bash
-npm test                                   # 纯逻辑单测 28 组，不联网
-ADMIN_USER=admin ADMIN_PASSWORD=123456 npm run selftest   # 对着跑着的服务打 78 项接口用例
+npm test                                   # 纯逻辑单测 29 组，不联网
+ADMIN_USER=admin ADMIN_PASSWORD=123456 npm run selftest   # 对着跑着的服务打 84 项接口用例
 node tools/verify-cn-data.js               # 校验宝可梦名/地点名覆盖率
 npm run verify:terms                       # 校验术语表覆盖率
 npm run phrases                            # 重新生成整句表（上游语言包有更新时）
@@ -163,7 +163,7 @@ Pages 设置成 `Deploy from a branch` → 分支 `pages`、目录 `/ (root)`。
 | 报点时效 | 上游历史接口的时间戳是**报出时刻**（用 `Relicanth` 那条与首页倒计时对账验证过）。有效期按上游前端常量：Alpha 75 分钟、群蜂最多 25 分钟，可在管理台改。 |
 | 特异天气流水 | 上游**没有** pheno 的历史接口，`/api/history-data` 只覆盖 Alpha 与群蜂。本站的特异天气列只显示玩家上报的点。 |
 | 上游异常 | 上游偶发把宝可梦名返回成图鉴号（实测出现过 `pokemon: "369"`），已用反查表还原；令牌与会话 cookie 绑定，失效时会自动重建会话重试。 |
-| 术语来源 | 宝可梦名 / 招式名 / 特性名 / 属性名取自 **PokeAPI 的 `zh-hans` 官方简中**；`头目=Alpha`、`大量出现=Swarm`、`群怪=Horde`、`奇遇=Pheno` 与 `卷尘 / 动草 / 影子 / 水面` 四种天气取自 **Alphapedia 自带的简体中文语言包** `extra-zh.json`（社区通用叫法），不自己造词，认不出的一律回落英文。注意官方简中里 **HM「Strength」与宝可梦怪力（Machamp）同名**，界面写成 `怪力（Strength）` 带英文括注，不是翻错。 |
+| 术语来源 | 宝可梦名 / 招式名 / 特性名 / 属性名取自 **PokeAPI 的 `zh-hans` 官方简中**；`头目=Alpha`、`大量出现=Swarm`、`群怪=Horde`、`奇遇=Pheno` 与 `卷尘 / 动草 / 影子 / 水面` 四种天气取自 **Alphapedia 自带的简体中文语言包** `extra-zh.json`（社区通用叫法），不自己造词，认不出的一律回落英文。注意官方简中里 **HM「Strength」与宝可梦怪力（Machamp）同名**：界面统一只写「怪力」，鼠标悬停显示 `Strength` 用来区分（以前写成 `怪力（Strength）`，玩家反馈满屏英文，已改）。 |
 | 整句汉化 | `data/cn-phrases.json`（252 条）把上游的**备注与位置说明整句**翻成中文，每条都能回指到 Alphapedia 简体中文语言包，例如 `Acro Bike required` → 需要越野自行车、`⚠ ADS HAVE RECOIL ⚠` → 小怪带反伤自残技能、`South` → 南侧。 |
 | 蛋组名取证 | 上游用 PokeMMO 黑话（`Water A/B/C`、`Chaos`、`Cannot Breed`、`Genderless`），语言包和 PokeAPI 招式表都没有。`npm run audit:eggs` 按**宝可梦成员集合的包含率**推出每个黑话对应哪个官方蛋组，再直接取该蛋组的 PokeAPI `zh-hans` 名（19/19 包含率 ≥0.925，证据落在 `data/egg-group-mapping.json`）。这一步纠正了手写表里的错译：**`Field` 官方作「陆上」，不是「场地」**；`Chaos` → 不定形、`Cannot Breed` → 未发现、`Genderless` → 矿物。 |
 | 译名分歧 | `Giant Chasm` 官方维基作「巨人洞窟」，PokeMMO 圈也常说「巨大之洼」；`Tanoby Ruins` 作「阿斯卡纳遗迹 / 蔓藤废墟」。想改就写 `data/cn-overrides.json`：`{"locations":{"Giant Chasm":"巨大之洼"}}`，管理台点「重载词表」即可生效。 |

@@ -115,21 +115,21 @@
         </div>
         <div class="row checks">
           <label><input type="checkbox" id="pushEnabled" /> 启用推送</label>
-          <label><input type="checkbox" id="kindAlpha" /> 头目 Alpha</label>
-          <label><input type="checkbox" id="kindSwarm" /> 大量出现 Swarm</label>
-          <label><input type="checkbox" id="kindPheno" /> 奇遇 Pheno</label>
+          <label><input type="checkbox" id="kindAlpha" /> 头目</label>
+          <label><input type="checkbox" id="kindSwarm" /> 大量出现</label>
+          <label><input type="checkbox" id="kindPheno" /> 奇遇</label>
         </div>
         <div class="grid3">
           <label>关注宝可梦（空 = 全部，逗号分隔）
-            <input id="onlyPokemon" placeholder="Breloom, Relicanth" />
+            <input id="onlyPokemon" placeholder="斗笠菇, 古空棘鱼（英文名也认）" />
           </label>
           <label>屏蔽宝可梦（逗号分隔）
             <input id="exceptPokemon" />
           </label>
           <label>只看这些地区（空 = 全部）
-            <input id="regions" placeholder="Kanto, Hoenn" />
+            <input id="regions" placeholder="关都地区, 丰缘地区（英文名也认）" />
           </label>
-          <label>最低价值 tier
+          <label>最低价值分级（1～8）
             <input id="minTier" type="number" min="0" max="7" />
           </label>
           <label><input type="checkbox" id="quietEnabled" style="width:auto" /> 免打扰时段（北京时间）</label>
@@ -151,8 +151,8 @@
           <label>同步间隔（分钟）<input id="interval" type="number" min="1" max="60" /></label>
           <label>首轮回填小时<input id="backfill" type="number" min="1" max="240" /></label>
           <label>保留天数<input id="retention" type="number" min="1" max="60" /></label>
-          <label>Alpha 有效期（分钟）<input id="winAlpha" type="number" min="5" max="600" /></label>
-          <label>群蜂有效期（分钟）<input id="winSwarm" type="number" min="5" max="120" /></label>
+          <label>头目有效期（分钟）<input id="winAlpha" type="number" min="5" max="600" /></label>
+          <label>大量出现有效期（分钟）<input id="winSwarm" type="number" min="5" max="120" /></label>
           <label>修改账号<input id="newUser" type="text" placeholder="留空则不修改" autocomplete="off" /></label>
           <label>修改密码<input id="newToken" type="password" placeholder="留空则不修改" autocomplete="new-password" /></label>
         </div>

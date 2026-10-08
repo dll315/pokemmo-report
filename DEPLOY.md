@@ -138,7 +138,7 @@ docker run -d \
 ```bash
 docker logs -f pokemmo-report                # 看同步与推送日志（第一次要等 15~25 秒回填）
 docker inspect -f '{{.State.Health.Status}}' pokemmo-report   # healthcheck: healthy / unhealthy
-docker exec -e ADMIN_USER=admin -e ADMIN_PASSWORD=123456 pokemmo-report node tools/selftest.js   # 自检 78 项
+docker exec -e ADMIN_USER=admin -e ADMIN_PASSWORD=123456 pokemmo-report node tools/selftest.js   # 自检 84 项
 docker stop pokemmo-report && docker rm pokemmo-report        # 停止并删除（数据在宿主机，不会丢）
 ```
 
@@ -515,4 +515,5 @@ Secrets 里配 `WECOM_WEBHOOK`，Variables 里可选 `PUSH_KINDS` / `PUSH_ONLY` 
 | `docker: invalid empty volume spec` 并触发回滚 | 旧容器的挂载表里混着空项，`docker inspect` 抄出来的 `-v` 有空的。用第 4.1 节的 `--mount=/opt/pokemmo/data:/app/data` 显式指定挂载，不去读旧容器的表。 |
 | 管理台改了密码，下次登录还是旧密码 | `ADMIN_PASSWORD` 环境变量优先于 `config.json`（容器是 `-e` 起的，升级时又被继承了一遍）。要么在容器里改掉那行，要么直接 `bash /root/sdu.sh --mount=... --reset-admin` 归正回 `admin` / `123456`。 |
 | 外网 `HTTP 000`／浏览器打不开，而服务器本机 `127.0.0.1:3580` 是 200 | 云控制台的防火墙/安全组没放行 TCP 3580（本机服务是好的，别查代码）。见第 3 节。 |
+| 界面或卡片里出现英文 | 两种情况：① **跑的是旧版本**——早期版本故意写成「冲浪（Surf）」这种双语，玩家反馈满屏英文，已改成只出中文、英文进鼠标悬停，比一下 `build.version` 就知道；② **那个词确实没有可核译名**——上游语言包和 PokeAPI 都没有的专名（如阿斯卡纳遗迹的 `Rixy` 石室）按口径保留原文，不自己造词（见 README 的术语来源一节）。`npm test` 里有一组"可见文本一律中文"的对账，会把双语形态直接判失败。 |
 | `bash: /opt/pokemmo-report/tools/server-docker-upgrade.sh: No such file or directory` | 代码根本没到那个目录（clone/解包失败却继续往下跑）。`ls /opt/pokemmo-report/Dockerfile` 确认，取不到代码看第 0 节；本机 `scp` 那类路径要在 **Git Bash** 里写，PowerShell 不认 `/g/...`。 |

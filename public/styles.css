@@ -110,10 +110,9 @@ main { max-width: 1180px; margin: 0 auto; padding: 16px; }
 }
 .item .names { display: flex; align-items: baseline; gap: 6px; min-width: 0; }
 .item .cn { font-weight: 700; font-size: 15px; }
-.item .en { color: var(--ink-2); font-size: 11.5px; }
 .item .place { display: flex; flex-direction: column; font-size: 13px; min-width: 0; }
 .item .loc { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.item .locsub, .item .meta { color: var(--ink-2); font-size: 11.5px; }
+.item .meta { color: var(--ink-2); font-size: 11.5px; }
 .item .note { color: var(--ink-2); font-size: 11.5px; font-style: italic; }
 .reqs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
 .req {

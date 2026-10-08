@@ -10,26 +10,25 @@ const { slots } = require("./slots");
 const dict = require("./dict");
 const refdata = require("./refdata");
 
-/* 标题用社区通用术语（上游语言包：Alpha→头目、Swarm→大量出现(明雷)、Pheno→奇遇），
-   括注英文原名，避免老玩家对不上号 */
+/* 标题用社区通用术语（上游语言包：Alpha→头目、Swarm→大量出现(明雷)、Pheno→奇遇），只用中文 */
 const KIND_EMOJI = { alpha: "🔴", swarm: "🐝", pheno: "🌀" };
 function kindTitle(kind) {
-  const en = { alpha: "Alpha", swarm: "Swarm", pheno: "Pheno" }[kind] || "Alpha";
-  const cn = dict.concept(en);
-  return cn && cn !== en ? `${cn} ${en}` : en;
+  return dict.concept({ alpha: "Alpha", swarm: "Swarm", pheno: "Pheno" }[kind] || "Alpha");
 }
 
 const byteLen = (s) => Buffer.byteLength(s, "utf8");
 const LIMIT = 4096;
 
+/* 卡片是纯文本、没有悬停，所以只出中文；要核英文原名点"查看上游原始报点"那条链接。
+   以前这里是「中文（English）」双显，玩家满屏看见英文，等于没翻译。 */
 function displayName(ev) {
-  return ev.pokemonCn ? `${ev.pokemonCn}（${ev.pokemon}）` : ev.pokemon;
+  return ev.pokemonCn || ev.pokemon;
 }
 function placeName(ev) {
-  return ev.locationCn ? `${ev.locationCn}${ev.location && ev.locationCn !== ev.location ? `（${ev.location}）` : ""}` : ev.location;
+  return ev.locationCn || ev.location;
 }
 function regionName(ev) {
-  return ev.regionCn ? `${ev.regionCn}（${ev.region}）` : ev.region;
+  return ev.regionCn || ev.region;
 }
 
 function remainingText(ev, nowUnix) {
@@ -42,7 +41,7 @@ function remainingText(ev, nowUnix) {
 /* 去之前要带什么：秘传兽需求，来自上游静态表 */
 function hmsText(req) {
   if (!req || !req.hms || !req.hms.length) return "";
-  return req.hms.map((h) => dict.termPair("hms", h) || h).filter(Boolean).join(" / ");
+  return req.hms.map((h) => dict.term("hms", h) || dict.term("moves", h) || h).filter(Boolean).join(" / ");
 }
 
 /* 推送上下文：本波时段、这一波的头目统计、同地点还有谁。
@@ -83,12 +82,12 @@ function buildMessage(ev, { nowUnix = Math.floor(Date.now() / 1000), ctx = null 
     isAlpha && ctx && ctx.slot ? `本波：第 ${ctx.slot.index} 波 ${hhmm(ctx.slot.start)}–${hhmm(ctx.slot.end)}（北京时间）` : "",
     isAlpha && ctx && ctx.inGap && ctx.next ? `现在在两波之间：下一波 ${hhmm(ctx.next.start)} 开始` : "",
     `报出：${fmtBeijing(ev.tsUnix)}`,
-    ev.phenoType ? `天气：${dict.termPair("concepts", ev.phenoType)}` : "",
+    ev.phenoType ? `天气：${dict.concept(ev.phenoType)}` : "",
     hmsText(req) ? `需要：${hmsText(req)}` : "",
     req.specific ? `位置：${req.specific}` : "",
     (req.notes || []).filter(Boolean).length ? `小怪警告：${req.notes.filter(Boolean).slice(0, 2).join(" · ")}` : "",
-    ev.tier ? `价值 tier：${ev.tier}${req.valuable ? "　<font color=\"warning\">★ 上游标记为有价值</font>" : ""}` : "",
-    isAlpha && ctx && ctx.waveTotal ? `本波共 ${ctx.waveTotal} 个头目，其中 tier≥4 的 ${ctx.waveHigh} 个` : "",
+    ev.tier ? `价值分级：${ev.tier} 档${req.valuable ? "　<font color=\"warning\">★ 上游标记为有价值</font>" : ""}` : "",
+    isAlpha && ctx && ctx.waveTotal ? `本波共 ${ctx.waveTotal} 个头目，其中 4 档及以上的 ${ctx.waveHigh} 个` : "",
     others.length ? `同点还有：${others.slice(0, 3).map(displayName).join("、")}${others.length > 3 ? ` 等 ${others.length} 个` : ""}` : "",
     ev.source === "local" ? `来源：玩家上报${ev.reporter ? `（${ev.reporter}）` : ""}` : "",
     ev.note ? `备注：${String(ev.note).slice(0, 80)}` : "",

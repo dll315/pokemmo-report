@@ -160,9 +160,17 @@ async function rawPost(path, body) {
       check("驳回成功", rej.json?.ok === true, JSON.stringify(rej.json));
     } else check("待审核里能找到自检提交", false, "没找到");
 
-    const sync = await hit("/api/admin/sync", { method: "POST", admin: true, body: "{}" });
+    /* 一次同步可能撞上上游网络抖动（实测 swarm-history 偶发超时），重试三次再判失败，
+       否则自检会红一条与代码无关的错，看的人得先猜半天是不是自己改坏了 */
+    let sync = null;
+    for (let i = 1; i <= 3; i++) {
+      sync = await hit("/api/admin/sync", { method: "POST", admin: true, body: "{}" });
+      if ((sync.json?.errors || []).length === 0) break;
+      if (i < 3) console.log(`  …    第 ${i} 次同步抖动 ${JSON.stringify(sync.json?.errors)}，重试`);
+      await new Promise((s) => setTimeout(s, 3000));
+    }
     check("手动同步返回统计", sync.json?.ok === true && typeof sync.json.added === "number", JSON.stringify(sync.json).slice(0, 160));
-    check("同步无错误", (sync.json?.errors || []).length === 0, JSON.stringify(sync.json?.errors));
+    check("同步无错误（上游抖动最多重试 3 次）", (sync.json?.errors || []).length === 0, JSON.stringify(sync.json?.errors));
 
     const reload = await hit("/api/admin/reload-dict", { method: "POST", admin: true, body: "{}" });
     check("词表重载 200", reload.json?.ok === true, JSON.stringify(reload.json));
@@ -215,6 +223,30 @@ async function rawPost(path, body) {
 
     const tpBad = await hit("/api/admin/test-push", { method: "POST", admin: true, body: JSON.stringify({ webhook: "abc" }) });
     check("webhook 不合法时是结构化错误（不是 500）", tpBad.status === 200 && tpBad.json?.errcode === -1 && /不合法/.test(tpBad.json?.errmsg || ""), `${tpBad.status} ${JSON.stringify(tpBad.json).slice(0, 120)}`);
+
+    /* 中文为主：接口返回的展示字段里不许出现「中文（English）」，也不许有纯英文的中文位字段 */
+    const cjk = /[㐀-鿿]/;
+    const bilingualOf = (label, obj) => {
+      const s = JSON.stringify(obj);
+      const hits = s.match(/（[A-Za-z][^（）]{0,28}）/g) || [];
+      check(`${label} 里没有「中文（English）」双显`, hits.length === 0, hits.slice(0, 4).join(" "));
+    };
+    for (const [label, p] of [["词表选项", "/api/ref/options"], ["看板", "/api/board"], ["历史点位", "/api/events?limit=60"]]) {
+      const r = await hit(p);
+      bilingualOf(label, r.json);
+    }
+    const opts = (await hit("/api/ref/options")).json || {};
+    const enOnly = [];
+    for (const r of opts.regions || []) if (r.cn && !cjk.test(r.cn)) enOnly.push(`region:${r.en}=${r.cn}`);
+    for (const list of Object.values(opts.locationsByRegion || {}))
+      for (const l of list || []) if (l.cn && !cjk.test(l.cn)) enOnly.push(`loc:${l.en}=${l.cn}`);
+    for (const s of (opts.species || []).slice(0, 400)) if (s.cn && !cjk.test(s.cn)) enOnly.push(`sp:${s.en}=${s.cn}`);
+    check("下拉里的中文位字段真的含中文", enOnly.length === 0, enOnly.slice(0, 4).join(" "));
+    const hist = (await hit("/api/events?limit=60")).json || {};
+    const bare = (hist.rows || []).filter((e) => (e.location && !cjk.test(e.locationCn || "")) || (e.pokemon && !cjk.test(e.pokemonCn || "")));
+    check("历史点位每行都带中文名（词表更新能作用于老数据）", bare.length === 0, bare.slice(0, 3).map((e) => `${e.pokemon}/${e.location}`).join(" "));
+    const oneLoc = ((opts.locationsByRegion || {}).Hoenn || [])[0];
+    if (oneLoc) bilingualOf(`地点详情 ${oneLoc.en}`, (await hit(`/api/ref/location?name=${encodeURIComponent(oneLoc.en)}`)).json);
 
     const flush = await hit("/api/admin/flush", { method: "POST", admin: true, body: "{}" });
     check("flush 返回队列统计", typeof flush.json?.sent === "number", JSON.stringify(flush.json));
