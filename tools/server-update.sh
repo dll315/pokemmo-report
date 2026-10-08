@@ -117,9 +117,11 @@ if [ -z "$MODE" ] && command -v docker >/dev/null 2>&1 && docker ps -a --format 
 case "$MODE" in
   systemd) systemctl daemon-reload; systemctl restart poke; sleep 10; journalctl -u poke -n 12 --no-pager ;;
   docker)
-    echo "  你是 Docker 部署：代码换了必须重建镜像才生效。境内机器拉不到 Docker Hub，"
-    echo "  基础镜像已在本地的话执行："
-    echo "    cd $DIR && docker build -t pokemmo-report:latest . && docker restart pokemmo-report"
+    DOCKER_MODE=1
+    echo "  你是 Docker 部署：新代码要打进镜像才生效。**docker restart 不会换镜像**，"
+    echo "  管理台看不到变化通常就是这个原因。用专门的重建脚本（旧容器只改名，新容器验证通过才删）："
+    echo "    curl -fsSL --max-time 30 -o /root/sdu.sh \"https://gh-proxy.com/https://raw.githubusercontent.com/dll315/pokemmo-report/main/tools/server-docker-upgrade.sh\""
+    echo "    grep -q 'MOUNT_OVERRIDE' /root/sdu.sh && bash /root/sdu.sh --mount=/opt/pokemmo/data:/app/data"
     ;;
   *) echo "  ! 没找到 poke.service 也没找到 pokemmo-report 容器：代码已就位，但还没有服务在跑。"
      echo "    首次部署请按 DEPLOY.md 第 6 节建 systemd 单元（本脚本不替你创建服务）" ;;
@@ -131,6 +133,10 @@ curl -s -m 10 -o /dev/null -w "  服务器本机 127.0.0.1:$PORT → HTTP %{http
 NEW_LIVE=$(curl -s -m 10 "http://127.0.0.1:$PORT/api/config/public" 2>/dev/null | sed -n 's/.*"build":{"version":"\([^"]*\)".*/\1/p' | head -1)
 echo "  更新前运行版本 ${LIVE_VER:-无} → 更新后运行版本 ${NEW_LIVE:-无}（包里是 ${PKG_VER:-未标记}）"
 if [ -n "$NEW_LIVE" ] && [ -n "$PKG_VER" ] && [ "${NEW_LIVE:0:7}" != "${PKG_VER:0:7}" ]; then
-  echo "  ! 跑的还是旧版：重启没生效。执行 systemctl restart poke 再看这一行"
+  if [ -n "$DOCKER_MODE" ]; then
+    echo "  ! 跑的还是旧镜像：按上面 5/6 打印的那两条 curl/bash 重建并换容器（systemctl 对容器没用）"
+  else
+    echo "  ! 跑的还是旧版：重启没生效。执行 systemctl restart poke 再看这一行"
+  fi
 fi
 echo "  外网打不开而本机通 = 云控制台防火墙/安全组没放行 TCP $PORT"

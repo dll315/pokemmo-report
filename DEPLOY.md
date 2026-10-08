@@ -138,9 +138,13 @@ docker run -d \
 ```bash
 docker logs -f pokemmo-report                # 看同步与推送日志（第一次要等 15~25 秒回填）
 docker inspect -f '{{.State.Health.Status}}' pokemmo-report   # healthcheck: healthy / unhealthy
-docker exec -e ADMIN_USER=admin -e ADMIN_PASSWORD=123456 pokemmo-report node tools/selftest.js   # 自检 76 项
+docker exec -e ADMIN_USER=admin -e ADMIN_PASSWORD=123456 pokemmo-report node tools/selftest.js   # 自检 78 项
 docker stop pokemmo-report && docker rm pokemmo-report        # 停止并删除（数据在宿主机，不会丢）
 ```
+
+> 以后**升级别照抄上面这条 `docker rm`**，那是手工重建容器、会连带删掉旧容器。用第 4.1 节那条脚本，
+> 它先 build、旧容器只改名、新容器验到 HTTP 200 才删，失败当场恢复。
+> 也别用 `docker restart` 当更新——镜像不重建就还是旧代码，管理台看着"没变化"就是这个原因。
 
 更新到新版本：
 
@@ -187,7 +191,53 @@ ufw allow 3580/tcp                                                        # Ubun
 
 ### 4. 更新与备份
 
-#### 一条命令更新（推荐）
+更新命令按**你服务器上是怎么跑起来的**分路。先跑 4.0 判断，再照 4.1 / 4.2 / 4.3 里对应的那条执行。
+
+#### 4.0 先判断：端口是谁占着
+
+只读、不改任何东西，输出很短，整段贴回来就能判断：
+
+```bash
+ss -lntp | grep ':3580 '; docker ps -a --format '{{.Names}} | {{.Status}} | {{.Ports}}'
+```
+
+- 出现 `docker-proxy`，且 `docker ps` 里有 `pokemmo-report | Up ... | 0.0.0.0:3580->3580/tcp`
+  → **Docker 部署，走 4.1**。这时千万别用 systemd 抢端口（会撞 `EADDRINUSE` / `errno -98`）。
+- 没有 docker，且 `systemctl status poke` 是 active → **systemd 部署**：本机 `ssh` 得通走 4.2，
+  报 `ssh: connect to host ... port 22: Connection timed out` 走 4.3。
+
+#### 4.1 Docker 部署：一条命令升级（推荐，实测在用）
+
+在云控制台的网页终端（或任何已经登上服务器的 shell）里，**整段粘贴**：
+
+```bash
+curl -fsSL --max-time 30 -o /root/sdu.sh "https://gh-proxy.com/https://raw.githubusercontent.com/dll315/pokemmo-report/main/tools/server-docker-upgrade.sh" \
+  || curl -fsSL --max-time 30 -o /root/sdu.sh "https://raw.githubusercontent.com/dll315/pokemmo-report/main/tools/server-docker-upgrade.sh"
+grep -q 'MOUNT_OVERRIDE' /root/sdu.sh && bash /root/sdu.sh --mount=/opt/pokemmo/data:/app/data
+```
+
+三行各自为什么这么写：
+
+1. 先试 `gh-proxy.com`，代理挂了自动回落官方 `raw`（`raw` 在国内多数网络不通，所以留两条）。
+2. `grep -q 'MOUNT_OVERRIDE'` 是**内容守卫**：拿到的脚本必须真含新版才执行。GitHub 对分支压缩包有缓存，
+   没有这道守卫可能跑了一份旧脚本再报错。**如果这条什么都没打印就返回了，是守卫没放行**
+   （脚本还是旧的），重跑上一行 `curl` 即可。
+3. `--mount=/opt/pokemmo/data:/app/data` 显式给挂载、**不去读旧容器的挂载表**。实测过：有机器
+   `docker inspect` 出来的挂载表里混着空项，`docker run` 会报 `invalid empty volume spec` 并触发回滚。
+   数据目录不是这个路径的话，换成 `docker inspect` 里那个 `Source`；`--mount=` 可以给多次。
+
+脚本行为：取代码 → 先 `docker build` → 旧容器**只改名不删** → 新容器轮询到 HTTP 200 才删旧容器，
+起不来自动把旧容器恢复回去；旧镜像留成 `pokemmo-report:rollback`。
+`/opt/pokemmo/data` 里的 `db.json`（点位与上报）和 `config.json`（机器人连接、订阅规则）都不会被动。
+
+**如果管理台改过密码却不生效**：早期起容器时 `-e` 过密码，之后每次升级都继承下来，
+环境变量会盖过网页里设置的密码。归正回 `admin` / `123456`：
+
+```bash
+bash /root/sdu.sh --mount=/opt/pokemmo/data:/app/data --reset-admin
+```
+
+#### 4.2 systemd 部署，本机 ssh 得通：一条命令更新
 
 在你自己电脑上、仓库目录里跑（Git Bash）：
 
@@ -204,55 +254,41 @@ bash tools/deploy-update.sh root@别的IP 3581 # 换主机或端口
 - 服务器不需要 git，也不需要能访问 GitHub（第 0 节那个坑不会再踩一次）。
 - **`data/` 不在包里**，`db.json`（点位与上报）和 `config.json`（机器人连接、订阅规则）都不会被覆盖。
 - 认不出任何已部署痕迹时会**直接退出并告诉你这是首次部署**，不会半路创建服务。
-- Docker 那条它只更新代码并打印重建镜像的两条命令，不替你 `docker rm`（删容器属于不可逆动作）。
+- Docker 部署不用这条：`deploy-update.sh` 只会更新代码并打印 4.1 的命令，删容器换镜像属于不可逆动作，它不替你做。Docker 直接跑 4.1。
 
-#### 如果端口被容器占着：用 Docker 的方式升级
-
-先确认是谁占着端口（这条输出很短，整段贴回来就能判断）：
-
-```bash
-ss -lntp | grep ':3580 '; docker ps -a --format '{{.Names}} | {{.Status}} | {{.Ports}}'
-```
-
-出现 `docker-proxy` + `pokemmo-report | Up ... | 0.0.0.0:3580->3580/tcp` 就是**容器在跑旧镜像**，
-这时别用 systemd 抢端口，用 `tools/server-docker-upgrade.sh`：它先取代码、先 `docker build`，
-再从**现有容器**上读出挂载和环境变量原样继承，只有确认 `/app/data` 挂在宿主机上才敢删旧容器
-（否则停手，避免机器人地址和上报记录随容器一起没了），旧镜像留成 `pokemmo-report:rollback` 可回滚。
-
-```bash
-curl -fsSL --max-time 30 -o /root/sdu.sh "https://gh-proxy.com/https://raw.githubusercontent.com/dll315/pokemmo-report/main/tools/server-docker-upgrade.sh" \
-  || curl -fsSL --max-time 30 -o /root/sdu.sh "https://raw.githubusercontent.com/dll315/pokemmo-report/main/tools/server-docker-upgrade.sh"
-grep -q 'MOUNT_OVERRIDE' /root/sdu.sh && bash /root/sdu.sh --mount=/opt/pokemmo/data:/app/data
-```
-
-`--mount=` 是显式指定挂载、**不读旧容器的挂载表**：实测有机器 `docker inspect` 出来的表里混着空项，
-会让 `docker run` 报 `invalid empty volume spec` 并触发回滚。另有 `--reset-admin` 可把账号密码改回
-`admin` / `123456`（继承来的 `ADMIN_PASSWORD` 环境变量会盖过管理台里改的密码）。
-
-#### 本机连不上服务器 22 端口时：让服务器自己取代码
-
+#### 4.3 systemd 部署但本机连不通 22 端口：让服务器自己取代码
 
 `deploy-update.sh` 要在能 `ssh` 通服务器的电脑上跑。如果 22 端口被云防火墙挡着（实测过：`ssh: connect to host ... port 22: Connection timed out`，而 80/443 是通的），
-就把更新脚本传到服务器上、在**云控制台的网页终端**里跑，让它自己去 GitHub 取代码：
+就在**云控制台的网页终端**里跑下面这段，让服务器自己去 GitHub 取代码。
+
+服务器上已经有 `/opt/pokemmo-report` 的话，直接从第二条开始：
 
 ```bash
-# 服务器上（先只探测，不改任何东西）
+# 1) 连 /opt/pokemmo-report 都没有：先把更新脚本本身取下来（内容守卫：必须含 PKG_VER 才执行）
+curl -fsSL --max-time 30 -o /root/su.sh "https://gh-proxy.com/https://raw.githubusercontent.com/dll315/pokemmo-report/main/tools/server-update.sh" \
+  || curl -fsSL --max-time 30 -o /root/su.sh "https://raw.githubusercontent.com/dll315/pokemmo-report/main/tools/server-update.sh"
+grep -q 'PKG_VER' /root/su.sh && bash /root/su.sh --check
+
+# 2) 代码目录已在服务器上：先只探测（不改任何东西），确认能取到包、包里是哪个提交
 bash /opt/pokemmo-report/tools/server-update.sh --check
-# 探测通过就真的更新（备份 → 解包 → 重启 → 自检）
+# 3) 探测通过就真的更新（备份 → 解包 → 重启 → 自检）
 bash /opt/pokemmo-report/tools/server-update.sh
 ```
 
 它按 `codeload.github.com → gh-proxy.com → ghproxy.net` 顺序试，取到后先验包（gzip 合法、条目 >400、
 必须有 `server.js`、数一下图鉴图），验不过就直接放弃不动现有代码；更新前把整个代码目录备份成
 `.prev`，回滚就是把 `.prev` 覆盖回去。`data/` 不在仓库包里，所以点位、上报记录、机器人连接和订阅规则都不会被动。
-Docker 部署的话它只更新代码并打印重建镜像的命令，不替你 `docker rm`。
+它是按 `poke.service` 存在与否判定部署方式的：**Docker 部署请直接用 4.1**，走这条只会更新代码并打印重建镜像的命令，不替你换容器。
 
 想让本机脚本能用，就得在云控制台把 TCP 22 放行（更安全的做法是只放行你自己当前的出口 IP）。
 
-#### 手动更新（systemd 那条路）
+#### 4.4 手动更新（systemd 那条路，脚本也不好用时的兜底）
+
+前两条命令要在**本机的 Git Bash** 里跑（`/g/...` 是 Git Bash 写法，PowerShell 里 `scp` 会报
+`No such file or directory`，这就是踩过的那次）：
 
 ```bash
-# 本机
+# 本机 Git Bash（仓库目录里）
 git archive --format=tar.gz -o /g/QoderCNworks/pokemmo-report.tar.gz HEAD
 scp /g/QoderCNworks/pokemmo-report.tar.gz root@159.198.67.190:/root/
 
@@ -261,16 +297,27 @@ tar xzf /root/pokemmo-report.tar.gz -C /opt/pokemmo-report
 systemctl restart poke && journalctl -u poke -n 10 --no-pager
 ```
 
-#### 回滚
+#### 4.5 回滚
 
-服务跑的是 `/opt/pokemmo-report` 里的代码，回滚就是拿旧包再解一次：
+systemd 部署：服务跑的是 `/opt/pokemmo-report` 里的代码，回滚就是把旧代码盖回去
+（`server-update.sh` 会自动留 `.prev`，`deploy-update.sh` 不会，要留自己执行下面第一条）。
 
 ```bash
-# 更新前先留一份（deploy-update.sh 不会帮你留，要留自己执行）
-cp -a /opt/pokemmo-report /opt/pokemmo-report.prev
-# 出问题回退
-cp -a /opt/pokemmo-report.prev/. /opt/pokemmo-report/ && systemctl restart poke
+cp -a /opt/pokemmo-report /opt/pokemmo-report.prev                      # 更新前自己留一份
+cp -a /opt/pokemmo-report.prev/. /opt/pokemmo-report/ && systemctl restart poke   # 出问题回退
 ```
+
+Docker 部署：4.1 那条脚本已经把旧镜像留成标签了，回滚不用重新构建——
+
+```bash
+docker stop pokemmo-report && docker rm pokemmo-report
+docker run -d --name pokemmo-report --restart unless-stopped -p 3580:3580 \
+  -e ADMIN_USER=admin -e ADMIN_PASSWORD=123456 -v /opt/pokemmo/data:/app/data \
+  pokemmo-report:rollback
+```
+
+它自己会打印同样的一条命令（含你实际的挂载），照抄即可。新容器起失败时脚本会当场把旧容器改名恢复回去，
+不会留下"端口没人听"的状态。
 
 上游静态参考表在 `data/upstream/`，12 小时自动刷一次。备份打包那两个数据文件即可（命令见第 2b 节末尾）。
 
@@ -297,6 +344,17 @@ server {
 本站**没有任何 npm 依赖**（`src/net.js` 用 Node 自带的 `https` 模块），
 所以只要有 node 可执行文件就能跑：不用 `npm install`，不用 Docker Hub，不用镜像源。
 服务本身要 Node 16+（`tools/` 里的自检脚本用了全局 `fetch`，那个要 18+）。
+
+**首次部署想省事就一条命令**——`tools/server-bootstrap.sh` 把下面 1~6 步全包了（取代码 → 缺 Node 就从 npmmirror 装 →
+建 `poke.service` → 启动 → 本机自检），幂等可重复跑，不动 `data/`。在云控制台网页终端里整段粘贴：
+
+```bash
+curl -fsSL --max-time 30 -o /root/sb.sh "https://gh-proxy.com/https://raw.githubusercontent.com/dll315/pokemmo-report/main/tools/server-bootstrap.sh" \
+  || curl -fsSL --max-time 30 -o /root/sb.sh "https://raw.githubusercontent.com/dll315/pokemmo-report/main/tools/server-bootstrap.sh"
+grep -q 'systemd/system/poke.service' /root/sb.sh && bash /root/sb.sh
+```
+
+下面 1~6 步是它做的事情的展开，想手动控制每一步（或者服务器出网受限、只能从第 0 节 scp 包上来）就照着手敲。
 
 ```bash
 # 1) 代码到位（第 0 节：本机打包 scp 上来）
@@ -452,3 +510,9 @@ Secrets 里配 `WECOM_WEBHOOK`，Variables 里可选 `PUSH_KINDS` / `PUSH_ONLY` 
 | build 报 `unable to prepare context: path "/opt/pokemmo-report" not found` | 那个目录根本不存在／是空的——clone 没成功就往下的命令全跑了一遍。`ls /opt/pokemmo-report/Dockerfile` 确认代码到位，取不到代码看第 0 节。 |
 | `Get "https://registry-1.docker.io/v2/": context deadline exceeded` | Docker Hub 在境内连不上，跟本站代码无关。第 0b 节配加速源，或者干脆走第 6 节纯 Node（零依赖，不需要任何镜像）。 |
 | `FirewallD is not running` | 系统层防火墙本来就没开，`firewall-cmd` 那两条不用管；端口只剩云控制台「防火墙/安全组」一道，见第 3 节。 |
+| **更新后管理台没有任何变化** | 十有八九是**跑的还是旧镜像**：`docker restart`／`systemctl restart` 都不会重建镜像。先 `curl -s http://127.0.0.1:3580/api/config/public \| grep -o '"build":{[^}]*}'` 看运行版本，和 `cat /opt/pokemmo-report/BUILDINFO` 的包内版本比；不一致就按第 4.1 节重建（Docker）或 `systemctl restart poke`（systemd）。管理台右上角的版本号是同一个值。 |
+| `listen ... port 3580 errno: -98`（EADDRINUSE） | 端口已被占着。`ss -lntp \| grep ':3580 '` 看占的进程：`docker-proxy` 说明容器在跑（改用第 4.1 节，别再起 systemd），`node server.js` 且 cwd 是本项目就是手动起的游离进程，`kill` 掉它。 |
+| `docker: invalid empty volume spec` 并触发回滚 | 旧容器的挂载表里混着空项，`docker inspect` 抄出来的 `-v` 有空的。用第 4.1 节的 `--mount=/opt/pokemmo/data:/app/data` 显式指定挂载，不去读旧容器的表。 |
+| 管理台改了密码，下次登录还是旧密码 | `ADMIN_PASSWORD` 环境变量优先于 `config.json`（容器是 `-e` 起的，升级时又被继承了一遍）。要么在容器里改掉那行，要么直接 `bash /root/sdu.sh --mount=... --reset-admin` 归正回 `admin` / `123456`。 |
+| 外网 `HTTP 000`／浏览器打不开，而服务器本机 `127.0.0.1:3580` 是 200 | 云控制台的防火墙/安全组没放行 TCP 3580（本机服务是好的，别查代码）。见第 3 节。 |
+| `bash: /opt/pokemmo-report/tools/server-docker-upgrade.sh: No such file or directory` | 代码根本没到那个目录（clone/解包失败却继续往下跑）。`ls /opt/pokemmo-report/Dockerfile` 确认，取不到代码看第 0 节；本机 `scp` 那类路径要在 **Git Bash** 里写，PowerShell 不认 `/g/...`。 |

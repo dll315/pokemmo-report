@@ -43,8 +43,8 @@ WECOM_WEBHOOK="http://127.0.0.1:3599/send?key=MOCK" node server.js 3580
 ## 自检
 
 ```bash
-npm test                                   # 纯逻辑单测 25 组，不联网
-ADMIN_USER=admin ADMIN_PASSWORD=123456 npm run selftest   # 对着跑着的服务打 76 项接口用例
+npm test                                   # 纯逻辑单测 28 组，不联网
+ADMIN_USER=admin ADMIN_PASSWORD=123456 npm run selftest   # 对着跑着的服务打 78 项接口用例
 node tools/verify-cn-data.js               # 校验宝可梦名/地点名覆盖率
 npm run verify:terms                       # 校验术语表覆盖率
 npm run phrases                            # 重新生成整句表（上游语言包有更新时）
@@ -61,10 +61,16 @@ npm run audit:sources                      # 译名溯源复核：整句表回�
 ## 部署
 
 三条路，参数含义、更新、备份、放行端口、故障排查都在 **DEPLOY.md**。
-已经部署过一次的话，以后更新两条命令任选：
-- 本机（Git Bash）能 `ssh` 通服务器：**`bash tools/deploy-update.sh`** —— 打包 HEAD → ssh 传上去 → 解包重启 → 本机与外网各验一次。
-- 22 端口被云防火墙挡着：在服务器上跑 **`bash tools/server-update.sh`** —— 让服务器自己去 GitHub 取包（验包 → 备份 `.prev` → 解包 → 重启 → 自检）。
-两者的 `data/`（点位、上报、机器人连接、订阅规则）都不在包里，不会被覆盖。
+已经部署过一次的话，以后更新按 **DEPLOY.md 第 4.0 节**判断自己是哪种部署，再选对应那条：
+
+- **Docker 部署**（`ss -lntp` 里 3580 被 `docker-proxy` 占着）：在服务器上整段粘贴 ——
+  `curl` 取 `tools/server-docker-upgrade.sh` → `grep` 内容守卫 → `bash /root/sdu.sh --mount=/opt/pokemmo/data:/app/data`。
+  先 build、旧容器只改名、新容器验到 HTTP 200 才删，失败自动恢复；完整可粘贴的三行在 DEPLOY.md 4.1。
+- **systemd 部署、本机 Git Bash 能 `ssh` 通服务器**：**`bash tools/deploy-update.sh`** —— 打包 HEAD → ssh 传上去 → 解包重启 → 本机与外网各验一次。
+- **systemd 部署、22 端口被云防火墙挡着**：在服务器上跑 **`bash tools/server-update.sh`** —— 让服务器自己去 GitHub 取包（验包 → 备份 `.prev` → 解包 → 重启 → 自检）。
+
+三条都不动 `data/`（点位、上报、机器人连接、订阅规则）。**`docker restart` 不是更新**：镜像不重建，跑的还是旧代码，
+管理台看不到变化基本都是这个原因。
 
 ### A. 服务器上直接 `docker run`（推荐）
 

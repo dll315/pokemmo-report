@@ -402,5 +402,50 @@ t("词表更新后老数据也要显示中文（读取时重算，不靠入库�
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
+t("部署文档里的命令与脚本对得上（守卫串、参数、引用的文件都真实存在）", () => {
+  const doc = fs.readFileSync(path.join(ROOT, "DEPLOY.md"), "utf8");
+  const readme = fs.readFileSync(path.join(ROOT, "README.md"), "utf8");
+  const sh = (f) => fs.readFileSync(path.join(ROOT, "tools", f), "utf8");
+  const sdu = sh("server-docker-upgrade.sh");
+  const su = sh("server-update.sh");
+  const du = sh("deploy-update.sh");
+  const bs = sh("server-bootstrap.sh");
+
+  /* 文档靠 grep 内容守卫决定要不要执行下载来的脚本；守卫串一旦被改名或删掉，
+     那条命令会静默什么都不做，用户只看到"没反应"。这是最容易复发的一类不一致。 */
+  const guards = [
+    ["MOUNT_OVERRIDE", sdu, "4.1 的 grep 守卫"],
+    ["PKG_VER", su, "4.3 的 grep 守卫"],
+    ["systemd/system/poke.service", bs, "第 6 节的 grep 守卫"],
+  ];
+  for (const [marker, body, label] of guards) {
+    ok(doc.includes(marker), `${label}没有在 DEPLOY.md 里出现`);
+    ok(body.includes(marker), `${label}指向的串在脚本里找不到（脚本会拒绝执行）`);
+  }
+
+  /* 文档提到的每个 tools/*.sh 必须真的在仓库里，且是同一个可执行脚本 */
+  const refs = new Set([...`${doc}\n${readme}`.matchAll(/tools\/([a-z0-9_-]+\.sh)/g)].map((m) => m[1]));
+  ok(refs.size >= 4, `文档只引用了 ${refs.size} 个脚本，正则或文档可疑`);
+  for (const f of refs) ok(fs.existsSync(path.join(ROOT, "tools", f)), `文档引用了不存在的 tools/${f}`);
+
+  /* 文档写给用户的参数，脚本的 case 分支必须认 */
+  ok(/--mount=\S+/.test(doc) && sdu.includes("--mount=*"), "文档给了 --mount= 但 server-docker-upgrade.sh 不认");
+  ok(/--reset-admin/.test(doc) && sdu.includes("--reset-admin)"), "文档给了 --reset-admin 但脚本不认");
+  ok(/server-update\.sh --check/.test(doc) && su.includes('"--check"'), "文档给了 --check 但 server-update.sh 不认");
+
+  /* 复发了两次的那个坑：把 docker restart 当成更新（镜像不重建，跑的还是旧代码） */
+  ok(!su.includes("docker restart pokemmo-report"), "server-update.sh 又叫人 docker restart 了：那不会换镜像");
+  ok(!du.includes("docker restart pokemmo-report"), "deploy-update.sh 同上");
+
+  /* 命令里不许出现占位符凭据——占位符会被原样抄成真实密码（实测密码长度 8 就是这么来的） */
+  for (const ph of ["换成你自己", "同样的密码", "同样的地址", "<webhook>", "your-key", "YOUR_PASSWORD", "<TOKEN> 换成"]) {
+    ok(!doc.includes(ph) && !readme.includes(ph), `文档里又出现占位符：${ph}`);
+  }
+  /* 机器人地址只能在管理台管：命令里不该带 WECOM_WEBHOOK（<TOKEN> 那条是 git 令牌，允许） */
+  for (const [name, body] of [["DEPLOY.md", doc], ["README.md", readme], ["deploy-update.sh", du], ["server-bootstrap.sh", bs]]) {
+    ok(!/-e\s+WECOM_WEBHOOK|--wecom-webhook/.test(body), `${name} 又把 webhook 写进命令行里了`);
+  }
+});
+
 console.log(`\n单测通过 ${pass}，失败 ${fails.length}${fails.length ? "：" + fails.join(" / ") : ""}`);
 process.exit(fails.length ? 1 : 0);

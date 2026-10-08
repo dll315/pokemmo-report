@@ -76,9 +76,12 @@ case "$MODE" in
     echo "3/4 代码已更新，但没有 poke.service —— 先按 DEPLOY.md 第 6 节建单元，再 systemctl start poke"
     ;;
   docker)
-    echo "3/4 Docker 方式需要重建镜像，手动执行这两条："
-    echo "    cd /opt/pokemmo-report && docker build -t pokemmo-report:latest ."
-    echo "    docker stop pokemmo-report && docker rm pokemmo-report && docker run -d --name pokemmo-report --restart unless-stopped -p 3580:3580 -e ADMIN_USER=admin -e ADMIN_PASSWORD=123456 -v /opt/pokemmo/data:/app/data pokemmo-report:latest"
+    echo "3/4 你是 Docker 部署：代码已经解到 /opt/pokemmo-report，但**镜像不重建就不生效**"
+    echo "    （docker restart 只重启旧镜像，管理台会看起来毫无变化）。这一步不替你删容器，"
+    echo "    在服务器上跑下面这条——脚本刚才已经跟着包解到那个目录里了，它会重建镜像、"
+    echo "    旧容器只改名、新容器验到 HTTP 200 才删，起不来当场恢复："
+    echo "    bash /opt/pokemmo-report/tools/server-docker-upgrade.sh --mount=/opt/pokemmo/data:/app/data"
+    echo "    数据目录不是 /opt/pokemmo/data 就换成 docker inspect 里那个 Source；密码被环境变量盖住时加 --reset-admin"
     ;;
 esac
 
