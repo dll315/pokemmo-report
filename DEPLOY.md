@@ -220,12 +220,14 @@ ss -lntp | grep ':3580 '; docker ps -a --format '{{.Names}} | {{.Status}} | {{.P
 （否则停手，避免机器人地址和上报记录随容器一起没了），旧镜像留成 `pokemmo-report:rollback` 可回滚。
 
 ```bash
-for u in "https://raw.githubusercontent.com/dll315/pokemmo-report/main/tools/server-docker-upgrade.sh" \
-         "https://gh-proxy.com/https://raw.githubusercontent.com/dll315/pokemmo-report/main/tools/server-docker-upgrade.sh"; do
-  curl -fsSL --max-time 30 -o /root/sdu.sh "$u" && grep -q server-docker-upgrade /root/sdu.sh && echo "取到：$u" && break
-done
-bash /root/sdu.sh
+curl -fsSL --max-time 30 -o /root/sdu.sh "https://gh-proxy.com/https://raw.githubusercontent.com/dll315/pokemmo-report/main/tools/server-docker-upgrade.sh" \
+  || curl -fsSL --max-time 30 -o /root/sdu.sh "https://raw.githubusercontent.com/dll315/pokemmo-report/main/tools/server-docker-upgrade.sh"
+grep -q 'MOUNT_OVERRIDE' /root/sdu.sh && bash /root/sdu.sh --mount=/opt/pokemmo/data:/app/data
 ```
+
+`--mount=` 是显式指定挂载、**不读旧容器的挂载表**：实测有机器 `docker inspect` 出来的表里混着空项，
+会让 `docker run` 报 `invalid empty volume spec` 并触发回滚。另有 `--reset-admin` 可把账号密码改回
+`admin` / `123456`（继承来的 `ADMIN_PASSWORD` 环境变量会盖过管理台里改的密码）。
 
 #### 本机连不上服务器 22 端口时：让服务器自己取代码
 

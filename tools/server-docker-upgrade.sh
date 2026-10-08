@@ -2,8 +2,11 @@
 # 在【服务器】上用 root 跑：把正在跑的 pokemmo-report 容器升级到仓库最新代码，
 # 并且**原样继承现有容器的挂载与环境变量**（机器人地址、上报记录都在挂载目录里）。
 #
-#   bash server-docker-upgrade.sh                 # 升级，账号密码等环境原样继承
-#   bash server-docker-upgrade.sh --reset-admin   # 升级，并把账号强制改回 admin / 123456
+#   bash server-docker-upgrade.sh                                  # 升级，挂载与环境都从旧容器继承
+#   bash server-docker-upgrade.sh --mount=/opt/pokemmo/data:/app/data   # 显式指定挂载，不读旧容器的挂载表
+#   bash server-docker-upgrade.sh --reset-admin                    # 升级并把账号密码改回 admin / 123456
+#
+# 参数可叠加。--mount 可以重复给多次。
 #
 # 加 --reset-admin 的场景：早期起容器时 -e 了一个自己定的密码，之后每次升级都继承下来，
 # 而环境变量优先级高于 data/config.json，于是管理台里改密码"不生效"。
@@ -21,7 +24,14 @@ NAME="pokemmo-report"
 DIR="/opt/pokemmo-report"
 PORT="3580"
 RESET_ADMIN=""
-if [ "${1:-}" = "--reset-admin" ]; then RESET_ADMIN=1; fi
+MOUNT_OVERRIDE=""
+for a in "$@"; do
+  case "$a" in
+    --reset-admin) RESET_ADMIN=1 ;;
+    --mount=*) MOUNT_OVERRIDE="$MOUNT_OVERRIDE ${a#--mount=}" ;;
+    *) echo "× 不认识参数：$a（可用 --reset-admin / --mount=宿主机路径:容器路径）"; exit 1 ;;
+  esac
+done
 
 echo "1/5 取最新代码（按 main 的提交号取，避开 GitHub 的分支包缓存）"
 SHA="$(curl -fsSL --max-time 25 -H 'Accept: application/vnd.github+json' "https://api.github.com/repos/$REPO/commits/main" 2>/dev/null | sed -n 's/.*"sha"[[:space:]]*:[[:space:]]*"\([0-9a-f]\{40\}\)".*/\1/p' | head -1)"
@@ -44,6 +54,12 @@ if ! docker ps -a --format '{{.Names}}' | grep -qx "$NAME"; then
 fi
 mapfile -t MNTS < <(docker inspect -f '{{range .Mounts}}{{.Source}}:{{.Destination}}{{println}}{{end}}' "$NAME")
 mapfile -t ENVS < <(docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' "$NAME" | grep -vE '^(PATH|HOME|NODE_ENV|container)=') || true
+if [ -n "$MOUNT_OVERRIDE" ]; then
+  # 有些机器 inspect 出来的挂载表里混着空项（实测会让 docker run 报 invalid empty volume spec），
+  # 显式给定时就以显式为准
+  MNTS=($MOUNT_OVERRIDE)
+  echo "   挂载按命令行指定（不读旧容器的挂载表）：${MNTS[*]}"
+fi
 echo "   挂载 ${#MNTS[@]} 个：${MNTS[*]:-（无）}"
 echo "   环境 ${#ENVS[@]} 个：$(printf '%s ' "${ENVS[@]:-}" | sed -E 's/(key=)[^&[:space:]]+/\1***/g; s/(ADMIN_PASSWORD=).*/\1***/')"
 # 继承来的 ADMIN_* 会盖掉 data/config.json 里的设置（环境变量优先级最高），
