@@ -361,5 +361,46 @@ t("头目推送要报得详细：特性/配招/本波时段/同点其它/本波�
   ok(!/本波共/.test(sw.markdown.content), "群蜂卡片不塞头目的波次统计，别把不相关信息堆上去");
 });
 
+t("地点通名兜底：Chamber→石室 有整句出处，专名保留原文不造词", () => {
+  eq(dict.locationOf("Rixy Chamber"), "Rixy 石室", "Rixy Chamber 应译成 Rixy 石室");
+  eq(dict.locationOf("Guidance Chamber"), "Guidance 石室", "Guidance Chamber");
+  eq(dict.locationOf("Viapois Chamber"), "Viapois 石室", "Viapois Chamber");
+  /* 整条地名命中时不该走兜底，也不该被通名规则二次替换 */
+  const tanoby = dict.locationOf("Tanoby Ruins");
+  ok(tanoby && !/石室/.test(tanoby), `遗迹整条译名不该被通名规则污染：${tanoby}`);
+  eq(dict.locationOf("Rixy Chamber"), "Rixy 石室", "重复调用要幂等（正则带 g 容易踩 lastIndex）");
+  eq(dict.locationOf("Not A Real Place At All"), null, "没有任何可核通名命中时返回 null，界面回落英文");
+
+  /* 出处检查：cn-place-words 里每个词都要能在整句表里找到"英文含该词、中文含该译法"的整句 */
+  const pw = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "cn-place-words.json"), "utf8"));
+  const ph = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "cn-phrases.json"), "utf8"));
+  ok(pw.words.length > 0, "通名表不能为空");
+  for (const w of pw.words) {
+    const hits = Object.entries(ph).filter(([en, cn]) => new RegExp(`\\b${w.en}\\b`, "i").test(en) && String(cn).includes(w.cn));
+    ok(hits.length >= 1, `通名 ${w.en}→${w.cn} 在上游整句表里找不到出处，不该收进来`);
+    ok(Array.isArray(w.evidence) && w.evidence.length >= 1, `${w.en} 缺少 evidence 字段`);
+  }
+});
+
+t("词表更新后老数据也要显示中文（读取时重算，不靠入库时的缓存）", () => {
+  const dir = path.join(os.tmpdir(), "poke-refresh-" + process.pid);
+  fs.rmSync(dir, { recursive: true, force: true });
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, "db.json"), JSON.stringify({
+    version: 1,
+    meta: {},
+    events: [{ key: "swarm|a|x|1", kind: "swarm", source: "upstream", pokemon: "Aerodactyl", location: "Rixy Chamber", region: "Kanto", tsUnix: Math.floor(Date.now() / 1000), expiresUnix: Math.floor(Date.now() / 1000) + 600 }],
+    reports: [], queue: [],
+  }));
+  const s2 = new Store(dir);
+  s2.load();
+  const row = s2.events({ limit: 5 }).rows[0];
+  eq(row.locationCn, "Rixy 石室", "入库时没写 locationCn，读取要按当前词表补上");
+  eq(row.pokemonCn, "化石翼龙", "宝可梦名同理");
+  eq(s2.getEvent("swarm|a|x|1").locationCn, "Rixy 石室", "getEvent 也要重算（推送走这条路）");
+  ok(s2.events({ q: "石室", limit: 5 }).total >= 1, "按中文搜地点要能命中老数据");
+  fs.rmSync(dir, { recursive: true, force: true });
+});
+
 console.log(`\n单测通过 ${pass}，失败 ${fails.length}${fails.length ? "：" + fails.join(" / ") : ""}`);
 process.exit(fails.length ? 1 : 0);

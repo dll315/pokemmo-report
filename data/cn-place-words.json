@@ -1,0 +1,16 @@
+{
+  "_note": "地点名里的【通名】译法，用来处理字典里没有整条地名的情况（如阿斯卡纳遗迹的三间石室）。每条都要能在上游简体中文语言包的整句翻译里找到出处：英文通名出现在某条整句的键里、且对应中文值含该译法。专名（Rixy / Guidance / Viapois 等）没有任何可核中文来源，一律保留英文原文，不自己造词。出处文件：data/upstream/i18n-zh.json，落地副本 data/cn-phrases.json。",
+  "words": [
+    {
+      "en": "Chamber",
+      "cn": "石室",
+      "evidence": [
+        "Bottom Left Chamber to the Left → 左下石室靠左侧",
+        "Top Left Chamber to the Left → 左上石室靠左侧",
+        "First Chamber to the Right → 右侧第一个石室",
+        "Second Chamber to the Right → 右侧第二个石室",
+        "Last Chamber to the Right → 右侧最后一个石室"
+      ]
+    }
+  ]
+}

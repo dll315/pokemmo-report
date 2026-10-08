@@ -6,6 +6,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const dict = require("./dict");
 
 const VERSION = 1;
 
@@ -83,12 +84,14 @@ class Store {
   }
 
   getEvent(key) {
-    return this.index.get(key);
+    return dict.refreshNames(this.index.get(key));
   }
 
   events(opts = {}) {
     const nowSec = Math.floor(Date.now() / 1000);
     let list = [...this.index.values()];
+    /* 中文名按当前词表重算再筛，否则词表更新后老数据既显示英文、也搜不到中文 */
+    for (const e of list) dict.refreshNames(e);
     if (opts.kind) list = list.filter((e) => e.kind === opts.kind);
     if (opts.source) list = list.filter((e) => e.source === opts.source);
     if (opts.activeOnly) list = list.filter((e) => (e.expiresUnix || e.tsUnix) > nowSec);

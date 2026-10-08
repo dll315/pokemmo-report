@@ -15,6 +15,7 @@ let natdexMap = {};
 let terms = { moves: {}, abilities: {}, types: {}, hms: {}, balls: {}, concepts: {} };
 let termsIndex = {};
 let phrases = new Map();
+let placeWords = [];
 let loaded = { species: false, locations: false, terms: false };
 
 function readJson(name) {
@@ -68,6 +69,15 @@ function reload() {
     for (const [en, cn] of Object.entries(ph)) if (typeof cn === "string" && cn) phrases.set(lower(en), halfwidth(cn));
     loaded.phrases = !!phrases.size;
   }
+
+  /* 地点名里的通名词（Chamber→石室 这类），用来兜住字典里没有整条地名的情况。
+     只收有整句出处的词，见 data/cn-place-words.json 的 _note；单条编译成词边界正则备用。 */
+  placeWords = [];
+  const pw = readJson("cn-place-words.json");
+  for (const w of (pw && pw.words) || []) {
+    if (!w || !w.en || !w.cn) continue;
+    placeWords.push({ en: String(w.en).trim(), cn: halfwidth(String(w.cn).trim()), re: new RegExp(`\\b${String(w.en).trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "gi") });
+  }
   return loaded;
 }
 
@@ -87,7 +97,17 @@ function speciesOf(name) {
 function locationOf(name) {
   const key = lower(name);
   const hit = Object.entries(locations).find(([k]) => lower(k) === key);
-  return hit ? halfwidth(hit[1].cn) || null : null;
+  const exact = hit ? halfwidth(hit[1].cn) || "" : "";
+  if (exact) return exact;
+  /* 整条地名不在字典里（如阿斯卡纳遗迹的 Rixy / Guidance / Viapois 三间石室）：
+     至少把有出处的通名换掉 → "Rixy 石室"，专名保留原文，不自己造词 */
+  let out = String(name || "").trim();
+  let changed = false;
+  for (const w of placeWords) {
+    const next = out.replace(w.re, w.cn);
+    if (next !== out) { out = next; changed = true; }
+  }
+  return changed ? halfwidth(out) : null;
 }
 
 function regionOf(name) {
@@ -142,6 +162,19 @@ function translateText(text) {
   return raw.replace(textRe, (m) => term("moves", m) || term("abilities", m) || m);
 }
 
-module.exports = { reload, speciesOf, locationOf, regionOf, term, termPair, concept, termsFlat, translateText, loaded, raw: () => terms, DATA };
+/* 存进 db 的中文名只是缓存：词表更新（补译名、加通名兜底）之后，老数据也要立刻显示对的中文，
+   所以读取时按当前词表重算一次。找不到中文就保持原样，让界面回落到英文。 */
+function refreshNames(ev) {
+  if (!ev || typeof ev !== "object") return ev;
+  const l = locationOf(ev.location);
+  if (l && l !== ev.locationCn) ev.locationCn = l;
+  const s = ev.pokemon ? speciesOf(ev.pokemon) : null;
+  if (s && s.cn && s.cn !== ev.pokemonCn) ev.pokemonCn = s.cn;
+  const r = ev.region ? regionOf(ev.region) : "";
+  if (r && r !== ev.regionCn) ev.regionCn = r;
+  return ev;
+}
+
+module.exports = { reload, speciesOf, locationOf, regionOf, refreshNames, term, termPair, concept, termsFlat, translateText, loaded, raw: () => terms, DATA };
 
 reload();
